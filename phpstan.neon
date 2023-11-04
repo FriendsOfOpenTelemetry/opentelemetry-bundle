@@ -1,0 +1,7 @@
+parameters:
+    level: 6
+    paths:
+        - src/
+        - tests/
+    editorUrl: 'phpstorm://open?file=%%file%%&line=%%line%%'
+    tmpDir: %currentWorkingDirectory%/.phpstan
