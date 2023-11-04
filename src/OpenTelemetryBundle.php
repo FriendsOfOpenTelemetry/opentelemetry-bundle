@@ -1,11 +1,9 @@
 <?php
 
-declare(strict_types=1);
-
 namespace GaelReyrol\OpenTelemetryBundle;
 
-use Symfony\Component\HttpKernel\Bundle\AbstractBundle;
+use Symfony\Component\HttpKernel\Bundle\Bundle;
 
-class OpenTelemetryBundle extends AbstractBundle
+final class OpenTelemetryBundle extends Bundle
 {
 }
