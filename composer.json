@@ -14,12 +14,16 @@
         "php-cs-fixer:fix": "@php ./vendor/bin/php-cs-fixer fix",
         "php-cs-fixer:lint": "@php-cs-fixer:fix --dry-run --diff",
         "phpstan": "@php vendor/bin/phpstan analyse",
+        "phpunit": "@php vendor/bin/phpunit",
         "lint": [
             "@php-cs-fixer:lint",
             "@phpstan"
         ],
         "format": [
             "@php-cs-fixer:fix"
+        ],
+        "test": [
+            "@phpunit"
         ]
     },
     "autoload": {
@@ -29,7 +33,7 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "GaelReyrol\\OpenTelemtryBundle\\Tests\\": "tests/"
+            "GaelReyrol\\OpenTelemetryBundle\\Tests\\": "tests/"
         }
     },
     "minimum-stability": "stable",
@@ -56,7 +60,9 @@
         "phpstan/phpstan-phpunit": "^1.3",
         "phpstan/phpstan-strict-rules": "^1.5",
         "phpunit/phpunit": "^9.6",
+        "roave/security-advisories": "dev-latest",
         "symfony/framework-bundle": "^6.3",
+        "symfony/phpunit-bridge": "^6.3",
         "symfony/yaml": "^6.3"
     },
     "config": {

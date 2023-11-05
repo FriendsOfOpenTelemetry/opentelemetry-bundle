@@ -4,3 +4,5 @@ composer.lock
 .idea
 .phpstan
 .php-cs-fixer.cache
+phpunit.xml
+
