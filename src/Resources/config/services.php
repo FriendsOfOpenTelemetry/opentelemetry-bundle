@@ -9,10 +9,7 @@ return static function (ContainerConfigurator $container): void {
         ->defaults()
         ->private()
 
-        ->set('open_telemetry.tracing.kernel_event_subscriber', KernelEventSubscriber::class)
-        ->tag('kernel.event_subscriber')
-
-        ->set('open_telemetry.tracing.console_event_subscriber', ConsoleEventSubscriber::class)
-        ->tag('kernel.event_subscriber')
+        ->set('open_telemetry.instrumentation.kernel.event_subscriber', KernelEventSubscriber::class)
+        ->set('open_telemetry.instrumentation.console.event_subscriber', ConsoleEventSubscriber::class)
     ;
 };

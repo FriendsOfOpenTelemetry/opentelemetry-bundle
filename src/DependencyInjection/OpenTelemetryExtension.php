@@ -14,5 +14,15 @@ final class OpenTelemetryExtension extends ConfigurableExtension
     {
         $loader = new PhpFileLoader($container, new FileLocator(dirname(__DIR__).'/Resources/config'));
         $loader->load('services.php');
+
+        $kernelInstrumentation = $mergedConfig['instrumentation']['kernel'];
+        if (true === $kernelInstrumentation['enabled']) {
+            $container->getDefinition('open_telemetry.instrumentation.kernel.event_subscriber')->addTag('kernel.event_subscriber');
+        }
+
+        $consoleInstrumentation = $mergedConfig['instrumentation']['console'];
+        if (true === $consoleInstrumentation['enabled']) {
+            $container->getDefinition('open_telemetry.instrumentation.console.event_subscriber')->addTag('kernel.event_subscriber');
+        }
     }
 }

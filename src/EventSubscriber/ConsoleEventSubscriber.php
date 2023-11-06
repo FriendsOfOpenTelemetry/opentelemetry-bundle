@@ -2,7 +2,7 @@
 
 namespace GaelReyrol\OpenTelemetryBundle\EventSubscriber;
 
-use GaelReyrol\OpenTelemetryBundle\SymfonyTraceAttributes;
+use GaelReyrol\OpenTelemetryBundle\Attribute\ConsoleTraceAttributeEnum;
 use OpenTelemetry\API\Trace\Span;
 use OpenTelemetry\API\Trace\StatusCode;
 use OpenTelemetry\API\Trace\TracerInterface;
@@ -75,7 +75,7 @@ final class ConsoleEventSubscriber implements EventSubscriberInterface
         $span = Span::getCurrent();
         $span->setStatus(StatusCode::STATUS_ERROR);
         $span->recordException($event->getError(), [
-            SymfonyTraceAttributes::ConsoleExitCode->value => $event->getExitCode(),
+            ConsoleTraceAttributeEnum::ExitCode->value => $event->getExitCode(),
         ]);
     }
 
@@ -89,7 +89,7 @@ final class ConsoleEventSubscriber implements EventSubscriberInterface
 
         $span = Span::fromContext($scope->context());
         $span->setAttribute(
-            SymfonyTraceAttributes::ConsoleExitCode->value,
+            ConsoleTraceAttributeEnum::ExitCode->value,
             $event->getExitCode()
         );
 
@@ -105,6 +105,6 @@ final class ConsoleEventSubscriber implements EventSubscriberInterface
     public function handleSignal(ConsoleSignalEvent $event): void
     {
         $span = Span::getCurrent();
-        $span->setAttribute(SymfonyTraceAttributes::ConsoleSignal->value, $event->getHandlingSignal());
+        $span->setAttribute(ConsoleTraceAttributeEnum::Signal->value, $event->getHandlingSignal());
     }
 }

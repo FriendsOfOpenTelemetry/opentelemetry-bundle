@@ -39,7 +39,7 @@ open_telemetry:
         processor: simple
       traceable:
         type: traceable
-        sampler: always-on
+        sampler: always-off
         processor: simple
       parent:
         sampler:
@@ -54,13 +54,14 @@ open_telemetry:
       noop:
         type: noop
       batch:
-        type: batch
-        clock: OpenTelemetry\SDK\Common\Time\SystemClock
-        max_queue_size: 2048
-        schedule_delay: 5000
-        export_timeout: 30000
-        max_export_batch_size: 512
-        auto_flush: true
+        type:
+          batch:
+            clock: OpenTelemetry\SDK\Common\Time\SystemClock
+            max_queue_size: 2048
+            schedule_delay: 5000
+            export_timeout: 30000
+            max_export_batch_size: 512
+            auto_flush: true
         exporter: zipkin
       multi:
         type: multi

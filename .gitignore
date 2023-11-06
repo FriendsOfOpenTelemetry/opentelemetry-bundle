@@ -2,7 +2,11 @@ vendor
 composer.lock
 .direnv
 .idea
-.phpstan
-.php-cs-fixer.cache
-phpunit.xml
 
+.phpstan
+
+.php-cs-fixer.cache
+
+phpunit.xml
+.phpunit.result.cache
+.phpunit.cache
