@@ -36,13 +36,13 @@ final class ConsoleEventSubscriber implements EventSubscriberInterface
     {
         return [
             ConsoleEvents::COMMAND => [
-                ['handleCommand', 10000],
+                ['startSpan', 10000],
             ],
             ConsoleEvents::ERROR => [
                 ['handleError', -10000],
             ],
             ConsoleEvents::TERMINATE => [
-                ['handleTerminate', -10000],
+                ['endSpan', -10000],
             ],
             ConsoleEvents::SIGNAL => [
                 ['handleSignal', -10000],
@@ -50,7 +50,7 @@ final class ConsoleEventSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function handleCommand(ConsoleCommandEvent $event): void
+    public function startSpan(ConsoleCommandEvent $event): void
     {
         $command = $event->getCommand();
 
@@ -79,7 +79,7 @@ final class ConsoleEventSubscriber implements EventSubscriberInterface
         ]);
     }
 
-    public function handleTerminate(ConsoleTerminateEvent $event): void
+    public function endSpan(ConsoleTerminateEvent $event): void
     {
         $scope = Context::storage()->scope();
         if (!$scope instanceof ContextStorageScopeInterface) {
@@ -105,6 +105,6 @@ final class ConsoleEventSubscriber implements EventSubscriberInterface
     public function handleSignal(ConsoleSignalEvent $event): void
     {
         $span = Span::getCurrent();
-        $span->setAttribute(ConsoleTraceAttributeEnum::Signal->value, $event->getHandlingSignal());
+        $span->setAttribute(ConsoleTraceAttributeEnum::SignalCode->value, $event->getHandlingSignal());
     }
 }

@@ -21,7 +21,7 @@ final class ConfigurationTest extends TestCase
                 'environment' => '%kernel.environment%',
             ],
             'instrumentation' => [
-                'kernel' => [
+                'http_kernel' => [
                     'enabled' => true,
                     'provider' => 'default_provider',
                 ],
@@ -59,7 +59,7 @@ final class ConfigurationTest extends TestCase
                 version:              ~ # Required, Example: 1.0.0
                 environment:          '%kernel.environment%' # Required
             instrumentation:
-                kernel:
+                http_kernel:
                     enabled:              true
                     provider:             default_provider # Required
                 console:

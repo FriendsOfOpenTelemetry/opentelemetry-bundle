@@ -44,8 +44,7 @@
         "open-telemetry/sdk": "^1.0",
         "open-telemetry/sem-conv": "^1.22",
         "symfony/config": "^6.3",
-        "symfony/dependency-injection": "^6.3",
-        "symfony/http-kernel": "^6.3"
+        "symfony/dependency-injection": "^6.3"
     },
     "require-dev": {
         "ext-ffi": "*",
@@ -54,6 +53,9 @@
         "ext-opentelemetry": "*",
         "ext-xdebug": "*",
         "friendsofphp/php-cs-fixer": "^3.37",
+        "open-telemetry/exporter-otlp": "^1.0",
+        "open-telemetry/exporter-zipkin": "^1.0",
+        "open-telemetry/transport-grpc": "^1.0",
         "phpstan/extension-installer": "^1.3",
         "phpstan/phpstan": "^1.10",
         "phpstan/phpstan-deprecation-rules": "^1.1",
@@ -63,6 +65,7 @@
         "phpunit/phpunit": "^9.6",
         "roave/security-advisories": "dev-latest",
         "symfony/framework-bundle": "^6.3",
+        "symfony/http-kernel": "^6.3",
         "symfony/phpunit-bridge": "^6.3",
         "symfony/yaml": "^6.3"
     },
@@ -72,5 +75,12 @@
             "php-http/discovery": false
         },
         "sort-packages": true
+    },
+    "suggest": {
+        "symfony/console": "Needed to enable Symfony HttpKernel instrumentation",
+        "symfony/http-kernel": "Needed to enable Symfony Console instrumentation",
+        "open-telemetry/exporter-otlp": "Needed to export OpenTelemetry data via OTPL",
+        "open-telemetry/exporter-zipkin": "Needed to export OpenTelemetry data via Zipkin",
+        "open-telemetry/transport-grpc": "Needed to export OpenTelemetry data via gRPC"
     }
 }

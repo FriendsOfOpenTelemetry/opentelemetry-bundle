@@ -87,7 +87,7 @@ final class ConsoleEventSubscriberTest extends TestCase
     {
         $subscriber = new ConsoleEventSubscriber($this->tracerProvider);
 
-        $subscriber->handleCommand($event);
+        $subscriber->startSpan($event);
 
         $span = Span::getCurrent();
         assert($span instanceof \OpenTelemetry\SDK\Trace\Span);

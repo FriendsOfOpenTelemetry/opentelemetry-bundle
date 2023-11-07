@@ -62,7 +62,7 @@ final class Configuration implements ConfigurationInterface
                 ->arrayNode('instrumentation')
                 ->addDefaultsIfNotSet()
                 ->children()
-                    ->arrayNode('kernel')
+                    ->arrayNode('http_kernel')
                         ->canBeDisabled()
                         ->children()
                             ->scalarNode('provider')
