@@ -2,7 +2,7 @@
 
 namespace GaelReyrol\OpenTelemetryBundle\DependencyInjection;
 
-enum OpenTelemetryProviderEnum: string
+enum TraceProviderEnum: string
 {
     case Default = 'default';
     case Noop = 'noop';

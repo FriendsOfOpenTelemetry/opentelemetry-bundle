@@ -2,7 +2,7 @@
 
 namespace GaelReyrol\OpenTelemetryBundle\DependencyInjection;
 
-enum OpenTelemetrySamplerEnum: string
+enum TraceSamplerEnum: string
 {
     case AlwaysOn = 'always_on';
     case AlwaysOff = 'always_off';

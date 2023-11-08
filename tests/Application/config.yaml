@@ -73,23 +73,28 @@ open_telemetry:
     exporters:
       in-memory: in-memory://
       console:
-        type: stream
-        dsn: php+json://stdout
+        type: console
       json:
         type: otlp
-        dsn: http+json://localhost:4318/v1/traces
+        endpoint: http://localhost:4318/v1/traces
+        headers: []
+        compression: none
+        format: json
       ndjson:
         type: otlp
-        dsn: http+ndjson://localhost:4318/v1/traces
+        endpoint: http://localhost:4318/v1/traces
+        format: ndjson
       protobuf:
         type: otlp
-        dsn: http+protobuf://localhost:4318/v1/traces
+        endpoint: http://localhost:4318/v1/traces
+        format: protobuf
       grpc:
-        type: grpc
-        dns: http://localhost:4317
+        type: otlp
+        endpoint: http://localhost:4317
+        format: grpc
       zipkin:
         type: zipkin
-        dsn: http+json://localhost:9411/api/v2/spans
+        dsn: http://localhost:9411/api/v2/spans
   logs:
   metrics:
 

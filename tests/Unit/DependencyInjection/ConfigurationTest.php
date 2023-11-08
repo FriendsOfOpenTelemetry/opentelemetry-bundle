@@ -67,6 +67,9 @@ final class ConfigurationTest extends TestCase
                     provider:             default_provider # Required
             traces:
                 enabled:              true
+
+                # The default provider to use
+                default_provider:     ~ # Required
                 providers:
 
                     # Prototype

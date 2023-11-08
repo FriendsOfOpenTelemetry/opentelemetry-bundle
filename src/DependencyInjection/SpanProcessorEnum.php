@@ -2,7 +2,7 @@
 
 namespace GaelReyrol\OpenTelemetryBundle\DependencyInjection;
 
-enum OpenTelemetryProcessorEnum: string
+enum SpanProcessorEnum: string
 {
     case Batch = 'batch';
     case Multi = 'multi';

@@ -2,12 +2,11 @@
 
 use GaelReyrol\OpenTelemetryBundle\EventSubscriber\ConsoleEventSubscriber;
 use GaelReyrol\OpenTelemetryBundle\EventSubscriber\HttpKernelEventSubscriber;
-use OpenTelemetry\Contrib\Grpc\GrpcTransportFactory;
-use OpenTelemetry\Contrib\Otlp\OtlpHttpTransportFactory;
-use OpenTelemetry\Contrib\Otlp\SpanExporterFactory as OtlpSpanExporterFactory;
-use OpenTelemetry\Contrib\Zipkin\SpanExporterFactory as ZipKinSpanExporter;
-use OpenTelemetry\SDK\Common\Export\Http\PsrTransportFactory;
-use OpenTelemetry\SDK\Common\Export\Stream\StreamTransportFactory;
+use GaelReyrol\OpenTelemetryBundle\Factory\ConsoleSpanExporterFactory;
+use GaelReyrol\OpenTelemetryBundle\Factory\InMemorySpanExporterFactory;
+use GaelReyrol\OpenTelemetryBundle\Factory\OtlpSpanExporterFactory;
+use GaelReyrol\OpenTelemetryBundle\Factory\ZipkinSpanExporterFactory;
+use GaelReyrol\OpenTelemetryBundle\OpenTelemetryBundle;
 use OpenTelemetry\SDK\Common\Export\TransportInterface;
 use OpenTelemetry\SDK\Trace\NoopTracerProvider;
 use OpenTelemetry\SDK\Trace\Sampler\AlwaysOffSampler;
@@ -15,8 +14,6 @@ use OpenTelemetry\SDK\Trace\Sampler\AlwaysOnSampler;
 use OpenTelemetry\SDK\Trace\Sampler\ParentBased;
 use OpenTelemetry\SDK\Trace\Sampler\TraceIdRatioBasedSampler;
 use OpenTelemetry\SDK\Trace\SamplerInterface;
-use OpenTelemetry\SDK\Trace\SpanExporter\ConsoleSpanExporterFactory;
-use OpenTelemetry\SDK\Trace\SpanExporter\InMemorySpanExporterFactory;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 use OpenTelemetry\SDK\Trace\SpanProcessor\BatchSpanProcessor;
 use OpenTelemetry\SDK\Trace\SpanProcessor\MultiSpanProcessor;
@@ -31,6 +28,9 @@ use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigura
 
 return static function (ContainerConfigurator $container): void {
     $container->parameters()
+        ->set('open_telemetry.bundle.name', OpenTelemetryBundle::name())
+        ->set('open_telemetry.bundle.version', OpenTelemetryBundle::version())
+
         ->set('open_telemetry.traces.providers.default.class', TracerProvider::class)
         ->set('open_telemetry.traces.providers.default.builder.class', TracerProviderBuilder::class)
         ->set('open_telemetry.traces.providers.default.factory.class', TracerProviderFactory::class)
@@ -47,14 +47,10 @@ return static function (ContainerConfigurator $container): void {
         ->set('open_telemetry.traces.processors.noop.class', NoopSpanProcessor::class)
 
         ->set('open_telemetry.traces.exporters.in_memory.factory.class', InMemorySpanExporterFactory::class)
+
         ->set('open_telemetry.traces.exporters.console.factory.class', ConsoleSpanExporterFactory::class)
         ->set('open_telemetry.traces.exporters.otlp.factory.class', OtlpSpanExporterFactory::class)
-        ->set('open_telemetry.traces.exporters.zipkin.factory.class', ZipKinSpanExporter::class)
-
-        ->set('open_telemetry.traces.transports.http.factory.class', PsrTransportFactory::class)
-        ->set('open_telemetry.traces.transports.otlp.factory.class', OtlpHttpTransportFactory::class)
-        ->set('open_telemetry.traces.transports.grpc.factory.class', GrpcTransportFactory::class)
-        ->set('open_telemetry.traces.transports.stream.factory.class', StreamTransportFactory::class)
+        ->set('open_telemetry.traces.exporters.zipkin.factory.class', ZipkinSpanExporterFactory::class)
     ;
 
     $container->services()

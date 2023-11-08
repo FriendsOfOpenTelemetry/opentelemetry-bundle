@@ -2,11 +2,10 @@
 
 namespace GaelReyrol\OpenTelemetryBundle\DependencyInjection;
 
-enum OpenTelemetryExporterEnum: string
+enum TraceExporterEnum: string
 {
     case InMemory = 'in_memory';
-    case Stream = 'stream';
+    case Console = 'console';
     case Otlp = 'otlp';
-    case Grpc = 'grpc';
     case Zipkin = 'zipkin';
 }

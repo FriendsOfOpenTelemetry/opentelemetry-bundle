@@ -25,11 +25,6 @@ final class ConsoleEventSubscriber implements EventSubscriberInterface
     public function __construct(
         TracerProviderInterface $tracerProvider,
     ) {
-        $this->tracer = $tracerProvider->getTracer(
-            'gaelreyrol/opentelemetry-bundle',
-            '0.0.0',
-            TraceAttributes::SCHEMA_URL,
-        );
     }
 
     public static function getSubscribedEvents(): array

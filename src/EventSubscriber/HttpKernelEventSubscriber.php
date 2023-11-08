@@ -4,7 +4,6 @@ namespace GaelReyrol\OpenTelemetryBundle\EventSubscriber;
 
 use OpenTelemetry\API\Trace\TracerInterface;
 use OpenTelemetry\SDK\Trace\TracerProviderInterface;
-use OpenTelemetry\SemConv\TraceAttributes;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
 
@@ -15,11 +14,6 @@ final class HttpKernelEventSubscriber implements EventSubscriberInterface
     public function __construct(
         TracerProviderInterface $tracerProvider,
     ) {
-        $this->tracer = $tracerProvider->getTracer(
-            'gaelreyrol/opentelemetry-bundle',
-            '0.0.0',
-            TraceAttributes::SCHEMA_URL,
-        );
     }
 
     public static function getSubscribedEvents(): array
