@@ -5,6 +5,7 @@ namespace GaelReyrol\OpenTelemetryBundle\DependencyInjection;
 use GaelReyrol\OpenTelemetryBundle\Factory\ConsoleSpanExporterFactory;
 use GaelReyrol\OpenTelemetryBundle\Factory\InMemorySpanExporterFactory;
 use GaelReyrol\OpenTelemetryBundle\Factory\OtlpSpanExporterFactory;
+use GaelReyrol\OpenTelemetryBundle\Factory\SpanExporterFactoryInterface;
 use GaelReyrol\OpenTelemetryBundle\Factory\ZipkinSpanExporterFactory;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Console\Application;
@@ -27,10 +28,28 @@ final class OpenTelemetryExtension extends ConfigurableExtension
         $loader = new PhpFileLoader($container, new FileLocator(dirname(__DIR__).'/Resources/config'));
         $loader->load('services.php');
 
+        $this->loadService($mergedConfig['service'], $container);
+
         $this->loadHttpKernelInstrumentation($mergedConfig['instrumentation']['kernel'], $container);
         $this->loadConsoleInstrumentation($mergedConfig['instrumentation']['console'], $container);
 
         $this->loadTraces($mergedConfig['traces'], $container);
+    }
+
+    /**
+     * @param array{
+     *     namespace: string,
+     *     name: string,
+     *     version: string,
+     *     environment: string
+     * } $config
+     */
+    private function loadService(array $config, ContainerBuilder $container): void
+    {
+        $container->setParameter('open_telemetry.service.namespace', $config['namespace']);
+        $container->setParameter('open_telemetry.service.name', $config['name']);
+        $container->setParameter('open_telemetry.service.version', $config['version']);
+        $container->setParameter('open_telemetry.service.environment', $config['environment']);
     }
 
     /**
@@ -65,6 +84,15 @@ final class OpenTelemetryExtension extends ConfigurableExtension
         $container->getDefinition('open_telemetry.instrumentation.console.event_subscriber')->addTag('kernel.event_subscriber');
     }
 
+    /**
+     * @param array{
+     *     enabled: bool,
+     *     default_provider: string,
+     *     exporters: array<string, mixed>,
+     *     processors: array<string, mixed>,
+     *     providers: array<string, mixed>
+     * } $config
+     */
     private function loadTraces(array $config, ContainerBuilder $container): void
     {
         if (false === $config['enabled']) {
@@ -85,6 +113,15 @@ final class OpenTelemetryExtension extends ConfigurableExtension
         }
     }
 
+    /**
+     * @param array{
+     *      type: string,
+     *      endpoint: string,
+     *      headers: array<string, string>,
+     *      format?: string,
+     *      compression?: string
+     * } $exporter
+     */
     private function loadTraceExporter(string $name, array $exporter, ContainerBuilder $container): void
     {
         $configuration = $container->setDefinition(sprintf('open_telemetry.traces.exporters.%s.configuration', $name), new ChildDefinition('open_telemetry.traces.exporter.configuration'));
@@ -102,13 +139,42 @@ final class OpenTelemetryExtension extends ConfigurableExtension
     }
 
     /**
-     * @param array{type: string, dsn: string} $exporter
+     * @param array{
+     *     type: string,
+     *     endpoint: string,
+     *     headers: array<string, string>,
+     *     format?: string,
+     *     compression?: string
+     * } $exporter
+     *
+     * @return array{
+     *     type: TraceExporterEnum,
+     *     endpoint: string,
+     *     headers: array<string, string>,
+     *     format: ?OtlpExporterFormatEnum,
+     *     compression: ?OtlpExporterCompressionEnum,
+     *     factory: class-string<SpanExporterFactoryInterface>
+     * }
      */
     private function getTraceExporterOptions(array $exporter): array
     {
-        $options = $exporter;
+        $options = [
+            'type' => TraceExporterEnum::from($exporter['type']),
+            'endpoint' => $exporter['endpoint'],
+            'headers' => $exporter['headers'],
+            'format' => OtlpExporterFormatEnum::tryFrom($exporter['format']),
+            'compression' => OtlpExporterCompressionEnum::tryFrom($exporter['compression']),
+        ];
 
-        $options['factory'] = match (TraceExporterEnum::from($exporter['type'])) {
+        if (TraceExporterEnum::Otlp === $options['type'] && null === $options['compression']) {
+            $options['compression'] = OtlpExporterCompressionEnum::None;
+        }
+
+        if (TraceExporterEnum::Otlp === $options['type'] && null === $options['format']) {
+            throw new \InvalidArgumentException(sprintf("Exporter is of type '%s' requires a format", $options['type']->value));
+        }
+
+        $options['factory'] = match ($options['type']) {
             TraceExporterEnum::InMemory => InMemorySpanExporterFactory::class,
             TraceExporterEnum::Console => ConsoleSpanExporterFactory::class,
             TraceExporterEnum::Otlp => OtlpSpanExporterFactory::class,

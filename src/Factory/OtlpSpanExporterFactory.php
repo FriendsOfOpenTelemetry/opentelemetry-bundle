@@ -11,7 +11,6 @@ use OpenTelemetry\Contrib\Otlp\Protocols;
 use OpenTelemetry\Contrib\Otlp\SpanExporter;
 use OpenTelemetry\SDK\Common\Configuration\KnownValues;
 use OpenTelemetry\SDK\Common\Export\TransportFactoryInterface;
-use OpenTelemetry\SDK\Common\Export\TransportInterface;
 use OpenTelemetry\SDK\Registry;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 
@@ -24,21 +23,20 @@ final class OtlpSpanExporterFactory implements SpanExporterFactoryInterface
 
     public function createFromOptions(array $options): SpanExporterInterface
     {
-        $transport = $this->buildTransport($options);
-
-        return new SpanExporter($transport);
-    }
-
-    private function buildTransport(array $options): TransportInterface
-    {
         $protocol = $this->getProtocol($options['format']);
         $contentType = Protocols::contentType($protocol);
         $headers = $this->getHeaders($options['headers']);
         $compression = $this->getCompression($options['compression']);
 
         $factoryClass = Registry::transportFactory($protocol);
+        $transport = ($this->transportFactory ?? new $factoryClass())->create(
+            $this->formatEndPoint($options['endpoint'], $protocol),
+            $contentType,
+            $headers,
+            $compression,
+        );
 
-        return ($this->transportFactory ?? new $factoryClass())->create($this->formatEndPoint($options['endpoint'], $protocol), $contentType, $headers, $compression);
+        return new SpanExporter($transport);
     }
 
     private function getProtocol(OtlpExporterFormatEnum $format): string
