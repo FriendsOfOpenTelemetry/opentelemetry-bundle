@@ -7,11 +7,25 @@ use GaelReyrol\OpenTelemetryBundle\Factory\InMemorySpanExporterFactory;
 use GaelReyrol\OpenTelemetryBundle\Factory\OtlpSpanExporterFactory;
 use GaelReyrol\OpenTelemetryBundle\Factory\SpanExporterFactoryInterface;
 use GaelReyrol\OpenTelemetryBundle\Factory\ZipkinSpanExporterFactory;
+use OpenTelemetry\SDK\Trace\NoopTracerProvider;
+use OpenTelemetry\SDK\Trace\Sampler\AlwaysOffSampler;
+use OpenTelemetry\SDK\Trace\Sampler\AlwaysOnSampler;
+use OpenTelemetry\SDK\Trace\Sampler\ParentBased;
+use OpenTelemetry\SDK\Trace\Sampler\TraceIdRatioBasedSampler;
+use OpenTelemetry\SDK\Trace\SamplerInterface;
+use OpenTelemetry\SDK\Trace\SpanProcessor\BatchSpanProcessor;
+use OpenTelemetry\SDK\Trace\SpanProcessor\MultiSpanProcessor;
+use OpenTelemetry\SDK\Trace\SpanProcessor\NoopSpanProcessor;
+use OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor;
+use OpenTelemetry\SDK\Trace\SpanProcessorInterface;
+use OpenTelemetry\SDK\Trace\TracerProvider;
+use OpenTelemetry\SDK\Trace\TracerProviderInterface;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Console\Application;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
+use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\DependencyInjection\ConfigurableExtension;
 use Symfony\Component\HttpKernel\HttpKernel;
 
@@ -20,8 +34,6 @@ use Symfony\Component\HttpKernel\HttpKernel;
  */
 final class OpenTelemetryExtension extends ConfigurableExtension
 {
-    private string $defaultTraceProvider;
-
     /** @phpstan-ignore-next-line */
     protected function loadInternal(array $mergedConfig, ContainerBuilder $container): void
     {
@@ -107,10 +119,11 @@ final class OpenTelemetryExtension extends ConfigurableExtension
             $this->loadTraceProcessor($name, $processor, $container);
         }
 
-        $this->defaultTraceProvider = $config['default_provider'];
         foreach ($config['providers'] as $name => $provider) {
             $this->loadTraceProvider($name, $provider, $container);
         }
+
+        $defaultTraceProviderReference = new Reference(sprintf('open_telemetry.traces.providers.%s', $config['default_provider']));
     }
 
     /**
@@ -124,18 +137,13 @@ final class OpenTelemetryExtension extends ConfigurableExtension
      */
     private function loadTraceExporter(string $name, array $exporter, ContainerBuilder $container): void
     {
-        $configuration = $container->setDefinition(sprintf('open_telemetry.traces.exporters.%s.configuration', $name), new ChildDefinition('open_telemetry.traces.exporter.configuration'));
-
         $exporterId = sprintf('open_telemetry.traces.exporters.%s', $name);
-
         $options = $this->getTraceExporterOptions($exporter);
 
         $container
             ->setDefinition($exporterId, new ChildDefinition('open_telemetry.traces.exporter'))
-            ->setPublic(true)
-            ->setArguments([
-                $options,
-            ]);
+            ->setFactory([$options['factory'], 'createFromOptions'])
+            ->setArguments($options);
     }
 
     /**
@@ -184,11 +192,128 @@ final class OpenTelemetryExtension extends ConfigurableExtension
         return $options;
     }
 
+    /**
+     * @param array{
+     *      type: string,
+     *      processors?: string[],
+     *      exporter?: string
+     *  } $processor
+     */
     private function loadTraceProcessor(string $name, array $processor, ContainerBuilder $container): void
     {
+        $processorId = sprintf('open_telemetry.traces.processors.%s', $name);
+        $options = $this->getTraceProcessorOptions($processor);
+
+        $container
+            ->setDefinition($processorId, new ChildDefinition('open_telemetry.traces.processor'))
+            ->setClass($options['class'])
+            ->setArguments([...$options]);
     }
 
+    /**
+     * @param array{
+     *     type: string,
+     *     processors?: string[],
+     *     exporter?: string
+     * } $processor
+     *
+     * @return array{
+     *     processors?: Reference[],
+     *     exporter?: Reference,
+     *     class: class-string<SpanProcessorInterface>
+     * }
+     */
+    private function getTraceProcessorOptions(array $processor): array
+    {
+        $options = [
+            'type' => SpanProcessorEnum::from($processor['type']),
+        ];
+
+        // if (SpanProcessorEnum::Batch === $options['type']) {
+        //     // TODO: Check batch options
+        //     clock: OpenTelemetry\SDK\Common\Time\SystemClock
+        //     max_queue_size: 2048
+        //     schedule_delay: 5000
+        //     export_timeout: 30000
+        //     max_export_batch_size: 512
+        //     auto_flush: true
+        // }
+
+        if (SpanProcessorEnum::Multi === $options['type']) {
+            $options['processors'] = array_map(
+                fn (string $processor) => new Reference(sprintf('open_telemetry.traces.processors.%s', $processor)),
+                $processor['processors'],
+            );
+        }
+
+        if (SpanProcessorEnum::Simple === $options['type']) {
+            $options['exporter'] = new Reference(sprintf('open_telemetry.traces.processors.%s', $processor['exporter']));
+        }
+
+        $options['class'] = match ($options['type']) {
+            SpanProcessorEnum::Noop => NoopSpanProcessor::class,
+            SpanProcessorEnum::Simple => SimpleSpanProcessor::class,
+            SpanProcessorEnum::Multi => MultiSpanProcessor::class,
+            // SpanProcessorEnum::Batch => BatchSpanProcessor::class,
+        };
+
+        return $options;
+    }
+
+    /**
+     * @param array{
+     *     type: string,
+     *     sampler: string,
+     *     processors: string[]
+     * } $provider
+     */
     private function loadTraceProvider(string $name, array $provider, ContainerBuilder $container): void
     {
+        $providerId = sprintf('open_telemetry.traces.provider.%s', $name);
+        $options = $this->getTraceProviderOptions($provider);
+
+        $container
+            ->setDefinition($providerId, new ChildDefinition('open_telemetry.traces.provider'))
+            ->setClass($options['provider'])
+            ->setArguments([...$options]);
+    }
+
+    /**
+     * @param array{
+     *     type: string,
+     *     sampler: string,
+     *     processors: string[]
+     * } $provider
+     *
+     * @return array{
+     *     type: TraceProviderEnum,
+     *     sampler: class-string<SamplerInterface>,
+     *     processors: Reference[],
+     *     provider: class-string<TracerProviderInterface>
+     * }
+     */
+    private function getTraceProviderOptions(array $provider): array
+    {
+        $options = [
+            'type' => TraceProviderEnum::from($provider['type']),
+            'processors' => array_map(
+                fn (string $processor) => new Reference(sprintf('open_telemetry.traces.processors.%s', $processor)),
+                $provider['processors']
+            ),
+        ];
+
+        $options['sampler'] = match (TraceSamplerEnum::from($provider['sampler'])) {
+            TraceSamplerEnum::AlwaysOn => AlwaysOnSampler::class,
+            TraceSamplerEnum::AlwaysOff => AlwaysOffSampler::class,
+            TraceSamplerEnum::ParentBased => ParentBased::class,
+            TraceSamplerEnum::TraceIdRatio => TraceIdRatioBasedSampler::class,
+        };
+
+        $options['provider'] = match ($options['type']) {
+            TraceProviderEnum::Default => TracerProvider::class,
+            TraceProviderEnum::Noop => NoopTracerProvider::class,
+        };
+
+        return $options;
     }
 }
