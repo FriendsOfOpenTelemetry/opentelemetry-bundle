@@ -11,9 +11,9 @@ use GaelReyrol\OpenTelemetryBundle\Factory\SpanProcessor\NoopSpanProcessorFactor
 use GaelReyrol\OpenTelemetryBundle\Factory\SpanProcessor\SimpleSpanProcessorFactory;
 use GaelReyrol\OpenTelemetryBundle\Factory\SpanProcessor\SpanProcessorFactoryInterface;
 use GaelReyrol\OpenTelemetryBundle\Factory\TracerProvider\NoopTracerProviderFactory;
+use GaelReyrol\OpenTelemetryBundle\Factory\TracerProvider\TracerProviderFactory;
 use GaelReyrol\OpenTelemetryBundle\Factory\TracerProvider\TracerProviderFactoryInterface;
 use OpenTelemetry\SDK\Trace\SpanProcessor\MultiSpanProcessor;
-use OpenTelemetry\SDK\Trace\TracerProviderFactory;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Console\Application;
 use Symfony\Component\DependencyInjection\ChildDefinition;
@@ -24,7 +24,7 @@ use Symfony\Component\HttpKernel\DependencyInjection\ConfigurableExtension;
 use Symfony\Component\HttpKernel\HttpKernel;
 
 /**
- * @phpstan-type ComponentInstrumentationOptions array{enabled: bool, tracing_provider?: string}
+ * @phpstan-type ComponentInstrumentationOptions array{enabled: bool, tracer?: string}
  */
 final class OpenTelemetryExtension extends ConfigurableExtension
 {
@@ -72,8 +72,8 @@ final class OpenTelemetryExtension extends ConfigurableExtension
 
         $definition = $container->getDefinition('open_telemetry.instrumentation.http_kernel.event_subscriber')->addTag('kernel.event_subscriber');
 
-        if (isset($config['tracing_provider'])) {
-            $definition->setArgument('tracerProvider', new Reference(sprintf('open_telemetry.traces.provider.%s', $config['tracing_provider'])));
+        if (isset($config['tracer'])) {
+            $definition->setArgument('tracer', new Reference(sprintf('open_telemetry.traces.tracers.%s', $config['tracer'])));
         }
     }
 
@@ -92,15 +92,16 @@ final class OpenTelemetryExtension extends ConfigurableExtension
 
         $definition = $container->getDefinition('open_telemetry.instrumentation.console.event_subscriber')->addTag('kernel.event_subscriber');
 
-        if (isset($config['tracing_provider'])) {
-            $definition->setArgument('tracerProvider', new Reference(sprintf('open_telemetry.traces.provider.%s', $config['tracing_provider'])));
+        if (isset($config['tracer'])) {
+            $definition->setArgument('tracer', new Reference(sprintf('open_telemetry.traces.tracers.%s', $config['tracer'])));
         }
     }
 
     /**
      * @param array{
      *     enabled: bool,
-     *     default_provider: string,
+     *     default_tracer: string,
+     *     tracers: array<string, mixed>,
      *     exporters: array<string, mixed>,
      *     processors: array<string, mixed>,
      *     providers: array<string, mixed>
@@ -124,7 +125,11 @@ final class OpenTelemetryExtension extends ConfigurableExtension
             $this->loadTraceProvider($name, $provider, $container);
         }
 
-        $container->set('open_telemetry.traces.default_provider', new Reference(sprintf('open_telemetry.traces.providers.%s', $config['default_provider'])));
+        foreach ($config['tracers'] as $name => $tracer) {
+            $this->loadTraceTracer($name, $tracer, $container);
+        }
+
+        $container->set('open_telemetry.traces.default_tracer', new Reference(sprintf('open_telemetry.traces.tracers.%s', $config['default_tracer'])));
     }
 
     /**
@@ -270,7 +275,7 @@ final class OpenTelemetryExtension extends ConfigurableExtension
      */
     private function loadTraceProvider(string $name, array $provider, ContainerBuilder $container): void
     {
-        $providerId = sprintf('open_telemetry.traces.provider.%s', $name);
+        $providerId = sprintf('open_telemetry.traces.providers.%s', $name);
         $options = $this->getTraceProviderOptions($provider);
 
         $container
@@ -316,5 +321,28 @@ final class OpenTelemetryExtension extends ConfigurableExtension
         };
 
         return $options;
+    }
+
+    /**
+     * @param array{
+     *     name?: string,
+     *     version?: string,
+     *     provider: string
+     * } $tracer
+     */
+    private function loadTraceTracer(string $name, array $tracer, ContainerBuilder $container): void
+    {
+        $tracerId = sprintf('open_telemetry.traces.tracers.%s', $name);
+
+        $container
+            ->setDefinition($tracerId, new ChildDefinition('open_telemetry.traces.tracer'))
+            ->setConfigurator([
+                new Reference(sprintf('open_telemetry.traces.providers.%s', $tracer['provider'])),
+                'getTracer',
+            ])
+            ->setArguments([
+                $tracer['name'] ?? $container->getParameter('open_telemetry.bundle.name'),
+                $tracer['version'] ?? $container->getParameter('open_telemetry.bundle.version'),
+            ]);
     }
 }

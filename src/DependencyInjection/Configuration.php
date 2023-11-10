@@ -65,16 +65,16 @@ final class Configuration implements ConfigurationInterface
                     ->arrayNode('http_kernel')
                         ->canBeDisabled()
                         ->children()
-                            ->scalarNode('tracing_provider')
-                                ->info('The tracing provider to use, defaults to `default_provider`')
+                            ->scalarNode('tracer')
+                                ->info('The tracer to use, defaults to `default_tracer`')
                             ->end()
                         ->end()
                     ->end()
                     ->arrayNode('console')
                         ->canBeDisabled()
                         ->children()
-                            ->scalarNode('tracing_provider')
-                                ->info('The tracing provider to use, defaults to `default_provider`')
+                            ->scalarNode('tracer')
+                                ->info('The tracer to use, defaults to `default_tracer`')
                             ->end()
                         ->end()
                     ->end()
@@ -91,16 +91,38 @@ final class Configuration implements ConfigurationInterface
             ->addDefaultsIfNotSet()
             ->canBeDisabled()
             ->children()
-                ->scalarNode('default_provider')
-                    ->info('The default provider to use among the `providers`')
+                ->scalarNode('default_tracer')
+                    ->info('The default tracer to use among the `tracers`')
                     ->isRequired()
                     ->cannotBeEmpty()
                 ->end()
+                ->append($this->getTracingTracersNode())
                 ->append($this->getTracingProvidersNode())
                 ->append($this->getTracingProcessorsNode())
                 ->append($this->getTracingExportersNode())
             ->end()
         ;
+    }
+
+    private function getTracingTracersNode(): ArrayNodeDefinition
+    {
+        $treeBuilder = new TreeBuilder('tracers');
+
+        $node = $treeBuilder->getRootNode()
+            ->requiresAtLeastOneElement()
+            ->useAttributeAsKey('tracer')
+            ->arrayPrototype()
+                ->children()
+                    ->scalarNode('name')->end()
+                    ->scalarNode('version')->end()
+                    ->scalarNode('provider')
+                        ->cannotBeEmpty()
+                        ->isRequired()
+                    ->end()
+                ->end()
+            ->end();
+
+        return $node;
     }
 
     private function getTracingProvidersNode(): ArrayNodeDefinition

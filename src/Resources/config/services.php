@@ -3,6 +3,7 @@
 use GaelReyrol\OpenTelemetryBundle\EventSubscriber\ConsoleEventSubscriber;
 use GaelReyrol\OpenTelemetryBundle\EventSubscriber\HttpKernelEventSubscriber;
 use GaelReyrol\OpenTelemetryBundle\OpenTelemetryBundle;
+use OpenTelemetry\API\Trace\TracerInterface;
 use OpenTelemetry\API\Trace\TracerProviderInterface;
 use OpenTelemetry\SDK\Trace\Sampler\AlwaysOffSampler;
 use OpenTelemetry\SDK\Trace\Sampler\AlwaysOnSampler;
@@ -25,10 +26,10 @@ return static function (ContainerConfigurator $container): void {
         ->private()
 
         ->set('open_telemetry.instrumentation.http_kernel.event_subscriber', HttpKernelEventSubscriber::class)
-            ->arg('tracerProvider', service('open_telemetry.traces.default_provider'))
+            ->arg('tracer', service('open_telemetry.traces.default_tracer'))
 
         ->set('open_telemetry.instrumentation.console.event_subscriber', ConsoleEventSubscriber::class)
-            ->arg('tracerProvider', service('open_telemetry.traces.default_provider'))
+            ->arg('tracer', service('open_telemetry.traces.default_tracer'))
 
         ->set('open_telemetry.traces.samplers.always_on', AlwaysOnSampler::class)
         ->set('open_telemetry.traces.samplers.always_off', AlwaysOffSampler::class)
@@ -39,5 +40,6 @@ return static function (ContainerConfigurator $container): void {
         ->set('open_telemetry.traces.exporter', SpanExporterInterface::class)
         ->set('open_telemetry.traces.processor', SpanProcessorInterface::class)
         ->set('open_telemetry.traces.provider', TracerProviderInterface::class)
+        ->set('open_telemetry.traces.tracer', TracerInterface::class)
     ;
 };

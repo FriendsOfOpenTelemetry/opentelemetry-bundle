@@ -30,6 +30,7 @@ final class ConfigurationTest extends TestCase
             ],
             'traces' => [
                 'enabled' => true,
+                'tracers' => [],
                 'providers' => [],
                 'processors' => [],
                 'exporters' => [],
@@ -60,18 +61,25 @@ final class ConfigurationTest extends TestCase
                 http_kernel:
                     enabled:              true
 
-                    # The tracing provider to use, defaults to `default_provider`
-                    tracing_provider:     ~
+                    # The tracer to use, defaults to `default_tracer`
+                    tracer:               ~
                 console:
                     enabled:              true
 
-                    # The tracing provider to use, defaults to `default_provider`
-                    tracing_provider:     ~
+                    # The tracer to use, defaults to `default_tracer`
+                    tracer:               ~
             traces:
                 enabled:              true
 
-                # The default provider to use among the `providers`
-                default_provider:     ~ # Required
+                # The default tracer to use among the `tracers`
+                default_tracer:       ~ # Required
+                tracers:
+
+                    # Prototype
+                    tracer:
+                        name:                 ~
+                        version:              ~
+                        provider:             ~ # Required
                 providers:
 
                     # Prototype
