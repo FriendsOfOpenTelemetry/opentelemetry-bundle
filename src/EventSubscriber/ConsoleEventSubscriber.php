@@ -6,7 +6,6 @@ use GaelReyrol\OpenTelemetryBundle\Attribute\ConsoleTraceAttributeEnum;
 use OpenTelemetry\API\Trace\Span;
 use OpenTelemetry\API\Trace\StatusCode;
 use OpenTelemetry\API\Trace\TracerInterface;
-use OpenTelemetry\API\Trace\TracerProviderInterface;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\ContextStorageScopeInterface;
 use OpenTelemetry\SemConv\TraceAttributes;
@@ -20,10 +19,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final class ConsoleEventSubscriber implements EventSubscriberInterface
 {
-    private readonly TracerInterface $tracer;
-
     public function __construct(
-        TracerProviderInterface $tracerProvider,
+        private readonly TracerInterface $tracer,
     ) {
     }
 

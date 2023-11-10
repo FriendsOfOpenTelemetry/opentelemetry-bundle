@@ -2,24 +2,18 @@
 
 namespace GaelReyrol\OpenTelemetryBundle\DependencyInjection;
 
-use GaelReyrol\OpenTelemetryBundle\Factory\ConsoleSpanExporterFactory;
-use GaelReyrol\OpenTelemetryBundle\Factory\InMemorySpanExporterFactory;
-use GaelReyrol\OpenTelemetryBundle\Factory\OtlpSpanExporterFactory;
-use GaelReyrol\OpenTelemetryBundle\Factory\SpanExporterFactoryInterface;
-use GaelReyrol\OpenTelemetryBundle\Factory\ZipkinSpanExporterFactory;
-use OpenTelemetry\SDK\Trace\NoopTracerProvider;
-use OpenTelemetry\SDK\Trace\Sampler\AlwaysOffSampler;
-use OpenTelemetry\SDK\Trace\Sampler\AlwaysOnSampler;
-use OpenTelemetry\SDK\Trace\Sampler\ParentBased;
-use OpenTelemetry\SDK\Trace\Sampler\TraceIdRatioBasedSampler;
-use OpenTelemetry\SDK\Trace\SamplerInterface;
-use OpenTelemetry\SDK\Trace\SpanProcessor\BatchSpanProcessor;
+use GaelReyrol\OpenTelemetryBundle\Factory\SpanExporter\ConsoleSpanExporterFactory;
+use GaelReyrol\OpenTelemetryBundle\Factory\SpanExporter\InMemorySpanExporterFactory;
+use GaelReyrol\OpenTelemetryBundle\Factory\SpanExporter\OtlpSpanExporterFactory;
+use GaelReyrol\OpenTelemetryBundle\Factory\SpanExporter\SpanExporterFactoryInterface;
+use GaelReyrol\OpenTelemetryBundle\Factory\SpanExporter\ZipkinSpanExporterFactory;
+use GaelReyrol\OpenTelemetryBundle\Factory\SpanProcessor\NoopSpanProcessorFactory;
+use GaelReyrol\OpenTelemetryBundle\Factory\SpanProcessor\SimpleSpanProcessorFactory;
+use GaelReyrol\OpenTelemetryBundle\Factory\SpanProcessor\SpanProcessorFactoryInterface;
+use GaelReyrol\OpenTelemetryBundle\Factory\TracerProvider\NoopTracerProviderFactory;
+use GaelReyrol\OpenTelemetryBundle\Factory\TracerProvider\TracerProviderFactoryInterface;
 use OpenTelemetry\SDK\Trace\SpanProcessor\MultiSpanProcessor;
-use OpenTelemetry\SDK\Trace\SpanProcessor\NoopSpanProcessor;
-use OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor;
-use OpenTelemetry\SDK\Trace\SpanProcessorInterface;
-use OpenTelemetry\SDK\Trace\TracerProvider;
-use OpenTelemetry\SDK\Trace\TracerProviderInterface;
+use OpenTelemetry\SDK\Trace\TracerProviderFactory;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Console\Application;
 use Symfony\Component\DependencyInjection\ChildDefinition;
@@ -30,7 +24,7 @@ use Symfony\Component\HttpKernel\DependencyInjection\ConfigurableExtension;
 use Symfony\Component\HttpKernel\HttpKernel;
 
 /**
- * @phpstan-type ComponentInstrumentationOptions array{enabled: bool, provider: string}
+ * @phpstan-type ComponentInstrumentationOptions array{enabled: bool, tracing_provider?: string}
  */
 final class OpenTelemetryExtension extends ConfigurableExtension
 {
@@ -41,11 +35,10 @@ final class OpenTelemetryExtension extends ConfigurableExtension
         $loader->load('services.php');
 
         $this->loadService($mergedConfig['service'], $container);
+        $this->loadTraces($mergedConfig['traces'], $container);
 
         $this->loadHttpKernelInstrumentation($mergedConfig['instrumentation']['kernel'], $container);
         $this->loadConsoleInstrumentation($mergedConfig['instrumentation']['console'], $container);
-
-        $this->loadTraces($mergedConfig['traces'], $container);
     }
 
     /**
@@ -77,7 +70,11 @@ final class OpenTelemetryExtension extends ConfigurableExtension
             throw new \LogicException('To configure the HttpKernel instrumentation, you must first install the symfony/http-kernel package.');
         }
 
-        $container->getDefinition('open_telemetry.instrumentation.http_kernel.event_subscriber')->addTag('kernel.event_subscriber');
+        $definition = $container->getDefinition('open_telemetry.instrumentation.http_kernel.event_subscriber')->addTag('kernel.event_subscriber');
+
+        if (isset($config['tracing_provider'])) {
+            $definition->setArgument('tracerProvider', new Reference(sprintf('open_telemetry.traces.provider.%s', $config['tracing_provider'])));
+        }
     }
 
     /**
@@ -93,7 +90,11 @@ final class OpenTelemetryExtension extends ConfigurableExtension
             throw new \LogicException('To configure the Console instrumentation, you must first install the symfony/console package.');
         }
 
-        $container->getDefinition('open_telemetry.instrumentation.console.event_subscriber')->addTag('kernel.event_subscriber');
+        $definition = $container->getDefinition('open_telemetry.instrumentation.console.event_subscriber')->addTag('kernel.event_subscriber');
+
+        if (isset($config['tracing_provider'])) {
+            $definition->setArgument('tracerProvider', new Reference(sprintf('open_telemetry.traces.provider.%s', $config['tracing_provider'])));
+        }
     }
 
     /**
@@ -123,7 +124,7 @@ final class OpenTelemetryExtension extends ConfigurableExtension
             $this->loadTraceProvider($name, $provider, $container);
         }
 
-        $defaultTraceProviderReference = new Reference(sprintf('open_telemetry.traces.providers.%s', $config['default_provider']));
+        $container->set('open_telemetry.traces.default_provider', new Reference(sprintf('open_telemetry.traces.providers.%s', $config['default_provider'])));
     }
 
     /**
@@ -206,8 +207,8 @@ final class OpenTelemetryExtension extends ConfigurableExtension
 
         $container
             ->setDefinition($processorId, new ChildDefinition('open_telemetry.traces.processor'))
-            ->setClass($options['class'])
-            ->setArguments([...$options]);
+            ->setFactory([$options['factory'] => 'createFromOptions'])
+            ->setArguments($options);
     }
 
     /**
@@ -220,7 +221,7 @@ final class OpenTelemetryExtension extends ConfigurableExtension
      * @return array{
      *     processors?: Reference[],
      *     exporter?: Reference,
-     *     class: class-string<SpanProcessorInterface>
+     *     factory: class-string<SpanProcessorFactoryInterface>
      * }
      */
     private function getTraceProcessorOptions(array $processor): array
@@ -250,9 +251,9 @@ final class OpenTelemetryExtension extends ConfigurableExtension
             $options['exporter'] = new Reference(sprintf('open_telemetry.traces.processors.%s', $processor['exporter']));
         }
 
-        $options['class'] = match ($options['type']) {
-            SpanProcessorEnum::Noop => NoopSpanProcessor::class,
-            SpanProcessorEnum::Simple => SimpleSpanProcessor::class,
+        $options['factory'] = match ($options['type']) {
+            SpanProcessorEnum::Noop => NoopSpanProcessorFactory::class,
+            SpanProcessorEnum::Simple => SimpleSpanProcessorFactory::class,
             SpanProcessorEnum::Multi => MultiSpanProcessor::class,
             // SpanProcessorEnum::Batch => BatchSpanProcessor::class,
         };
@@ -274,8 +275,8 @@ final class OpenTelemetryExtension extends ConfigurableExtension
 
         $container
             ->setDefinition($providerId, new ChildDefinition('open_telemetry.traces.provider'))
-            ->setClass($options['provider'])
-            ->setArguments([...$options]);
+            ->setFactory([$options['factory'], 'createFromOptions'])
+            ->setArguments($options);
     }
 
     /**
@@ -287,9 +288,9 @@ final class OpenTelemetryExtension extends ConfigurableExtension
      *
      * @return array{
      *     type: TraceProviderEnum,
-     *     sampler: class-string<SamplerInterface>,
      *     processors: Reference[],
-     *     provider: class-string<TracerProviderInterface>
+     *     sampler: Reference,
+     *     factory: class-string<TracerProviderFactoryInterface>
      * }
      */
     private function getTraceProviderOptions(array $provider): array
@@ -303,15 +304,15 @@ final class OpenTelemetryExtension extends ConfigurableExtension
         ];
 
         $options['sampler'] = match (TraceSamplerEnum::from($provider['sampler'])) {
-            TraceSamplerEnum::AlwaysOn => AlwaysOnSampler::class,
-            TraceSamplerEnum::AlwaysOff => AlwaysOffSampler::class,
-            TraceSamplerEnum::ParentBased => ParentBased::class,
-            TraceSamplerEnum::TraceIdRatio => TraceIdRatioBasedSampler::class,
+            TraceSamplerEnum::AlwaysOn => new Reference('open_telemetry.traces.samplers.always_on'),
+            TraceSamplerEnum::AlwaysOff => new Reference('open_telemetry.traces.samplers.always_off'),
+            TraceSamplerEnum::TraceIdRatio => new Reference('open_telemetry.traces.samplers.trace_id_ratio_based'),
+            TraceSamplerEnum::ParentBased => new Reference('open_telemetry.traces.samplers.parent_based'),
         };
 
-        $options['provider'] = match ($options['type']) {
-            TraceProviderEnum::Default => TracerProvider::class,
-            TraceProviderEnum::Noop => NoopTracerProvider::class,
+        $options['factory'] = match ($options['type']) {
+            TraceProviderEnum::Default => TracerProviderFactory::class,
+            TraceProviderEnum::Noop => NoopTracerProviderFactory::class,
         };
 
         return $options;

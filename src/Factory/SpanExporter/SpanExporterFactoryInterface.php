@@ -1,6 +1,6 @@
 <?php
 
-namespace GaelReyrol\OpenTelemetryBundle\Factory;
+namespace GaelReyrol\OpenTelemetryBundle\Factory\SpanExporter;
 
 use GaelReyrol\OpenTelemetryBundle\DependencyInjection\OtlpExporterCompressionEnum;
 use GaelReyrol\OpenTelemetryBundle\DependencyInjection\OtlpExporterFormatEnum;
@@ -16,5 +16,5 @@ interface SpanExporterFactoryInterface
      *     compression: ?OtlpExporterCompressionEnum,
      * } $options
      */
-    public function createFromOptions(array $options): SpanExporterInterface;
+    public static function createFromOptions(array $options): SpanExporterInterface;
 }

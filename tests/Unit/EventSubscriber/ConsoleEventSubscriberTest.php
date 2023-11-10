@@ -5,6 +5,7 @@ namespace GaelReyrol\OpenTelemetryBundle\Tests\Unit\EventSubscriber;
 use GaelReyrol\OpenTelemetryBundle\EventSubscriber\ConsoleEventSubscriber;
 use GaelReyrol\OpenTelemetryBundle\Tests\Application\Command\DummyCommand;
 use OpenTelemetry\API\Trace\Span;
+use OpenTelemetry\API\Trace\TracerInterface;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\ContextStorageScopeInterface;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
@@ -16,6 +17,7 @@ use OpenTelemetry\SDK\Trace\Sampler\ParentBased;
 use OpenTelemetry\SDK\Trace\SpanLimitsBuilder;
 use OpenTelemetry\SDK\Trace\StatusData;
 use OpenTelemetry\SDK\Trace\Tracer;
+use OpenTelemetry\SDK\Trace\TracerProvider;
 use OpenTelemetry\SDK\Trace\TracerProviderInterface;
 use OpenTelemetry\SDK\Trace\TracerSharedState;
 use OpenTelemetry\SemConv\TraceAttributes;
@@ -31,29 +33,32 @@ use Symfony\Component\Console\Output\NullOutput;
  */
 final class ConsoleEventSubscriberTest extends TestCase
 {
-    private readonly MockObject&TracerProviderInterface $tracerProvider;
+    //    private readonly MockObject&TracerProviderInterface $tracerProvider;
+    private readonly MockObject&TracerInterface $tracer;
 
     protected function setUp(): void
     {
-        $this->tracerProvider = $this->createMock(TracerProviderInterface::class);
-        $this->tracerProvider
-            ->expects(self::once())
-            ->method('getTracer')
-            ->with('gaelreyrol/opentelemetry-bundle', '0.0.0', TraceAttributes::SCHEMA_URL)
-            ->willReturn(new Tracer(
-                new TracerSharedState(
-                    new RandomIdGenerator(),
-                    ResourceInfoFactory::defaultResource(),
-                    (new SpanLimitsBuilder())->build(),
-                    new ParentBased(new AlwaysOnSampler()),
-                    [],
-                ),
-                (new InstrumentationScopeFactory(Attributes::factory()))->create(
-                    'gaelreyrol/opentelemetry-bundle',
-                    '0.0.0',
-                    TraceAttributes::SCHEMA_URL,
-                ),
-            ));
+        //        $this->tracerProvider = $this->createMock(TracerProviderInterface::class);
+        //        $this->tracerProvider
+        //            ->expects(self::once())
+        //            ->method('getTracer')
+        //            ->with('gaelreyrol/opentelemetry-bundle', '0.0.0', TraceAttributes::SCHEMA_URL)
+        //            ->willReturn(new Tracer(
+        //                new TracerSharedState(
+        //                    new RandomIdGenerator(),
+        //                    ResourceInfoFactory::defaultResource(),
+        //                    (new SpanLimitsBuilder())->build(),
+        //                    new ParentBased(new AlwaysOnSampler()),
+        //                    [],
+        //                ),
+        //                (new InstrumentationScopeFactory(Attributes::factory()))->create(
+        //                    'gaelreyrol/opentelemetry-bundle',
+        //                    '0.0.0',
+        //                    TraceAttributes::SCHEMA_URL,
+        //                ),
+        //            ));
+
+        $this->tracer = $this->createMock(TracerInterface::class);
     }
 
     protected function tearDown(): void
@@ -66,8 +71,6 @@ final class ConsoleEventSubscriberTest extends TestCase
 
         $span = Span::fromContext($scope->context());
         $span->end();
-
-        $this->tracerProvider->shutdown();
     }
 
     /**
@@ -85,7 +88,7 @@ final class ConsoleEventSubscriberTest extends TestCase
      */
     public function testHandleCommandEvent(ConsoleCommandEvent $event): void
     {
-        $subscriber = new ConsoleEventSubscriber($this->tracerProvider);
+        $subscriber = new ConsoleEventSubscriber($this->tracer);
 
         $subscriber->startSpan($event);
 

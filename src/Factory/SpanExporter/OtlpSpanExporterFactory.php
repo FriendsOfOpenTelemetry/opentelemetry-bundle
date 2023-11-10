@@ -1,6 +1,6 @@
 <?php
 
-namespace GaelReyrol\OpenTelemetryBundle\Factory;
+namespace GaelReyrol\OpenTelemetryBundle\Factory\SpanExporter;
 
 use GaelReyrol\OpenTelemetryBundle\DependencyInjection\OtlpExporterCompressionEnum;
 use GaelReyrol\OpenTelemetryBundle\DependencyInjection\OtlpExporterFormatEnum;
@@ -10,27 +10,21 @@ use OpenTelemetry\Contrib\Otlp\OtlpUtil;
 use OpenTelemetry\Contrib\Otlp\Protocols;
 use OpenTelemetry\Contrib\Otlp\SpanExporter;
 use OpenTelemetry\SDK\Common\Configuration\KnownValues;
-use OpenTelemetry\SDK\Common\Export\TransportFactoryInterface;
 use OpenTelemetry\SDK\Registry;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 
-final class OtlpSpanExporterFactory implements SpanExporterFactoryInterface
+final readonly class OtlpSpanExporterFactory implements SpanExporterFactoryInterface
 {
-    public function __construct(
-        private readonly ?TransportFactoryInterface $transportFactory = null
-    ) {
-    }
-
-    public function createFromOptions(array $options): SpanExporterInterface
+    public static function createFromOptions(array $options): SpanExporterInterface
     {
-        $protocol = $this->getProtocol($options['format']);
+        $protocol = self::getProtocol($options['format']);
         $contentType = Protocols::contentType($protocol);
-        $headers = $this->getHeaders($options['headers']);
-        $compression = $this->getCompression($options['compression']);
+        $headers = self::getHeaders($options['headers']);
+        $compression = self::getCompression($options['compression']);
 
         $factoryClass = Registry::transportFactory($protocol);
-        $transport = ($this->transportFactory ?? new $factoryClass())->create(
-            $this->formatEndPoint($options['endpoint'], $protocol),
+        $transport = (new $factoryClass())->create(
+            self::formatEndPoint($options['endpoint'], $protocol),
             $contentType,
             $headers,
             $compression,
@@ -39,7 +33,7 @@ final class OtlpSpanExporterFactory implements SpanExporterFactoryInterface
         return new SpanExporter($transport);
     }
 
-    private function getProtocol(OtlpExporterFormatEnum $format): string
+    private static function getProtocol(OtlpExporterFormatEnum $format): string
     {
         return match ($format) {
             OtlpExporterFormatEnum::Json => Protocols::HTTP_JSON,
@@ -49,7 +43,7 @@ final class OtlpSpanExporterFactory implements SpanExporterFactoryInterface
         };
     }
 
-    private function formatEndPoint(string $endpoint, string $protocol): string
+    private static function formatEndPoint(string $endpoint, string $protocol): string
     {
         if (Protocols::GRPC === $protocol) {
             return $endpoint.OtlpUtil::method(Signals::TRACE);
@@ -63,12 +57,12 @@ final class OtlpSpanExporterFactory implements SpanExporterFactoryInterface
      *
      * @return array<string, string>
      */
-    private function getHeaders(array $headers): array
+    private static function getHeaders(array $headers): array
     {
         return $headers + OtlpUtil::getUserAgentHeader();
     }
 
-    private function getCompression(OtlpExporterCompressionEnum $compression): string
+    private static function getCompression(OtlpExporterCompressionEnum $compression): string
     {
         return match ($compression) {
             OtlpExporterCompressionEnum::Gzip => KnownValues::VALUE_GZIP,
