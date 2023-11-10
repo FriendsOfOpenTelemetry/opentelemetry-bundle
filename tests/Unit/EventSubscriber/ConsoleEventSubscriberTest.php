@@ -4,6 +4,7 @@ namespace GaelReyrol\OpenTelemetryBundle\Tests\Unit\EventSubscriber;
 
 use GaelReyrol\OpenTelemetryBundle\EventSubscriber\ConsoleEventSubscriber;
 use GaelReyrol\OpenTelemetryBundle\Tests\Application\Command\DummyCommand;
+use OpenTelemetry\API\Trace\NoopTracerProvider;
 use OpenTelemetry\API\Trace\Span;
 use OpenTelemetry\API\Trace\TracerInterface;
 use OpenTelemetry\Context\Context;
@@ -33,32 +34,11 @@ use Symfony\Component\Console\Output\NullOutput;
  */
 final class ConsoleEventSubscriberTest extends TestCase
 {
-    //    private readonly MockObject&TracerProviderInterface $tracerProvider;
-    private readonly MockObject&TracerInterface $tracer;
+    private readonly TracerInterface $tracer;
 
     protected function setUp(): void
     {
-        //        $this->tracerProvider = $this->createMock(TracerProviderInterface::class);
-        //        $this->tracerProvider
-        //            ->expects(self::once())
-        //            ->method('getTracer')
-        //            ->with('gaelreyrol/opentelemetry-bundle', '0.0.0', TraceAttributes::SCHEMA_URL)
-        //            ->willReturn(new Tracer(
-        //                new TracerSharedState(
-        //                    new RandomIdGenerator(),
-        //                    ResourceInfoFactory::defaultResource(),
-        //                    (new SpanLimitsBuilder())->build(),
-        //                    new ParentBased(new AlwaysOnSampler()),
-        //                    [],
-        //                ),
-        //                (new InstrumentationScopeFactory(Attributes::factory()))->create(
-        //                    'gaelreyrol/opentelemetry-bundle',
-        //                    '0.0.0',
-        //                    TraceAttributes::SCHEMA_URL,
-        //                ),
-        //            ));
-
-        $this->tracer = $this->createMock(TracerInterface::class);
+        $this->tracer = (new TracerProvider())->getTracer('gaelreyrol/opentelemetry-bundle');
     }
 
     protected function tearDown(): void
