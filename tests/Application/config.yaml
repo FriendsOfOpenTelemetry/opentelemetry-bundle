@@ -20,9 +20,9 @@ open_telemetry:
 
   instrumentation:
     kernel:
-      trace_provider: main
+      tracer: main
     console:
-      trace_provider: main
+      tracer: main
     http:
       enabled: false
     messenger: false
@@ -30,25 +30,34 @@ open_telemetry:
     profiler:
 
   traces:
+    default_tracer: main
+    tracers:
+      main:
+        name: 'test'
+        version: 'beta'
+        provider: main
     providers:
       noop:
         type: noop
       main:
         type: default
         sampler: always-on
-        processor: simple
+        processors: simple
       traceable:
         type: traceable
-        sampler: always-off
+        sampler:
+          type: always-off
         processor: simple
       parent:
         sampler:
-          parent_based: always-on
-        processor: multi
+          type: parent_based
+          parent: always-on
+        processors: multi
       ratio:
         sampler:
-          trace_id_ratio: 0.5
-        processor: batch
+          type: trace_id_ratio
+          ratio: 0.5
+        processors: batch
 
     processors:
       noop:

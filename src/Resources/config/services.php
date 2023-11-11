@@ -35,7 +35,6 @@ return static function (ContainerConfigurator $container): void {
         ->set('open_telemetry.traces.samplers.always_off', AlwaysOffSampler::class)
         ->set('open_telemetry.traces.samplers.trace_id_ratio_based', TraceIdRatioBasedSampler::class)
         ->set('open_telemetry.traces.samplers.parent_based', ParentBased::class)
-            ->arg('root', service('open_telemetry.traces.samplers.always-on'))
 
         ->set('open_telemetry.traces.exporter', SpanExporterInterface::class)
         ->set('open_telemetry.traces.processor', SpanProcessorInterface::class)

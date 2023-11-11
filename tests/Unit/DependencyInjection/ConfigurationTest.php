@@ -12,14 +12,24 @@ use Symfony\Component\Config\Definition\Processor;
  */
 final class ConfigurationTest extends TestCase
 {
-    public function testDefaultConfiguration(): void
+    /**
+     * @param array<string, array<string,mixed>> $configs
+     *
+     * @return array<string, array<string,mixed>>
+     */
+    protected function process(array $configs): array
     {
-        $configuration = (new Processor())->processConfiguration(new Configuration(), ['open_telemetry' => []]);
+        $processor = new Processor();
+
+        return $processor->processConfiguration(new Configuration(), $configs);
+    }
+
+    public function testEmptyConfiguration(): void
+    {
+        $configuration = $this->process([]);
 
         self::assertSame([
-            'service' => [
-                'environment' => '%kernel.environment%',
-            ],
+            'service' => [],
             'instrumentation' => [
                 'http_kernel' => [
                     'enabled' => true,
@@ -48,7 +58,7 @@ final class ConfigurationTest extends TestCase
     {
         $dumper = new YamlReferenceDumper();
 
-        $ouput = $dumper->dump(new Configuration());
+        $output = $dumper->dump(new Configuration());
 
         self::assertSame(<<<YML
         open_telemetry:
@@ -56,7 +66,7 @@ final class ConfigurationTest extends TestCase
                 namespace:            ~ # Required, Example: MyOrganization
                 name:                 ~ # Required, Example: MyApp
                 version:              ~ # Required, Example: 1.0.0
-                environment:          '%kernel.environment%' # Required
+                environment:          ~ # Required, Example: '%kernel.environment%'
             instrumentation:
                 http_kernel:
                     enabled:              true
@@ -87,7 +97,9 @@ final class ConfigurationTest extends TestCase
                         type:                 default # One of "default"; "noop", Required
                         sampler:
                             type:                 always_on # One of "always_on"; "always_off"; "trace_id_ratio"; "parent_based", Required
-                        processor:            ~ # Required
+                            ratio:                ~
+                            parent:               ~
+                        processors:           [] # Required
                 processors:
 
                     # Prototype
@@ -120,6 +132,6 @@ final class ConfigurationTest extends TestCase
             metrics:
                 enabled:              true
 
-        YML, $ouput);
+        YML, $output);
     }
 }

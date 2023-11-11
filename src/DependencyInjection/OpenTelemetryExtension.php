@@ -18,6 +18,7 @@ use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Console\Application;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\DependencyInjection\ConfigurableExtension;
@@ -37,7 +38,7 @@ final class OpenTelemetryExtension extends ConfigurableExtension
         $this->loadService($mergedConfig['service'], $container);
         $this->loadTraces($mergedConfig['traces'], $container);
 
-        $this->loadHttpKernelInstrumentation($mergedConfig['instrumentation']['kernel'], $container);
+        $this->loadHttpKernelInstrumentation($mergedConfig['instrumentation']['http_kernel'], $container);
         $this->loadConsoleInstrumentation($mergedConfig['instrumentation']['console'], $container);
     }
 
@@ -176,8 +177,8 @@ final class OpenTelemetryExtension extends ConfigurableExtension
             'type' => TraceExporterEnum::from($exporter['type']),
             'endpoint' => $exporter['endpoint'],
             'headers' => $exporter['headers'],
-            'format' => OtlpExporterFormatEnum::tryFrom($exporter['format']),
-            'compression' => OtlpExporterCompressionEnum::tryFrom($exporter['compression']),
+            'format' => isset($exporter['format']) ? OtlpExporterFormatEnum::from($exporter['format']) : null,
+            'compression' => isset($exporter['compression']) ? OtlpExporterCompressionEnum::from($exporter['compression']) : null,
         ];
 
         if (TraceExporterEnum::Otlp === $options['type'] && null === $options['compression']) {
@@ -269,7 +270,7 @@ final class OpenTelemetryExtension extends ConfigurableExtension
     /**
      * @param array{
      *     type: string,
-     *     sampler: string,
+     *     sampler: array{type: string, ratio?: float, parent?: string},
      *     processors: string[]
      * } $provider
      */
@@ -278,6 +279,8 @@ final class OpenTelemetryExtension extends ConfigurableExtension
         $providerId = sprintf('open_telemetry.traces.providers.%s', $name);
         $options = $this->getTraceProviderOptions($provider);
 
+        $options['sampler'] = $this->getTraceSamplerDefinition($provider['sampler'], $container);
+
         $container
             ->setDefinition($providerId, new ChildDefinition('open_telemetry.traces.provider'))
             ->setFactory([$options['factory'], 'createFromOptions'])
@@ -285,16 +288,49 @@ final class OpenTelemetryExtension extends ConfigurableExtension
     }
 
     /**
+     * @param array{type: string, ratio?: float, parent?: string} $sampler
+     */
+    private function getTraceSamplerDefinition(array $sampler, ContainerBuilder $container): Definition
+    {
+        $type = TraceSamplerEnum::from($sampler['type']);
+
+        if (TraceSamplerEnum::TraceIdRatio === $type && !isset($sampler['ratio'])) {
+            throw new \InvalidArgumentException(sprintf("Sampler of type '%s' requires a ratio parameter.", $type->value));
+        }
+
+        if (TraceSamplerEnum::ParentBased === $type) {
+            if (!isset($sampler['parent'])) {
+                throw new \InvalidArgumentException(sprintf("Sampler of type '%s' requires a parent parameter.", $type->value));
+            }
+            $parentSampler = TraceSamplerEnum::tryFrom($sampler['parent']);
+            if (!in_array($parentSampler, [TraceSamplerEnum::AlwaysOn, TraceSamplerEnum::AlwaysOff], true)) {
+                throw new \InvalidArgumentException(sprintf("Unsupported '%s' parent sampler", $parentSampler->value));
+            }
+        }
+
+        return match ($type) {
+            TraceSamplerEnum::AlwaysOn => $container->getDefinition('open_telemetry.traces.samplers.always_on'),
+            TraceSamplerEnum::AlwaysOff => $container->getDefinition('open_telemetry.traces.samplers.always_off'),
+            TraceSamplerEnum::TraceIdRatio => $container
+                ->getDefinition('open_telemetry.traces.samplers.trace_id_ratio_based')
+                ->setArgument('probability', $sampler['ratio']),
+            TraceSamplerEnum::ParentBased => $container
+                ->getDefinition('open_telemetry.traces.samplers.parent_based')
+                ->setArgument('root', $this->getTraceSamplerDefinition([
+                    'type' => $sampler['parent'],
+                ], $container)),
+        };
+    }
+
+    /**
      * @param array{
      *     type: string,
-     *     sampler: string,
      *     processors: string[]
      * } $provider
      *
      * @return array{
      *     type: TraceProviderEnum,
      *     processors: Reference[],
-     *     sampler: Reference,
      *     factory: class-string<TracerProviderFactoryInterface>
      * }
      */
@@ -307,13 +343,6 @@ final class OpenTelemetryExtension extends ConfigurableExtension
                 $provider['processors']
             ),
         ];
-
-        $options['sampler'] = match (TraceSamplerEnum::from($provider['sampler'])) {
-            TraceSamplerEnum::AlwaysOn => new Reference('open_telemetry.traces.samplers.always_on'),
-            TraceSamplerEnum::AlwaysOff => new Reference('open_telemetry.traces.samplers.always_off'),
-            TraceSamplerEnum::TraceIdRatio => new Reference('open_telemetry.traces.samplers.trace_id_ratio_based'),
-            TraceSamplerEnum::ParentBased => new Reference('open_telemetry.traces.samplers.parent_based'),
-        };
 
         $options['factory'] = match ($options['type']) {
             TraceProviderEnum::Default => TracerProviderFactory::class,
@@ -336,6 +365,7 @@ final class OpenTelemetryExtension extends ConfigurableExtension
 
         $container
             ->setDefinition($tracerId, new ChildDefinition('open_telemetry.traces.tracer'))
+            ->setPublic(true)
             ->setConfigurator([
                 new Reference(sprintf('open_telemetry.traces.providers.%s', $tracer['provider'])),
                 'getTracer',
