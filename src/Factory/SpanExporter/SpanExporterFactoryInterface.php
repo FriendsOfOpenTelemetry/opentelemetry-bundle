@@ -9,12 +9,12 @@ use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 interface SpanExporterFactoryInterface
 {
     /**
-     * @param array{
-     *     endpoint: string,
-     *     headers: array<string, string>,
-     *     format: ?OtlpExporterFormatEnum,
-     *     compression: ?OtlpExporterCompressionEnum,
-     * } $options
+     * @param array<string, string> $headers
      */
-    public static function createFromOptions(array $options): SpanExporterInterface;
+    public static function create(
+        string $endpoint,
+        array $headers,
+        OtlpExporterFormatEnum $format = null,
+        OtlpExporterCompressionEnum $compression = null,
+    ): SpanExporterInterface;
 }

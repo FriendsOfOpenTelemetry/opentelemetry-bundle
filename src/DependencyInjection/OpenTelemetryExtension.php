@@ -149,7 +149,7 @@ final class OpenTelemetryExtension extends ConfigurableExtension
 
         $container
             ->setDefinition($exporterId, new ChildDefinition('open_telemetry.traces.exporter'))
-            ->setFactory([$options['factory'], 'createFromOptions'])
+            ->setFactory([$options['factory'], 'create'])
             ->setArguments($options);
     }
 
@@ -213,7 +213,7 @@ final class OpenTelemetryExtension extends ConfigurableExtension
 
         $container
             ->setDefinition($processorId, new ChildDefinition('open_telemetry.traces.processor'))
-            ->setFactory([$options['factory'] => 'createFromOptions'])
+            ->setFactory([$options['factory'], 'create'])
             ->setArguments($options);
     }
 
@@ -283,7 +283,7 @@ final class OpenTelemetryExtension extends ConfigurableExtension
 
         $container
             ->setDefinition($providerId, new ChildDefinition('open_telemetry.traces.provider'))
-            ->setFactory([$options['factory'], 'createFromOptions'])
+            ->setFactory([$options['factory'], 'create'])
             ->setArguments($options);
     }
 

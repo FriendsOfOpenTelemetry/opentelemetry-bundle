@@ -8,9 +8,9 @@ open_telemetry:
     default_tracer: main
     tracers:
       main:
-        provider: main
+        provider: default
     providers:
-      main:
+      default:
         type: default
         sampler: always_on
         processors:
@@ -20,7 +20,7 @@ open_telemetry:
         type: simple
         exporter: json
     exporters:
-      json:
+      otlp_json:
         type: otlp
         endpoint: http://localhost:4318/v1/traces
         format: json

@@ -15,19 +15,20 @@ use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 
 final readonly class OtlpSpanExporterFactory implements SpanExporterFactoryInterface
 {
-    public static function createFromOptions(array $options): SpanExporterInterface
-    {
-        $protocol = self::getProtocol($options['format']);
-        $contentType = Protocols::contentType($protocol);
-        $headers = self::getHeaders($options['headers']);
-        $compression = self::getCompression($options['compression']);
+    public static function create(
+        string $endpoint,
+        array $headers,
+        OtlpExporterFormatEnum $format = null,
+        OtlpExporterCompressionEnum $compression = null,
+    ): SpanExporterInterface {
+        $protocol = self::getProtocol($format);
 
         $factoryClass = Registry::transportFactory($protocol);
         $transport = (new $factoryClass())->create(
-            self::formatEndPoint($options['endpoint'], $protocol),
-            $contentType,
-            $headers,
-            $compression,
+            self::formatEndPoint($endpoint, $protocol),
+            Protocols::contentType($protocol),
+            self::getHeaders($headers),
+            self::getCompression($compression),
         );
 
         return new SpanExporter($transport);

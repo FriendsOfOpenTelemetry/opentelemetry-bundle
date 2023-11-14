@@ -8,10 +8,10 @@ use OpenTelemetry\SDK\Trace\SpanProcessorInterface;
 interface SpanProcessorFactoryInterface
 {
     /**
-     * @param array{
-     *      processors?: SpanProcessorInterface[],
-     *      exporter?: SpanExporterInterface,
-     *  } $options
+     * @param SpanProcessorInterface[] $processors
      */
-    public static function createFromOptions(array $options): SpanProcessorInterface;
+    public static function create(
+        array $processors = [],
+        SpanExporterInterface $exporter = null
+    ): SpanProcessorInterface;
 }
