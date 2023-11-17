@@ -53,6 +53,8 @@
         "ext-opentelemetry": "*",
         "ext-xdebug": "*",
         "friendsofphp/php-cs-fixer": "^3.37",
+        "matthiasnoback/symfony-config-test": "^4.3",
+        "matthiasnoback/symfony-dependency-injection-test": "^4.3",
         "open-telemetry/exporter-otlp": "^1.0",
         "open-telemetry/exporter-zipkin": "^1.0",
         "open-telemetry/transport-grpc": "^1.0",
