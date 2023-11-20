@@ -3,6 +3,7 @@
 namespace GaelReyrol\OpenTelemetryBundle\Tests\Unit\DependencyInjection;
 
 use GaelReyrol\OpenTelemetryBundle\DependencyInjection\Configuration;
+use Matthias\SymfonyConfigTest\PhpUnit\ConfigurationTestCaseTrait;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Definition\Dumper\YamlReferenceDumper;
 use Symfony\Component\Config\Definition\Processor;
@@ -12,6 +13,13 @@ use Symfony\Component\Config\Definition\Processor;
  */
 final class ConfigurationTest extends TestCase
 {
+    use ConfigurationTestCaseTrait;
+
+    protected function getConfiguration(): Configuration
+    {
+        return new Configuration();
+    }
+
     /**
      * @param array<string, array<string,mixed>> $configs
      *
@@ -21,7 +29,7 @@ final class ConfigurationTest extends TestCase
     {
         $processor = new Processor();
 
-        return $processor->processConfiguration(new Configuration(), $configs);
+        return $processor->processConfiguration($this->getConfiguration(), $configs);
     }
 
     public function testEmptyConfiguration(): void
@@ -33,6 +41,8 @@ final class ConfigurationTest extends TestCase
             'instrumentation' => [
                 'http_kernel' => [
                     'enabled' => true,
+                    'request_headers' => [],
+                    'response_headers' => [],
                 ],
                 'console' => [
                     'enabled' => true,
@@ -73,6 +83,8 @@ final class ConfigurationTest extends TestCase
 
                     # The tracer to use, defaults to `default_tracer`
                     tracer:               ~
+                    request_headers:      []
+                    response_headers:     []
                 console:
                     enabled:              true
 

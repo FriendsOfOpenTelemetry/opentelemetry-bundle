@@ -21,14 +21,14 @@ final readonly class OtlpSpanExporterFactory implements SpanExporterFactoryInter
         OtlpExporterFormatEnum $format = null,
         OtlpExporterCompressionEnum $compression = null,
     ): SpanExporterInterface {
-        $protocol = self::getProtocol($format);
+        $protocol = self::getProtocol($format ?? OtlpExporterFormatEnum::Json);
 
         $factoryClass = Registry::transportFactory($protocol);
         $transport = (new $factoryClass())->create(
             self::formatEndPoint($endpoint, $protocol),
             Protocols::contentType($protocol),
             self::getHeaders($headers),
-            self::getCompression($compression),
+            self::getCompression($compression ?? OtlpExporterCompressionEnum::None),
         );
 
         return new SpanExporter($transport);
