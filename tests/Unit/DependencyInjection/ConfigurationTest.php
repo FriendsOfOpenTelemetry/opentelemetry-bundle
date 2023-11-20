@@ -55,10 +55,13 @@ final class ConfigurationTest extends TestCase
                 'processors' => [],
                 'exporters' => [],
             ],
-            'logs' => [
-                'enabled' => true,
-            ],
             'metrics' => [
+                'enabled' => true,
+                'meters' => [],
+                'providers' => [],
+                'exporters' => [],
+            ],
+            'logs' => [
                 'enabled' => true,
             ],
         ], $configuration);
@@ -85,11 +88,17 @@ final class ConfigurationTest extends TestCase
                     tracer:               ~
                     request_headers:      []
                     response_headers:     []
+
+                    # The meter to use, defaults to `default_meter`
+                    meter:                ~
                 console:
                     enabled:              true
 
                     # The tracer to use, defaults to `default_tracer`
                     tracer:               ~
+
+                    # The meter to use, defaults to `default_meter`
+                    meter:                ~
             traces:
                 enabled:              true
 
@@ -130,7 +139,7 @@ final class ConfigurationTest extends TestCase
                         type:                 otlp # One of "in_memory"; "console"; "otlp"; "zipkin", Required
                         endpoint:             ~ # Required
 
-                        # Required if exporter type is otlp
+                        # Required if exporter type is json
                         format:               ~ # One of "json"; "ndjson"; "gprc"; "protobuf"
                         headers:
 
@@ -139,9 +148,31 @@ final class ConfigurationTest extends TestCase
                                 name:                 ~ # Required
                                 value:                ~ # Required
                         compression:          ~ # One of "none"; "gzip"
-            logs:
-                enabled:              true
             metrics:
+                enabled:              true
+
+                # The default meter to use among the `meters`
+                default_meter:        ~ # Required
+                meters:
+
+                    # Prototype
+                    meter:
+                        name:                 ~
+                        provider:             ~ # Required
+                providers:
+
+                    # Prototype
+                    provider:
+                        type:                 default # One of "noop"; "default", Required
+                        exporter:             ~ # Required
+                exporters:
+
+                    # Prototype
+                    exporter:
+                        type:                 default # One of "noop"; "default"; "console"; "in_memory"; "push_default"; "push_console", Required
+                        temporality:          ~ # One of "delta"; "cumulative"
+                        protocol:             ~ # One of "noop"; "default"
+            logs:
                 enabled:              true
 
         YML, $output);

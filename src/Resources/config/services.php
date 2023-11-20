@@ -6,6 +6,10 @@ use GaelReyrol\OpenTelemetryBundle\OpenTelemetryBundle;
 use GaelReyrol\OpenTelemetryBundle\Propagator\HeadersPropagator;
 use OpenTelemetry\API\Trace\TracerProviderInterface;
 use OpenTelemetry\Context\Propagation\NoopTextMapPropagator;
+use OpenTelemetry\SDK\Metrics\Meter;
+use OpenTelemetry\SDK\Metrics\MeterProviderInterface;
+use OpenTelemetry\SDK\Metrics\MetricExporterInterface;
+use OpenTelemetry\SDK\Metrics\MetricReader\ExportingReader;
 use OpenTelemetry\SDK\Trace\Sampler\AlwaysOffSampler;
 use OpenTelemetry\SDK\Trace\Sampler\AlwaysOnSampler;
 use OpenTelemetry\SDK\Trace\Sampler\ParentBased;
@@ -54,6 +58,14 @@ return static function (ContainerConfigurator $container): void {
         ->set('open_telemetry.traces.provider' /* , TracerProviderInterface::class */)
             ->synthetic()
         ->set('open_telemetry.traces.tracer', Tracer::class)
+            ->synthetic()
+
+        ->set('open_telemetry.metrics.exporting_reader', ExportingReader::class)
+        ->set('open_telemetry.metrics.exporter' /* , MetricExporterInterface::class */)
+            ->synthetic()
+        ->set('open_telemetry.metrics.provider' /* , MeterProviderInterface::class */)
+            ->synthetic()
+        ->set('open_telemetry.metrics.meter', Meter::class)
             ->synthetic()
     ;
 };

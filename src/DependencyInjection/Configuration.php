@@ -17,8 +17,8 @@ final class Configuration implements ConfigurationInterface
         $this->addServiceSection($rootNode);
         $this->addInstrumentationSection($rootNode);
         $this->addTracesSection($rootNode);
-        $this->addLogsSection($rootNode);
         $this->addMetricsSection($rootNode);
+        $this->addLogsSection($rootNode);
 
         return $treeBuilder;
     }
@@ -79,6 +79,10 @@ final class Configuration implements ConfigurationInterface
                                 ->scalarPrototype()
                                 ->end()
                             ->end()
+                            ->scalarNode('meter')
+                                ->info('The meter to use, defaults to `default_meter`')
+                                ->cannotBeEmpty()
+                            ->end()
                         ->end()
                     ->end()
                     ->arrayNode('console')
@@ -86,6 +90,10 @@ final class Configuration implements ConfigurationInterface
                         ->children()
                             ->scalarNode('tracer')
                                 ->info('The tracer to use, defaults to `default_tracer`')
+                                ->cannotBeEmpty()
+                            ->end()
+                            ->scalarNode('meter')
+                                ->info('The meter to use, defaults to `default_meter`')
                                 ->cannotBeEmpty()
                             ->end()
                         ->end()
@@ -224,7 +232,7 @@ final class Configuration implements ConfigurationInterface
                         ->isRequired()
                     ->end()
                     ->enumNode('format')
-                        ->info(sprintf('Required if exporter type is %s', TraceExporterEnum::Otlp->value))
+                        ->info(sprintf('Required if exporter type is %s', OtlpExporterFormatEnum::Json->value))
                         ->values(array_map(fn (OtlpExporterFormatEnum $enum) => $enum->value, OtlpExporterFormatEnum::cases()))
                     ->end()
                     ->arrayNode('headers')
@@ -245,22 +253,103 @@ final class Configuration implements ConfigurationInterface
         return $node;
     }
 
+    private function addMetricsSection(ArrayNodeDefinition $node): void
+    {
+        $node
+            ->children()
+                ->arrayNode('metrics')
+                ->addDefaultsIfNotSet()
+                ->canBeDisabled()
+                ->children()
+                    ->scalarNode('default_meter')
+                        ->info('The default meter to use among the `meters`')
+                        ->isRequired()
+                        ->cannotBeEmpty()
+                    ->end()
+                    ->append($this->getMetricMetersNode())
+                    ->append($this->getMetricProvidersNode())
+                    ->append($this->getMetricExportersNode())
+                ->end()
+            ->end()
+        ;
+    }
+
+    private function getMetricMetersNode(): ArrayNodeDefinition
+    {
+        $treeBuilder = new TreeBuilder('meters');
+
+        $node = $treeBuilder->getRootNode()
+            ->requiresAtLeastOneElement()
+            ->useAttributeAsKey('meter')
+            ->arrayPrototype()
+                ->children()
+                    ->scalarNode('name')
+                        ->cannotBeEmpty()
+                    ->end()
+                    ->scalarNode('provider')
+                        ->cannotBeEmpty()
+                        ->isRequired()
+                    ->end()
+                ->end()
+            ->end();
+
+        return $node;
+    }
+
+    private function getMetricProvidersNode(): ArrayNodeDefinition
+    {
+        $treeBuilder = new TreeBuilder('providers');
+
+        $node = $treeBuilder->getRootNode()
+            ->requiresAtLeastOneElement()
+            ->useAttributeAsKey('provider')
+            ->arrayPrototype()
+                ->children()
+                    ->enumNode('type')
+                        ->defaultValue(MetricProviderEnum::Default->value)
+                        ->values(array_map(fn (MetricProviderEnum $enum) => $enum->value, MetricProviderEnum::cases()))
+                        ->isRequired()
+                    ->end()
+                    ->scalarNode('exporter')
+                        ->isRequired()
+                    ->end()
+                ->end()
+            ->end();
+
+        return $node;
+    }
+
+    private function getMetricExportersNode(): ArrayNodeDefinition
+    {
+        $treeBuilder = new TreeBuilder('exporters');
+
+        $node = $treeBuilder->getRootNode()
+            ->requiresAtLeastOneElement()
+            ->useAttributeAsKey('exporter')
+            ->arrayPrototype()
+                ->children()
+                    ->enumNode('type')
+                        ->defaultValue(MetricExporterEnum::Default->value)
+                        ->values(array_map(fn (MetricExporterEnum $enum) => $enum->value, MetricExporterEnum::cases()))
+                        ->isRequired()
+                    ->end()
+                    ->enumNode('temporality')
+                        ->values(array_map(fn (MetricTemporalityEnum $enum) => $enum->value, MetricTemporalityEnum::cases()))
+                    ->end()
+                    ->enumNode('protocol')
+                        ->values(array_map(fn (MetricProviderEnum $enum) => $enum->value, MetricProviderEnum::cases()))
+                    ->end()
+                ->end()
+            ->end();
+
+        return $node;
+    }
+
     private function addLogsSection(ArrayNodeDefinition $node): void
     {
         $node
             ->children()
             ->arrayNode('logs')
-            ->addDefaultsIfNotSet()
-            ->canBeDisabled()
-            ->end()
-        ;
-    }
-
-    private function addMetricsSection(ArrayNodeDefinition $node): void
-    {
-        $node
-            ->children()
-            ->arrayNode('metrics')
             ->addDefaultsIfNotSet()
             ->canBeDisabled()
             ->end()
