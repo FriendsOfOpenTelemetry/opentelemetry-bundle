@@ -6,6 +6,9 @@ use GaelReyrol\OpenTelemetryBundle\OpenTelemetryBundle;
 use GaelReyrol\OpenTelemetryBundle\Propagator\HeadersPropagator;
 use OpenTelemetry\API\Trace\TracerProviderInterface;
 use OpenTelemetry\Context\Propagation\NoopTextMapPropagator;
+use OpenTelemetry\SDK\Logs\Logger;
+use OpenTelemetry\SDK\Logs\LoggerProviderInterface;
+use OpenTelemetry\SDK\Logs\LogRecordExporterInterface;
 use OpenTelemetry\SDK\Metrics\Meter;
 use OpenTelemetry\SDK\Metrics\MeterProviderInterface;
 use OpenTelemetry\SDK\Metrics\MetricExporterInterface;
@@ -60,12 +63,21 @@ return static function (ContainerConfigurator $container): void {
         ->set('open_telemetry.traces.tracer', Tracer::class)
             ->synthetic()
 
-        ->set('open_telemetry.metrics.exporting_reader', ExportingReader::class)
+        ->set('open_telemetry.metrics.reader', ExportingReader::class)
         ->set('open_telemetry.metrics.exporter' /* , MetricExporterInterface::class */)
             ->synthetic()
         ->set('open_telemetry.metrics.provider' /* , MeterProviderInterface::class */)
             ->synthetic()
         ->set('open_telemetry.metrics.meter', Meter::class)
+            ->synthetic()
+
+        ->set('open_telemetry.logs.exporter' /* , LogRecordExporterInterface::class */)
+            ->synthetic()
+        ->set('open_telemetry.logs.processor' /* , LogRecordProcessorInterface::class */)
+        ->synthetic()
+        ->set('open_telemetry.logs.provider' /* , LoggerProviderInterface::class */)
+            ->synthetic()
+        ->set('open_telemetry.logs.logger', Logger::class)
             ->synthetic()
     ;
 };
