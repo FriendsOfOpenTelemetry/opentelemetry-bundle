@@ -2,7 +2,7 @@
 
 namespace GaelReyrol\OpenTelemetryBundle\EventSubscriber;
 
-use GaelReyrol\OpenTelemetryBundle\Attribute\HttpKernelTraceAttributeEnum;
+use GaelReyrol\OpenTelemetryBundle\AttributeEnum\HttpKernelTraceAttributeEnum;
 use OpenTelemetry\API\Trace\SpanInterface;
 use OpenTelemetry\API\Trace\SpanKind;
 use OpenTelemetry\API\Trace\StatusCode;
@@ -15,11 +15,14 @@ use OpenTelemetry\SemConv\TraceAttributes;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\HeaderBag;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
+use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\Event\FinishRequestEvent;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\Event\TerminateEvent;
+use Symfony\Component\HttpKernel\Event\ViewEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
 final class HttpKernelEventSubscriber implements EventSubscriberInterface
@@ -60,9 +63,15 @@ final class HttpKernelEventSubscriber implements EventSubscriberInterface
                 ['startRequest', 10000],
                 ['recordRoute', 31], // after RouterListener
             ],
-//            KernelEvents::CONTROLLER => [],
-//            KernelEvents::CONTROLLER_ARGUMENTS => [],
-//            KernelEvents::VIEW => [],
+            KernelEvents::CONTROLLER => [
+                ['recordController'],
+            ],
+            KernelEvents::CONTROLLER_ARGUMENTS => [
+                ['recordControllerArguments'],
+            ],
+            KernelEvents::VIEW => [
+                ['recordView'],
+            ],
             KernelEvents::RESPONSE => [
                 ['recordResponse', -10000],
             ],
@@ -128,6 +137,30 @@ final class HttpKernelEventSubscriber implements EventSubscriberInterface
         $span->setAttribute(TraceAttributes::HTTP_ROUTE, $routeName);
     }
 
+    public function recordController(ControllerEvent $event): void
+    {
+        $span = $this->fetchRequestSpan($event->getRequest());
+        if (null === $span) {
+            return;
+        }
+    }
+
+    public function recordControllerArguments(ControllerArgumentsEvent $event): void
+    {
+        $span = $this->fetchRequestSpan($event->getRequest());
+        if (null === $span) {
+            return;
+        }
+    }
+
+    public function recordView(ViewEvent $event): void
+    {
+        $span = $this->fetchRequestSpan($event->getRequest());
+        if (null === $span) {
+            return;
+        }
+    }
+
     public function recordException(ExceptionEvent $event): void
     {
         $span = $this->fetchRequestSpan($event->getRequest());
@@ -157,6 +190,8 @@ final class HttpKernelEventSubscriber implements EventSubscriberInterface
         $span->setAttribute(TraceAttributes::HTTP_RESPONSE_STATUS_CODE, $response->getStatusCode());
         if ($response->getStatusCode() >= 500 && $response->getStatusCode() < 600) {
             $span->setStatus(StatusCode::STATUS_ERROR);
+        } else {
+            $span->setStatus(StatusCode::STATUS_OK);
         }
 
         $span->setAttributes($this->headerAttributes($response->headers, $this->responseHeaderAttributes));

@@ -1,6 +1,6 @@
 <?php
 
-namespace GaelReyrol\OpenTelemetryBundle\Attribute;
+namespace GaelReyrol\OpenTelemetryBundle\AttributeEnum;
 
 enum HttpKernelTraceAttributeEnum: string
 {
