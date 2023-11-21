@@ -2,16 +2,16 @@
 
 namespace GaelReyrol\OpenTelemetryBundle\DependencyInjection;
 
-use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Metric\ExemplarFilterEnum;
-use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Metric\MeterProviderEnum;
-use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Metric\MetricExporterEnum;
-use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Metric\MetricTemporalityEnum;
+use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Metric\MeterProvider\ExemplarFilterEnum;
+use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Metric\MeterProvider\MeterProviderEnum;
+use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Metric\MetricExporter\MetricExporterEnum;
+use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Metric\MetricExporter\MetricTemporalityEnum;
 use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\OtlpExporterCompressionEnum;
 use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\OtlpExporterFormatEnum;
 use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\SpanProcessorEnum;
-use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Trace\TraceExporterEnum;
-use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Trace\TraceProviderEnum;
-use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Trace\TraceSamplerEnum;
+use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Trace\SpanExporter\TraceExporterEnum;
+use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Trace\TracerProvider\TraceProviderEnum;
+use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Trace\TracerProvider\TraceSamplerEnum;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
@@ -347,14 +347,30 @@ final class Configuration implements ConfigurationInterface
                         ->values(array_map(fn (MetricExporterEnum $enum) => $enum->value, MetricExporterEnum::cases()))
                         ->isRequired()
                     ->end()
+                    ->scalarNode('endpoint')
+                        ->cannotBeEmpty()
+                    ->end()
+                    ->enumNode('format')
+                        ->info(sprintf('Required if exporter type is %s', OtlpExporterFormatEnum::Json->value))
+                        ->values(array_map(fn (OtlpExporterFormatEnum $enum) => $enum->value, OtlpExporterFormatEnum::cases()))
+                    ->end()
+                    ->arrayNode('headers')
+                        ->arrayPrototype()
+                        ->children()
+                            ->scalarNode('name')->isRequired()->cannotBeEmpty()->end()
+                            ->scalarNode('value')->isRequired()->cannotBeEmpty()->end()
+                        ->end()
+                    ->end()
+                    ->end()
+                    ->enumNode('compression')
+                        ->values(array_map(fn (OtlpExporterCompressionEnum $enum) => $enum->value, OtlpExporterCompressionEnum::cases()))
+                    ->end()
                     ->enumNode('temporality')
                         ->values(array_map(fn (MetricTemporalityEnum $enum) => $enum->value, MetricTemporalityEnum::cases()))
                     ->end()
-                    ->enumNode('protocol')
-                        ->values(array_map(fn (MeterProviderEnum $enum) => $enum->value, MeterProviderEnum::cases()))
-                    ->end()
                 ->end()
-            ->end();
+            ->end()
+        ;
 
         return $node;
     }

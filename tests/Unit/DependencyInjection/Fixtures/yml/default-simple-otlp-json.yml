@@ -24,3 +24,13 @@ open_telemetry:
         type: otlp
         endpoint: http://localhost:4318/v1/traces
         format: json
+  metrics:
+    default_meter: main
+    meters:
+      main:
+        provider: noop
+  logs:
+    default_logger: main
+    loggers:
+      main:
+        provider: noop

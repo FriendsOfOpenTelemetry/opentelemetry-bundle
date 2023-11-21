@@ -72,7 +72,7 @@ return static function (ContainerConfigurator $container): void {
         ->set('open_telemetry.logs.exporter' /* , LogRecordExporterInterface::class */)
             ->synthetic()
         ->set('open_telemetry.logs.processor' /* , LogRecordProcessorInterface::class */)
-        ->synthetic()
+            ->synthetic()
         ->set('open_telemetry.logs.provider' /* , LoggerProviderInterface::class */)
             ->synthetic()
         ->set('open_telemetry.logs.logger', Logger::class)

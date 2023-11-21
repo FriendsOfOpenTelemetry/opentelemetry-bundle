@@ -165,13 +165,24 @@ final class ConfigurationTest extends TestCase
                     provider:
                         type:                 default # One of "noop"; "default", Required
                         exporter:             ~ # Required
+                        filter:               none # One of "with_sampled_trace"; "all"; "none"
                 exporters:
 
                     # Prototype
                     exporter:
-                        type:                 default # One of "noop"; "default"; "console"; "in_memory"; "push_default"; "push_console", Required
-                        temporality:          ~ # One of "delta"; "cumulative"
-                        protocol:             ~ # One of "noop"; "default"
+                        type:                 default # One of "noop"; "default"; "console"; "in_memory", Required
+                        endpoint:             ~
+
+                        # Required if exporter type is json
+                        format:               ~ # One of "json"; "ndjson"; "gprc"; "protobuf"
+                        headers:
+
+                            # Prototype
+                            -
+                                name:                 ~ # Required
+                                value:                ~ # Required
+                        compression:          ~ # One of "none"; "gzip"
+                        temporality:          ~ # One of "delta"; "cumulative"; "lowmemory"
             logs:
                 enabled:              true
 

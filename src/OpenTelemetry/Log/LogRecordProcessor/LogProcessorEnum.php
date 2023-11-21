@@ -1,8 +1,8 @@
 <?php
 
-namespace GaelReyrol\OpenTelemetryBundle\OpenTelemetry;
+namespace GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Log\LogRecordProcessor;
 
-enum SpanProcessorEnum: string
+enum LogProcessorEnum: string
 {
     case Multi = 'multi';
     case Simple = 'simple';

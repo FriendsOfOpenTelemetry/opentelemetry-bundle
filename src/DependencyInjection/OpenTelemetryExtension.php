@@ -2,37 +2,36 @@
 
 namespace GaelReyrol\OpenTelemetryBundle\DependencyInjection;
 
-use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Metric\ExemplarFilterEnum;
-use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Metric\Factory\MeterProvider\MeterProviderFactory;
-use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Metric\Factory\MeterProvider\MeterProviderFactoryInterface;
-use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Metric\Factory\MeterProvider\NoopMeterProviderFactory;
-use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Metric\Factory\MetricExporter\ConsoleMetricExporterFactory;
-use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Metric\Factory\MetricExporter\InMemoryMetricExporterFactory;
-use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Metric\Factory\MetricExporter\MetricExporterFactory;
-use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Metric\Factory\MetricExporter\MetricExporterFactoryInterface;
-use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Metric\Factory\MetricExporter\NoopMetricExporterFactory;
-use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Metric\MeterProviderEnum;
-use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Metric\MetricExporterEnum;
-use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Metric\MetricProtocolEnum;
-use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Metric\MetricTemporalityEnum;
+use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Metric\MeterProvider\ExemplarFilterEnum;
+use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Metric\MeterProvider\MeterProviderEnum;
+use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Metric\MeterProvider\MeterProviderFactory;
+use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Metric\MeterProvider\MeterProviderFactoryInterface;
+use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Metric\MeterProvider\NoopMeterProviderFactory;
+use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Metric\MetricExporter\ConsoleMetricExporterFactory;
+use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Metric\MetricExporter\InMemoryMetricExporterFactory;
+use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Metric\MetricExporter\MetricExporterEnum;
+use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Metric\MetricExporter\MetricExporterFactory;
+use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Metric\MetricExporter\MetricExporterFactoryInterface;
+use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Metric\MetricExporter\MetricTemporalityEnum;
+use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Metric\MetricExporter\NoopMetricExporterFactory;
 use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\OtlpExporterCompressionEnum;
 use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\OtlpExporterFormatEnum;
 use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\SpanProcessorEnum;
-use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Trace\Factory\SpanExporter\ConsoleSpanExporterFactory;
-use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Trace\Factory\SpanExporter\InMemorySpanExporterFactory;
-use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Trace\Factory\SpanExporter\OtlpSpanExporterFactory;
-use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Trace\Factory\SpanExporter\SpanExporterFactoryInterface;
-use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Trace\Factory\SpanExporter\ZipkinSpanExporterFactory;
-use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Trace\Factory\SpanProcessor\MultiSpanProcessorFactory;
-use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Trace\Factory\SpanProcessor\NoopSpanProcessorFactory;
-use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Trace\Factory\SpanProcessor\SimpleSpanProcessorFactory;
-use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Trace\Factory\SpanProcessor\SpanProcessorFactoryInterface;
-use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Trace\Factory\TracerProvider\NoopTracerProviderFactory;
-use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Trace\Factory\TracerProvider\TracerProviderFactory;
-use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Trace\Factory\TracerProvider\TracerProviderFactoryInterface;
-use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Trace\TraceExporterEnum;
-use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Trace\TraceProviderEnum;
-use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Trace\TraceSamplerEnum;
+use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Trace\SpanExporter\ConsoleSpanExporterFactory;
+use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Trace\SpanExporter\InMemorySpanExporterFactory;
+use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Trace\SpanExporter\OtlpSpanExporterFactory;
+use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Trace\SpanExporter\SpanExporterFactoryInterface;
+use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Trace\SpanExporter\TraceExporterEnum;
+use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Trace\SpanExporter\ZipkinSpanExporterFactory;
+use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Trace\SpanProcessor\MultiSpanProcessorFactory;
+use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Trace\SpanProcessor\NoopSpanProcessorFactory;
+use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Trace\SpanProcessor\SimpleSpanProcessorFactory;
+use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Trace\SpanProcessor\SpanProcessorFactoryInterface;
+use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Trace\TracerProvider\NoopTracerProviderFactory;
+use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Trace\TracerProvider\TraceProviderEnum;
+use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Trace\TracerProvider\TracerProviderFactory;
+use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Trace\TracerProvider\TracerProviderFactoryInterface;
+use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Trace\TracerProvider\TraceSamplerEnum;
 use OpenTelemetry\Contrib\Otlp\MetricExporter;
 use OpenTelemetry\Contrib\Otlp\SpanExporter as OtlpSpanExporter;
 use OpenTelemetry\Contrib\Zipkin\Exporter as ZipkinSpanExporter;
@@ -75,6 +74,7 @@ final class OpenTelemetryExtension extends ConfigurableExtension
         $this->loadService($mergedConfig['service'], $container);
         $this->loadTraces($mergedConfig['traces'], $container);
         $this->loadMetrics($mergedConfig['metrics'], $container);
+        $this->loadLogs($mergedConfig['logs'], $container);
 
         $this->loadHttpKernelInstrumentation($mergedConfig['instrumentation']['http_kernel'], $mergedConfig['traces'], $container);
         $this->loadConsoleInstrumentation($mergedConfig['instrumentation']['console'], $mergedConfig['traces'], $container);
@@ -502,10 +502,10 @@ final class OpenTelemetryExtension extends ConfigurableExtension
      * @param array{
      *     type: string,
      *     endpoint?: string,
+     *     format?: string,
      *     headers?: array<string, string>,
      *     compression?: string,
      *     temporality?: string,
-     *     protocol?: string,
      * } $exporter
      */
     private function loadMetricExporter(string $name, array $exporter, ContainerBuilder $container): void
@@ -519,10 +519,10 @@ final class OpenTelemetryExtension extends ConfigurableExtension
             ->setFactory([$options['factory'], 'create'])
             ->setArguments([
                 '$endpoint' => $options['endpoint'],
+                '$format' => $options['format'],
                 '$headers' => $options['headers'],
                 '$compression' => $options['compression'],
                 '$temporality' => $options['temporality'],
-                '$protocol' => $options['protocol'],
             ]);
     }
 
@@ -530,19 +530,19 @@ final class OpenTelemetryExtension extends ConfigurableExtension
      * @param array{
      *     type: string,
      *     endpoint?: string,
+     *     format?: string,
      *     headers?: array<string, string>,
      *     compression?: string,
      *     temporality?: string,
-     *     protocol?: string,
      * } $exporter
      *
      * @return array{
      *     type: MetricExporterEnum,
      *     endpoint?: string,
      *     headers?: array<string, string>,
+     *     format?: OtlpExporterFormatEnum,
      *     compression?: OtlpExporterCompressionEnum,
      *     temporality?: MetricTemporalityEnum,
-     *     protocol?: MetricProtocolEnum,
      *     factory: class-string<MetricExporterFactoryInterface>,
      *     class: class-string<MetricExporterInterface>
      * }
@@ -552,10 +552,10 @@ final class OpenTelemetryExtension extends ConfigurableExtension
         $options = [
             'type' => MetricExporterEnum::from($exporter['type']),
             'endpoint' => $exporter['endpoint'] ?? null,
-            'headers' => $exporter['headers'] ?? null,
+            'headers' => $exporter['headers'] ?? [],
+            'format' => isset($exporter['format']) ? OtlpExporterFormatEnum::from($exporter['format']) : null,
             'compression' => isset($exporter['compression']) ? OtlpExporterCompressionEnum::from($exporter['compression']) : null,
             'temporality' => isset($exporter['temporality']) ? MetricTemporalityEnum::from($exporter['temporality']) : null,
-            'protocol' => isset($exporter['protocol']) ? MetricProtocolEnum::from($exporter['protocol']) : null,
         ];
 
         $options['factory'] = match ($options['type']) {
@@ -661,5 +661,40 @@ final class OpenTelemetryExtension extends ConfigurableExtension
                 $meter['name'] ?? $container->getParameter('open_telemetry.bundle.name'),
                 $meter['version'] ?? $container->getParameter('open_telemetry.bundle.version'),
             ]);
+    }
+
+    /**
+     * @param array{
+     *     enabled: bool,
+     *     default_logger: string,
+     *     loggers: array<string, mixed>,
+     *     exporters: array<string, mixed>,
+     *     processors: array<string, mixed>,
+     *     providers: array<string, mixed>
+     * } $config
+     */
+    private function loadLogs(array $config, ContainerBuilder $container): void
+    {
+        if (false === $config['enabled']) {
+            return;
+        }
+
+        foreach ($config['exporters'] as $name => $exporter) {
+            $this->loadLogExporter($name, $exporter, $container);
+        }
+
+        foreach ($config['processors'] as $name => $processor) {
+            $this->loadLogProcessor($name, $processor, $container);
+        }
+
+        foreach ($config['providers'] as $name => $provider) {
+            $this->loadLogProvider($name, $provider, $container);
+        }
+
+        foreach ($config['loggers'] as $name => $logger) {
+            $this->loadLogLogger($name, $logger, $container);
+        }
+
+        $container->set('open_telemetry.logs.default_logger', new Reference(sprintf('open_telemetry.logs.loggers.%s', $config['default_logger'])));
     }
 }
