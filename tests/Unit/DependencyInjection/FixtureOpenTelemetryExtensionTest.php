@@ -3,10 +3,10 @@
 namespace GaelReyrol\OpenTelemetryBundle\Tests\Unit\DependencyInjection;
 
 use GaelReyrol\OpenTelemetryBundle\DependencyInjection\OpenTelemetryExtension;
-use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Factory\Traces\SpanExporter\OtlpSpanExporterFactory;
-use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Factory\Traces\SpanProcessor\SimpleSpanProcessorFactory;
 use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\OtlpExporterCompressionEnum;
 use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\OtlpExporterFormatEnum;
+use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Trace\Factory\SpanExporter\OtlpSpanExporterFactory;
+use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Trace\Factory\SpanProcessor\SimpleSpanProcessorFactory;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 abstract class FixtureOpenTelemetryExtensionTest extends DependencyInjectionTest

@@ -2,12 +2,14 @@
 
 use GaelReyrol\OpenTelemetryBundle\EventSubscriber\ConsoleEventSubscriber;
 use GaelReyrol\OpenTelemetryBundle\EventSubscriber\HttpKernelEventSubscriber;
-use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Propagator\HeadersPropagator;
+use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Context\Propagator\HeadersPropagator;
 use GaelReyrol\OpenTelemetryBundle\OpenTelemetryBundle;
 use OpenTelemetry\Context\Propagation\NoopTextMapPropagator;
 use OpenTelemetry\SDK\Logs\Logger;
+use OpenTelemetry\SDK\Metrics\Exemplar\ExemplarFilter\AllExemplarFilter;
+use OpenTelemetry\SDK\Metrics\Exemplar\ExemplarFilter\NoneExemplarFilter;
+use OpenTelemetry\SDK\Metrics\Exemplar\ExemplarFilter\WithSampledTraceExemplarFilter;
 use OpenTelemetry\SDK\Metrics\Meter;
-use OpenTelemetry\SDK\Metrics\MetricReader\ExportingReader;
 use OpenTelemetry\SDK\Trace\Sampler\AlwaysOffSampler;
 use OpenTelemetry\SDK\Trace\Sampler\AlwaysOnSampler;
 use OpenTelemetry\SDK\Trace\Sampler\ParentBased;
@@ -56,7 +58,10 @@ return static function (ContainerConfigurator $container): void {
         ->set('open_telemetry.traces.tracer', Tracer::class)
             ->synthetic()
 
-        ->set('open_telemetry.metrics.reader', ExportingReader::class)
+        ->set('open_telemetry.metrics.exemplar_filters.with_sampled_trace', WithSampledTraceExemplarFilter::class)
+        ->set('open_telemetry.metrics.exemplar_filters.all', AllExemplarFilter::class)
+        ->set('open_telemetry.metrics.exemplar_filters.none', NoneExemplarFilter::class)
+
         ->set('open_telemetry.metrics.exporter' /* , MetricExporterInterface::class */)
             ->synthetic()
         ->set('open_telemetry.metrics.provider' /* , MeterProviderInterface::class */)

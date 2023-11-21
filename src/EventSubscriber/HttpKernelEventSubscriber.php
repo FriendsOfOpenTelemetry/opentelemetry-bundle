@@ -2,7 +2,7 @@
 
 namespace GaelReyrol\OpenTelemetryBundle\EventSubscriber;
 
-use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Attribute\HttpKernelTraceAttributeEnum;
+use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Context\Attribute\HttpKernelTraceAttributeEnum;
 use OpenTelemetry\API\Trace\SpanInterface;
 use OpenTelemetry\API\Trace\SpanKind;
 use OpenTelemetry\API\Trace\StatusCode;

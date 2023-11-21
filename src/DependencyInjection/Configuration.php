@@ -2,15 +2,16 @@
 
 namespace GaelReyrol\OpenTelemetryBundle\DependencyInjection;
 
-use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\MetricExporterEnum;
-use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\MetricProviderEnum;
-use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\MetricTemporalityEnum;
+use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Metric\ExemplarFilterEnum;
+use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Metric\MeterProviderEnum;
+use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Metric\MetricExporterEnum;
+use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Metric\MetricTemporalityEnum;
 use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\OtlpExporterCompressionEnum;
 use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\OtlpExporterFormatEnum;
 use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\SpanProcessorEnum;
-use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\TraceExporterEnum;
-use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\TraceProviderEnum;
-use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\TraceSamplerEnum;
+use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Trace\TraceExporterEnum;
+use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Trace\TraceProviderEnum;
+use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Trace\TraceSamplerEnum;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
@@ -315,12 +316,16 @@ final class Configuration implements ConfigurationInterface
             ->arrayPrototype()
                 ->children()
                     ->enumNode('type')
-                        ->defaultValue(MetricProviderEnum::Default->value)
-                        ->values(array_map(fn (MetricProviderEnum $enum) => $enum->value, MetricProviderEnum::cases()))
+                        ->defaultValue(MeterProviderEnum::Default->value)
+                        ->values(array_map(fn (MeterProviderEnum $enum) => $enum->value, MeterProviderEnum::cases()))
                         ->isRequired()
                     ->end()
                     ->scalarNode('exporter')
                         ->isRequired()
+                    ->end()
+                    ->enumNode('filter')
+                        ->defaultValue(ExemplarFilterEnum::None->value)
+                        ->values(array_map(fn (ExemplarFilterEnum $enum) => $enum->value, ExemplarFilterEnum::cases()))
                     ->end()
                 ->end()
             ->end();
@@ -346,7 +351,7 @@ final class Configuration implements ConfigurationInterface
                         ->values(array_map(fn (MetricTemporalityEnum $enum) => $enum->value, MetricTemporalityEnum::cases()))
                     ->end()
                     ->enumNode('protocol')
-                        ->values(array_map(fn (MetricProviderEnum $enum) => $enum->value, MetricProviderEnum::cases()))
+                        ->values(array_map(fn (MeterProviderEnum $enum) => $enum->value, MeterProviderEnum::cases()))
                     ->end()
                 ->end()
             ->end();
