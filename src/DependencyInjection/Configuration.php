@@ -2,6 +2,9 @@
 
 namespace GaelReyrol\OpenTelemetryBundle\DependencyInjection;
 
+use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Log\LogExporter\LogExporterEnum;
+use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Log\LoggerProvider\LoggerProviderEnum;
+use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Log\LogProcessor\LogProcessorEnum;
 use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Metric\MeterProvider\ExemplarFilterEnum;
 use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Metric\MeterProvider\MeterProviderEnum;
 use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Metric\MetricExporter\MetricExporterEnum;
@@ -73,7 +76,7 @@ final class Configuration implements ConfigurationInterface
                 ->addDefaultsIfNotSet()
                 ->children()
                     ->arrayNode('http_kernel')
-                        ->canBeDisabled()
+                        ->canBeEnabled()
                         ->children()
                             ->scalarNode('tracer')
                                 ->info('The tracer to use, defaults to `default_tracer`')
@@ -96,7 +99,7 @@ final class Configuration implements ConfigurationInterface
                         ->end()
                     ->end()
                     ->arrayNode('console')
-                        ->canBeDisabled()
+                        ->canBeEnabled()
                         ->children()
                             ->scalarNode('tracer')
                                 ->info('The tracer to use, defaults to `default_tracer`')
@@ -119,7 +122,7 @@ final class Configuration implements ConfigurationInterface
             ->children()
             ->arrayNode('traces')
             ->addDefaultsIfNotSet()
-            ->canBeDisabled()
+            ->canBeEnabled()
             ->children()
                 ->scalarNode('default_tracer')
                     ->info('The default tracer to use among the `tracers`')
@@ -269,7 +272,7 @@ final class Configuration implements ConfigurationInterface
             ->children()
                 ->arrayNode('metrics')
                 ->addDefaultsIfNotSet()
-                ->canBeDisabled()
+                ->canBeEnabled()
                 ->children()
                     ->scalarNode('default_meter')
                         ->info('The default meter to use among the `meters`')
@@ -379,10 +382,135 @@ final class Configuration implements ConfigurationInterface
     {
         $node
             ->children()
-            ->arrayNode('logs')
-            ->addDefaultsIfNotSet()
-            ->canBeDisabled()
+                ->arrayNode('logs')
+                ->addDefaultsIfNotSet()
+                ->canBeEnabled()
+                ->children()
+                    ->scalarNode('default_logger')
+                        ->info('The default logger to use among the `loggers`')
+                        ->isRequired()
+                        ->cannotBeEmpty()
+                    ->end()
+                    ->append($this->getLogsLoggersNode())
+                    ->append($this->getLogsProvidersNode())
+                    ->append($this->getLogsProcessorsNode())
+                    ->append($this->getLogsExportersNode())
+                ->end()
             ->end()
         ;
+    }
+
+    private function getLogsLoggersNode(): ArrayNodeDefinition
+    {
+        $treeBuilder = new TreeBuilder('loggers');
+
+        $node = $treeBuilder->getRootNode()
+            ->requiresAtLeastOneElement()
+            ->useAttributeAsKey('logger')
+            ->arrayPrototype()
+                ->children()
+                    ->scalarNode('name')->cannotBeEmpty()->end()
+                    ->scalarNode('version')->cannotBeEmpty()->end()
+                    ->scalarNode('provider')
+                        ->cannotBeEmpty()
+                        ->isRequired()
+                    ->end()
+                ->end()
+            ->end();
+
+        return $node;
+    }
+
+    private function getLogsProvidersNode(): ArrayNodeDefinition
+    {
+        $treeBuilder = new TreeBuilder('providers');
+
+        $node = $treeBuilder->getRootNode()
+            ->requiresAtLeastOneElement()
+            ->useAttributeAsKey('provider')
+            ->arrayPrototype()
+                ->children()
+                    ->enumNode('type')
+                        ->defaultValue(LoggerProviderEnum::Default->value)
+                        ->values(array_map(fn (LoggerProviderEnum $enum) => $enum->value, LoggerProviderEnum::cases()))
+                        ->isRequired()
+                    ->end()
+                    ->arrayNode('processors')
+                        ->isRequired()
+                        ->requiresAtLeastOneElement()
+                        ->scalarPrototype()->cannotBeEmpty()->isRequired()->end()
+                    ->end()
+                ->end()
+            ->end();
+
+        return $node;
+    }
+
+    private function getLogsProcessorsNode(): ArrayNodeDefinition
+    {
+        $treeBuilder = new TreeBuilder('processors');
+
+        $node = $treeBuilder->getRootNode()
+            ->requiresAtLeastOneElement()
+            ->useAttributeAsKey('processor')
+            ->arrayPrototype()
+                ->children()
+                    ->enumNode('type')
+                        ->defaultValue(LogProcessorEnum::Simple->value)
+                        ->values(array_map(fn (LogProcessorEnum $enum) => $enum->value, LogProcessorEnum::cases()))
+                        ->isRequired()
+                    ->end()
+                    ->arrayNode('processors')
+                        ->info('Required if processor type is multi')
+                    ->end()
+                    ->scalarNode('exporter')
+                        ->info('Required if processor type is simple or batch')
+                        ->cannotBeEmpty()
+                    ->end()
+                ->end()
+            ->end()
+        ;
+
+        return $node;
+    }
+
+    private function getLogsExportersNode(): ArrayNodeDefinition
+    {
+        $treeBuilder = new TreeBuilder('exporters');
+
+        $node = $treeBuilder->getRootNode()
+            ->requiresAtLeastOneElement()
+            ->useAttributeAsKey('exporter')
+            ->arrayPrototype()
+                ->children()
+                    ->enumNode('type')
+                        ->defaultValue(LogExporterEnum::Default->value)
+                        ->values(array_map(fn (LogExporterEnum $enum) => $enum->value, LogExporterEnum::cases()))
+                        ->isRequired()
+                    ->end()
+                    ->scalarNode('endpoint')
+                        ->cannotBeEmpty()
+                        ->isRequired()
+                    ->end()
+                    ->enumNode('format')
+                        ->info(sprintf('Required if exporter type is %s', OtlpExporterFormatEnum::Json->value))
+                        ->values(array_map(fn (OtlpExporterFormatEnum $enum) => $enum->value, OtlpExporterFormatEnum::cases()))
+                    ->end()
+                    ->arrayNode('headers')
+                        ->arrayPrototype()
+                            ->children()
+                                ->scalarNode('name')->isRequired()->cannotBeEmpty()->end()
+                                ->scalarNode('value')->isRequired()->cannotBeEmpty()->end()
+                            ->end()
+                        ->end()
+                    ->end()
+                    ->enumNode('compression')
+                        ->values(array_map(fn (OtlpExporterCompressionEnum $enum) => $enum->value, OtlpExporterCompressionEnum::cases()))
+                    ->end()
+                ->end()
+            ->end()
+        ;
+
+        return $node;
     }
 }

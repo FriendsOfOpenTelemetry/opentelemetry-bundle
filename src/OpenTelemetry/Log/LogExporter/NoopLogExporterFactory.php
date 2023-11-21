@@ -1,20 +1,20 @@
 <?php
 
-namespace GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Log\LogRecordExporter;
+namespace GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Log\LogExporter;
 
 use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\OtlpExporterCompressionEnum;
 use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\OtlpExporterFormatEnum;
+use OpenTelemetry\SDK\Logs\Exporter\NoopExporter;
 use OpenTelemetry\SDK\Logs\LogRecordExporterInterface;
 
-interface LogRecordExporterFactoryInterface
+final class NoopLogExporterFactory implements LogExporterFactoryInterface
 {
-    /**
-     * @param array<string, string> $headers
-     */
     public static function create(
         string $endpoint = null,
         array $headers = [],
         OtlpExporterFormatEnum $format = null,
         OtlpExporterCompressionEnum $compression = null,
-    ): LogRecordExporterInterface;
+    ): LogRecordExporterInterface {
+        return new NoopExporter();
+    }
 }

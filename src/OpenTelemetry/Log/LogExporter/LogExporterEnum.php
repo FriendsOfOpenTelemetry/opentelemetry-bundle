@@ -1,10 +1,10 @@
 <?php
 
-namespace GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Log\LogRecordExporter;
+namespace GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Log\LogExporter;
 
 enum LogExporterEnum: string
 {
-    case Logs = 'logs';
+    case Default = 'default';
     case Noop = 'noop';
     case Console = 'console';
     case InMemory = 'in_memory';

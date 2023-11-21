@@ -1,6 +1,6 @@
 <?php
 
-namespace GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Log\LogRecordExporter;
+namespace GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Log\LogExporter;
 
 use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\OtlpExporterCompressionEnum;
 use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\OtlpExporterFormatEnum;
@@ -13,7 +13,7 @@ use OpenTelemetry\SDK\Common\Configuration\KnownValues;
 use OpenTelemetry\SDK\Logs\LogRecordExporterInterface;
 use OpenTelemetry\SDK\Registry;
 
-final class LogsLogRecordExporterFactory implements LogRecordExporterFactoryInterface
+final class LogExporterFactory implements LogExporterFactoryInterface
 {
     public static function create(
         string $endpoint = null,

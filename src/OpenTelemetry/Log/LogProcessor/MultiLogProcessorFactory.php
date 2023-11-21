@@ -1,12 +1,12 @@
 <?php
 
-namespace GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Log\LogRecordProcessor;
+namespace GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Log\LogProcessor;
 
 use OpenTelemetry\SDK\Logs\LogRecordExporterInterface;
 use OpenTelemetry\SDK\Logs\LogRecordProcessorInterface;
 use OpenTelemetry\SDK\Logs\Processor\MultiLogRecordProcessor;
 
-final class MultiLogRecordProcessorFactory implements LogRecordProcessorFactoryInterface
+final class MultiLogProcessorFactory implements LogProcessorFactoryInterface
 {
     public static function create(
         array $processors = [],

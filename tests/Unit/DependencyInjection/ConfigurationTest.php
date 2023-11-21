@@ -40,29 +40,33 @@ final class ConfigurationTest extends TestCase
             'service' => [],
             'instrumentation' => [
                 'http_kernel' => [
-                    'enabled' => true,
+                    'enabled' => false,
                     'request_headers' => [],
                     'response_headers' => [],
                 ],
                 'console' => [
-                    'enabled' => true,
+                    'enabled' => false,
                 ],
             ],
             'traces' => [
-                'enabled' => true,
+                'enabled' => false,
                 'tracers' => [],
                 'providers' => [],
                 'processors' => [],
                 'exporters' => [],
             ],
             'metrics' => [
-                'enabled' => true,
+                'enabled' => false,
                 'meters' => [],
                 'providers' => [],
                 'exporters' => [],
             ],
             'logs' => [
-                'enabled' => true,
+                'enabled' => false,
+                'loggers' => [],
+                'providers' => [],
+                'processors' => [],
+                'exporters' => [],
             ],
         ], $configuration);
     }
@@ -82,7 +86,7 @@ final class ConfigurationTest extends TestCase
                 environment:          ~ # Required, Example: '%kernel.environment%'
             instrumentation:
                 http_kernel:
-                    enabled:              true
+                    enabled:              false
 
                     # The tracer to use, defaults to `default_tracer`
                     tracer:               ~
@@ -92,7 +96,7 @@ final class ConfigurationTest extends TestCase
                     # The meter to use, defaults to `default_meter`
                     meter:                ~
                 console:
-                    enabled:              true
+                    enabled:              false
 
                     # The tracer to use, defaults to `default_tracer`
                     tracer:               ~
@@ -100,7 +104,7 @@ final class ConfigurationTest extends TestCase
                     # The meter to use, defaults to `default_meter`
                     meter:                ~
             traces:
-                enabled:              true
+                enabled:              false
 
                 # The default tracer to use among the `tracers`
                 default_tracer:       ~ # Required
@@ -125,7 +129,7 @@ final class ConfigurationTest extends TestCase
 
                     # Prototype
                     processor:
-                        type:                 simple # One of "noop"; "simple"; "multi", Required
+                        type:                 simple # One of "multi"; "simple"; "noop", Required
 
                         # Required if processor type is multi
                         processors:           []
@@ -149,7 +153,7 @@ final class ConfigurationTest extends TestCase
                                 value:                ~ # Required
                         compression:          ~ # One of "none"; "gzip"
             metrics:
-                enabled:              true
+                enabled:              false
 
                 # The default meter to use among the `meters`
                 default_meter:        ~ # Required
@@ -184,7 +188,50 @@ final class ConfigurationTest extends TestCase
                         compression:          ~ # One of "none"; "gzip"
                         temporality:          ~ # One of "delta"; "cumulative"; "lowmemory"
             logs:
-                enabled:              true
+                enabled:              false
+
+                # The default logger to use among the `loggers`
+                default_logger:       ~ # Required
+                loggers:
+
+                    # Prototype
+                    logger:
+                        name:                 ~
+                        version:              ~
+                        provider:             ~ # Required
+                providers:
+
+                    # Prototype
+                    provider:
+                        type:                 default # One of "default"; "noop", Required
+                        processors:           [] # Required
+                processors:
+
+                    # Prototype
+                    processor:
+                        type:                 simple # One of "multi"; "simple"; "noop", Required
+
+                        # Required if processor type is multi
+                        processors:           []
+
+                        # Required if processor type is simple or batch
+                        exporter:             ~
+                exporters:
+
+                    # Prototype
+                    exporter:
+                        type:                 default # One of "default"; "noop"; "console"; "in_memory", Required
+                        endpoint:             ~ # Required
+
+                        # Required if exporter type is json
+                        format:               ~ # One of "json"; "ndjson"; "gprc"; "protobuf"
+                        headers:
+
+                            # Prototype
+                            -
+                                name:                 ~ # Required
+                                value:                ~ # Required
+                        compression:          ~ # One of "none"; "gzip"
 
         YML, $output);
     }

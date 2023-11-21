@@ -1,6 +1,6 @@
 <?php
 
-namespace GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Log\LogRecordProcessor;
+namespace GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Log\LogProcessor;
 
 enum LogProcessorEnum: string
 {

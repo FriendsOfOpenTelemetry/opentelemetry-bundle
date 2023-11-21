@@ -2,6 +2,19 @@
 
 namespace GaelReyrol\OpenTelemetryBundle\DependencyInjection;
 
+use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Log\LogExporter\InMemoryLogExporterFactory;
+use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Log\LogExporter\LogExporterEnum;
+use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Log\LogExporter\LogExporterFactory;
+use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Log\LogExporter\LogExporterFactoryInterface;
+use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Log\LogExporter\NoopLogExporterFactory;
+use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Log\LoggerProvider\LoggerProviderEnum;
+use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Log\LoggerProvider\LoggerProviderFactory;
+use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Log\LoggerProvider\LoggerProviderFactoryInterface;
+use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Log\LoggerProvider\NoopLoggerProviderFactory;
+use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Log\LogProcessor\LogProcessorEnum;
+use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Log\LogProcessor\LogProcessorFactoryInterface;
+use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Log\LogProcessor\MultiLogProcessorFactory;
+use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Log\LogProcessor\SimpleLogProcessorFactory;
 use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Metric\MeterProvider\ExemplarFilterEnum;
 use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Metric\MeterProvider\MeterProviderEnum;
 use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Metric\MeterProvider\MeterProviderFactory;
@@ -32,9 +45,21 @@ use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Trace\TracerProvider\TraceProvi
 use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Trace\TracerProvider\TracerProviderFactory;
 use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Trace\TracerProvider\TracerProviderFactoryInterface;
 use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Trace\TracerProvider\TraceSamplerEnum;
+use OpenTelemetry\Contrib\Otlp\LogsExporter as DefautLogExporter;
 use OpenTelemetry\Contrib\Otlp\MetricExporter;
 use OpenTelemetry\Contrib\Otlp\SpanExporter as OtlpSpanExporter;
 use OpenTelemetry\Contrib\Zipkin\Exporter as ZipkinSpanExporter;
+use OpenTelemetry\SDK\Logs\Exporter\ConsoleExporter;
+use OpenTelemetry\SDK\Logs\Exporter\InMemoryExporter as InMemoryLogExporter;
+use OpenTelemetry\SDK\Logs\Exporter\NoopExporter as NoopLogExporter;
+use OpenTelemetry\SDK\Logs\LoggerProvider;
+use OpenTelemetry\SDK\Logs\LoggerProviderInterface;
+use OpenTelemetry\SDK\Logs\LogRecordExporterInterface;
+use OpenTelemetry\SDK\Logs\LogRecordProcessorInterface;
+use OpenTelemetry\SDK\Logs\NoopLoggerProvider;
+use OpenTelemetry\SDK\Logs\Processor\MultiLogRecordProcessor;
+use OpenTelemetry\SDK\Logs\Processor\NoopLogRecordProcessor;
+use OpenTelemetry\SDK\Logs\Processor\SimpleLogRecordProcessor;
 use OpenTelemetry\SDK\Metrics\MeterProvider;
 use OpenTelemetry\SDK\Metrics\MeterProviderInterface;
 use OpenTelemetry\SDK\Metrics\MetricExporter\NoopMetricExporter;
@@ -696,5 +721,242 @@ final class OpenTelemetryExtension extends ConfigurableExtension
         }
 
         $container->set('open_telemetry.logs.default_logger', new Reference(sprintf('open_telemetry.logs.loggers.%s', $config['default_logger'])));
+    }
+
+    /**
+     * @param array{
+     *     type: string,
+     *     endpoint?: string,
+     *     format?: string,
+     *     headers?: array<string, string>,
+     *     compression?: string,
+     * } $exporter
+     */
+    private function loadLogExporter(string $name, array $exporter, ContainerBuilder $container): void
+    {
+        $exporterId = sprintf('open_telemetry.logs.exporters.%s', $name);
+        $options = $this->getLogExporterOptions($exporter);
+
+        $container
+            ->setDefinition($exporterId, new ChildDefinition('open_telemetry.logs.exporter'))
+            ->setClass($options['class'])
+            ->setFactory([$options['factory'], 'create'])
+            ->setArguments([
+                '$endpoint' => $options['endpoint'],
+                '$format' => $options['format'],
+                '$headers' => $options['headers'],
+                '$compression' => $options['compression'],
+            ]);
+    }
+
+    /**
+     * @param array{
+     *     type: string,
+     *     endpoint?: string,
+     *     format?: string,
+     *     headers?: array<string, string>,
+     *     compression?: string,
+     * } $exporter
+     *
+     * @return array{
+     *     type: LogExporterEnum,
+     *     endpoint?: string,
+     *     headers?: array<string, string>,
+     *     format?: OtlpExporterFormatEnum,
+     *     compression?: OtlpExporterCompressionEnum,
+     *     factory: class-string<LogExporterFactoryInterface>,
+     *     class: class-string<LogRecordExporterInterface>
+     * }
+     */
+    private function getLogExporterOptions(array $exporter): array
+    {
+        $options = [
+            'type' => LogExporterEnum::from($exporter['type']),
+            'endpoint' => $exporter['endpoint'] ?? null,
+            'headers' => $exporter['headers'] ?? [],
+            'format' => isset($exporter['format']) ? OtlpExporterFormatEnum::from($exporter['format']) : null,
+            'compression' => isset($exporter['compression']) ? OtlpExporterCompressionEnum::from($exporter['compression']) : null,
+        ];
+
+        $options['factory'] = match ($options['type']) {
+            LogExporterEnum::Noop => NoopLogExporterFactory::class,
+            LogExporterEnum::Default => LogExporterFactory::class,
+            LogExporterEnum::InMemory => InMemoryLogExporterFactory::class,
+            LogExporterEnum::Console => ConsoleMetricExporterFactory::class,
+        };
+
+        $options['class'] = match ($options['type']) {
+            LogExporterEnum::Noop => NoopLogExporter::class,
+            LogExporterEnum::Default => DefautLogExporter::class,
+            LogExporterEnum::InMemory => InMemoryLogExporter::class,
+            LogExporterEnum::Console => ConsoleExporter::class,
+        };
+
+        return $options;
+    }
+
+    /**
+     * @param array{
+     *      type: string,
+     *      processors?: string[],
+     *      exporter?: string
+     *  } $processor
+     */
+    private function loadLogProcessor(string $name, array $processor, ContainerBuilder $container): void
+    {
+        $processorId = sprintf('open_telemetry.logs.processors.%s', $name);
+        $options = $this->getLogProcessorOptions($processor);
+
+        $args = [];
+
+        if (isset($options['processors'])) {
+            $args['$processors'] = $options['processors'];
+        }
+
+        if (isset($options['exporter'])) {
+            $args['$exporter'] = $options['exporter'];
+        }
+
+        $container
+            ->setDefinition($processorId, new ChildDefinition('open_telemetry.logs.processor'))
+            ->setClass($options['class'])
+            ->setFactory([$options['factory'], 'create'])
+            ->setArguments($args);
+    }
+
+    /**
+     * @param array{
+     *     type: string,
+     *     processors?: string[],
+     *     exporter?: string
+     * } $processor
+     *
+     * @return array{
+     *     type: LogProcessorEnum,
+     *     processors?: Reference[],
+     *     exporter?: Reference,
+     *     factory: class-string<LogProcessorFactoryInterface>,
+     *     class: class-string<LogRecordProcessorInterface>
+     * }
+     */
+    private function getLogProcessorOptions(array $processor): array
+    {
+        $options = [
+            'type' => LogProcessorEnum::from($processor['type']),
+        ];
+
+        // if (LogProcessorEnum::Batch === $options['type']) {
+        //     // TODO: Check batch options
+        //     clock: OpenTelemetry\SDK\Common\Time\SystemClock
+        //     max_queue_size: 2048
+        //     schedule_delay: 5000
+        //     export_timeout: 30000
+        //     max_export_batch_size: 512
+        //     auto_flush: true
+        // }
+
+        if (LogProcessorEnum::Multi === $options['type']) {
+            $options['processors'] = array_map(
+                fn (string $processor) => new Reference(sprintf('open_telemetry.logs.processors.%s', $processor)),
+                $processor['processors'],
+            );
+        }
+
+        if (LogProcessorEnum::Simple === $options['type']) {
+            $options['exporter'] = new Reference(sprintf('open_telemetry.logs.exporters.%s', $processor['exporter']));
+        }
+
+        $options['factory'] = match ($options['type']) {
+            LogProcessorEnum::Noop => NoopLogExporterFactory::class,
+            LogProcessorEnum::Simple => SimpleLogProcessorFactory::class,
+            LogProcessorEnum::Multi => MultiLogProcessorFactory::class,
+            // LogProcessorEnum::Batch => BatchLogRecordProcessorFactory::class,
+        };
+
+        $options['class'] = match ($options['type']) {
+            LogProcessorEnum::Noop => NoopLogRecordProcessor::class,
+            LogProcessorEnum::Simple => SimpleLogRecordProcessor::class,
+            LogProcessorEnum::Multi => MultiLogRecordProcessor::class,
+            // LogProcessorEnum::Batch => BatchLogRecordProcessor::class,
+        };
+
+        return $options;
+    }
+
+    /**
+     * @param array{
+     *     type: string,
+     *     processor: string,
+     * } $provider
+     */
+    private function loadLogProvider(string $name, array $provider, ContainerBuilder $container): void
+    {
+        $providerId = sprintf('open_telemetry.logs.providers.%s', $name);
+        $options = $this->getLoggerProviderOptions($provider);
+
+        $container
+            ->setDefinition($providerId, new ChildDefinition('open_telemetry.logs.provider'))
+            ->setClass($options['class'])
+            ->setFactory([$options['factory'], 'create'])
+            ->setArguments([
+                '$processor' => $options['processor'],
+            ]);
+    }
+
+    /**
+     * @param array{
+     *     type: string,
+     *     processor: string,
+     * } $provider
+     *
+     * @return array{
+     *     type: LoggerProviderEnum,
+     *     processor: Reference,
+     *     factory: class-string<LoggerProviderFactoryInterface>,
+     *     class: class-string<LoggerProviderInterface>
+     * }
+     */
+    private function getLoggerProviderOptions(array $provider): array
+    {
+        $options = [
+            'type' => LoggerProviderEnum::from($provider['type']),
+            'processor' => new Reference(sprintf('open_telemetry.logs.processors.%s', $provider['processor'])),
+        ];
+
+        $options['factory'] = match ($options['type']) {
+            LoggerProviderEnum::Default => LoggerProviderFactory::class,
+            LoggerProviderEnum::Noop => NoopLoggerProviderFactory::class,
+        };
+
+        $options['class'] = match ($options['type']) {
+            LoggerProviderEnum::Default => LoggerProvider::class,
+            LoggerProviderEnum::Noop => NoopLoggerProvider::class,
+        };
+
+        return $options;
+    }
+
+    /**
+     * @param array{
+     *     name?: string,
+     *     version?: string,
+     *     provider: string
+     * } $logger
+     */
+    private function loadLogLogger(string $name, array $logger, ContainerBuilder $container): void
+    {
+        $loggerId = sprintf('open_telemetry.logs.loggers.%s', $name);
+
+        $container
+            ->setDefinition($loggerId, new ChildDefinition('open_telemetry.logs.logger'))
+            ->setPublic(true)
+            ->setFactory([
+                new Reference(sprintf('open_telemetry.logs.loggers.%s', $logger['provider'])),
+                'getLogger',
+            ])
+            ->setArguments([
+                $logger['name'] ?? $container->getParameter('open_telemetry.bundle.name'),
+                $logger['version'] ?? $container->getParameter('open_telemetry.bundle.version'),
+            ]);
     }
 }
