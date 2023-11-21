@@ -2,18 +2,24 @@
 
 namespace GaelReyrol\OpenTelemetryBundle\DependencyInjection;
 
-use GaelReyrol\OpenTelemetryBundle\Factory\SpanExporter\ConsoleSpanExporterFactory;
-use GaelReyrol\OpenTelemetryBundle\Factory\SpanExporter\InMemorySpanExporterFactory;
-use GaelReyrol\OpenTelemetryBundle\Factory\SpanExporter\OtlpSpanExporterFactory;
-use GaelReyrol\OpenTelemetryBundle\Factory\SpanExporter\SpanExporterFactoryInterface;
-use GaelReyrol\OpenTelemetryBundle\Factory\SpanExporter\ZipkinSpanExporterFactory;
-use GaelReyrol\OpenTelemetryBundle\Factory\SpanProcessor\MultiSpanProcessorFactory;
-use GaelReyrol\OpenTelemetryBundle\Factory\SpanProcessor\NoopSpanProcessorFactory;
-use GaelReyrol\OpenTelemetryBundle\Factory\SpanProcessor\SimpleSpanProcessorFactory;
-use GaelReyrol\OpenTelemetryBundle\Factory\SpanProcessor\SpanProcessorFactoryInterface;
-use GaelReyrol\OpenTelemetryBundle\Factory\TracerProvider\NoopTracerProviderFactory;
-use GaelReyrol\OpenTelemetryBundle\Factory\TracerProvider\TracerProviderFactory;
-use GaelReyrol\OpenTelemetryBundle\Factory\TracerProvider\TracerProviderFactoryInterface;
+use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Factory\Traces\SpanExporter\ConsoleSpanExporterFactory;
+use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Factory\Traces\SpanExporter\InMemorySpanExporterFactory;
+use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Factory\Traces\SpanExporter\OtlpSpanExporterFactory;
+use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Factory\Traces\SpanExporter\SpanExporterFactoryInterface;
+use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Factory\Traces\SpanExporter\ZipkinSpanExporterFactory;
+use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Factory\Traces\SpanProcessor\MultiSpanProcessorFactory;
+use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Factory\Traces\SpanProcessor\NoopSpanProcessorFactory;
+use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Factory\Traces\SpanProcessor\SimpleSpanProcessorFactory;
+use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Factory\Traces\SpanProcessor\SpanProcessorFactoryInterface;
+use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Factory\Traces\TracerProvider\NoopTracerProviderFactory;
+use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Factory\Traces\TracerProvider\TracerProviderFactory;
+use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Factory\Traces\TracerProvider\TracerProviderFactoryInterface;
+use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\OtlpExporterCompressionEnum;
+use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\OtlpExporterFormatEnum;
+use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\SpanProcessorEnum;
+use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\TraceExporterEnum;
+use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\TraceProviderEnum;
+use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\TraceSamplerEnum;
 use OpenTelemetry\Contrib\Otlp\SpanExporter as OtlpSpanExporter;
 use OpenTelemetry\Contrib\Zipkin\Exporter as ZipkinSpanExporter;
 use OpenTelemetry\SDK\Trace\NoopTracerProvider;

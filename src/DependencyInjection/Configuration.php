@@ -2,6 +2,15 @@
 
 namespace GaelReyrol\OpenTelemetryBundle\DependencyInjection;
 
+use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\MetricExporterEnum;
+use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\MetricProviderEnum;
+use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\MetricTemporalityEnum;
+use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\OtlpExporterCompressionEnum;
+use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\OtlpExporterFormatEnum;
+use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\SpanProcessorEnum;
+use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\TraceExporterEnum;
+use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\TraceProviderEnum;
+use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\TraceSamplerEnum;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;

@@ -2,7 +2,7 @@
 
 namespace GaelReyrol\OpenTelemetryBundle\EventSubscriber;
 
-use GaelReyrol\OpenTelemetryBundle\AttributeEnum\ConsoleTraceAttributeEnum;
+use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Attribute\ConsoleTraceAttributeEnum;
 use OpenTelemetry\API\Trace\Span;
 use OpenTelemetry\API\Trace\StatusCode;
 use OpenTelemetry\API\Trace\TracerInterface;

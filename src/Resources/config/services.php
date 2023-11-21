@@ -2,23 +2,16 @@
 
 use GaelReyrol\OpenTelemetryBundle\EventSubscriber\ConsoleEventSubscriber;
 use GaelReyrol\OpenTelemetryBundle\EventSubscriber\HttpKernelEventSubscriber;
+use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Propagator\HeadersPropagator;
 use GaelReyrol\OpenTelemetryBundle\OpenTelemetryBundle;
-use GaelReyrol\OpenTelemetryBundle\Propagator\HeadersPropagator;
-use OpenTelemetry\API\Trace\TracerProviderInterface;
 use OpenTelemetry\Context\Propagation\NoopTextMapPropagator;
 use OpenTelemetry\SDK\Logs\Logger;
-use OpenTelemetry\SDK\Logs\LoggerProviderInterface;
-use OpenTelemetry\SDK\Logs\LogRecordExporterInterface;
 use OpenTelemetry\SDK\Metrics\Meter;
-use OpenTelemetry\SDK\Metrics\MeterProviderInterface;
-use OpenTelemetry\SDK\Metrics\MetricExporterInterface;
 use OpenTelemetry\SDK\Metrics\MetricReader\ExportingReader;
 use OpenTelemetry\SDK\Trace\Sampler\AlwaysOffSampler;
 use OpenTelemetry\SDK\Trace\Sampler\AlwaysOnSampler;
 use OpenTelemetry\SDK\Trace\Sampler\ParentBased;
 use OpenTelemetry\SDK\Trace\Sampler\TraceIdRatioBasedSampler;
-use OpenTelemetry\SDK\Trace\SpanExporterInterface;
-use OpenTelemetry\SDK\Trace\SpanProcessorInterface;
 use OpenTelemetry\SDK\Trace\Tracer;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 
