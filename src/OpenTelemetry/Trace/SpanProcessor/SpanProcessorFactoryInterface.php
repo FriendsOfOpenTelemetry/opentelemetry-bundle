@@ -11,7 +11,7 @@ interface SpanProcessorFactoryInterface
      * @param SpanProcessorInterface[] $processors
      */
     public static function create(
-        array $processors = [],
+        array $processors = null,
         SpanExporterInterface $exporter = null
     ): SpanProcessorInterface;
 }

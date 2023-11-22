@@ -8,7 +8,7 @@ use OpenTelemetry\SDK\Trace\TracerProviderInterface;
 
 final class NoopTracerProviderFactory implements TracerProviderFactoryInterface
 {
-    public static function create(SamplerInterface $sampler, array $processors): TracerProviderInterface
+    public static function create(SamplerInterface $sampler = null, array $processors = null): TracerProviderInterface
     {
         return new NoopTracerProvider();
     }

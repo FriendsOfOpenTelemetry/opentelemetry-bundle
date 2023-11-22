@@ -8,9 +8,9 @@ use OpenTelemetry\SDK\Trace\TracerProviderInterface;
 
 final readonly class TracerProviderFactory implements TracerProviderFactoryInterface
 {
-    public static function create(SamplerInterface $sampler, array $processors): TracerProviderInterface
+    public static function create(SamplerInterface $sampler = null, array $processors = null): TracerProviderInterface
     {
-        if (0 === count($processors)) {
+        if (null === $processors || 0 === count($processors)) {
             throw new \InvalidArgumentException('Processors should not be empty');
         }
 

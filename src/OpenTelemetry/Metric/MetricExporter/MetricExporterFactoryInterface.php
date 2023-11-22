@@ -13,7 +13,7 @@ interface MetricExporterFactoryInterface
      */
     public static function create(
         string $endpoint = null,
-        array $headers = [],
+        array $headers = null,
         OtlpExporterCompressionEnum $compression = null,
         OtlpExporterFormatEnum $format = null,
         MetricTemporalityEnum $temporality = null,

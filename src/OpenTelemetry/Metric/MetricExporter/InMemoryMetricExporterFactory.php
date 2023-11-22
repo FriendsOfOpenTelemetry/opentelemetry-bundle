@@ -12,7 +12,7 @@ final class InMemoryMetricExporterFactory implements MetricExporterFactoryInterf
 {
     public static function create(
         string $endpoint = null,
-        array $headers = [],
+        array $headers = null,
         OtlpExporterCompressionEnum $compression = null,
         OtlpExporterFormatEnum $format = null,
         MetricTemporalityEnum $temporality = null,

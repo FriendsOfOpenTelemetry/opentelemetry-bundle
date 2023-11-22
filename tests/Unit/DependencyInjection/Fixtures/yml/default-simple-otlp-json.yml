@@ -5,7 +5,6 @@ open_telemetry:
     version: '0.0.0'
     environment: test
   traces:
-    default_tracer: main
     tracers:
       main:
         provider: default
@@ -25,12 +24,10 @@ open_telemetry:
         endpoint: http://localhost:4318/v1/traces
         format: json
   metrics:
-    default_meter: main
     meters:
       main:
         provider: noop
   logs:
-    default_logger: main
     loggers:
       main:
         provider: noop

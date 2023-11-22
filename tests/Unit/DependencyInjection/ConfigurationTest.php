@@ -49,20 +49,17 @@ final class ConfigurationTest extends TestCase
                 ],
             ],
             'traces' => [
-                'enabled' => false,
                 'tracers' => [],
                 'providers' => [],
                 'processors' => [],
                 'exporters' => [],
             ],
             'metrics' => [
-                'enabled' => false,
                 'meters' => [],
                 'providers' => [],
                 'exporters' => [],
             ],
             'logs' => [
-                'enabled' => false,
                 'loggers' => [],
                 'providers' => [],
                 'processors' => [],
@@ -88,26 +85,25 @@ final class ConfigurationTest extends TestCase
                 http_kernel:
                     enabled:              false
 
-                    # The tracer to use, defaults to `default_tracer`
+                    # The tracer to use, defaults to `default_tracer` or first tracer in `tracers`
                     tracer:               ~
                     request_headers:      []
                     response_headers:     []
 
-                    # The meter to use, defaults to `default_meter`
+                    # The meter to use, defaults to `default_meter` or first meter in `meters`
                     meter:                ~
                 console:
                     enabled:              false
 
-                    # The tracer to use, defaults to `default_tracer`
+                    # The tracer to use, defaults to `default_tracer` or first tracer in `tracers`
                     tracer:               ~
 
-                    # The meter to use, defaults to `default_meter`
+                    # The meter to use, defaults to `default_meter` or first meter in `meters`
                     meter:                ~
             traces:
-                enabled:              false
 
                 # The default tracer to use among the `tracers`
-                default_tracer:       ~ # Required
+                default_tracer:       ~
                 tracers:
 
                     # Prototype
@@ -124,7 +120,7 @@ final class ConfigurationTest extends TestCase
                             type:                 always_on # One of "always_on"; "always_off"; "trace_id_ratio"; "parent_based", Required
                             ratio:                ~
                             parent:               ~
-                        processors:           [] # Required
+                        processors:           []
                 processors:
 
                     # Prototype
@@ -141,7 +137,7 @@ final class ConfigurationTest extends TestCase
                     # Prototype
                     exporter:
                         type:                 otlp # One of "in_memory"; "console"; "otlp"; "zipkin", Required
-                        endpoint:             ~ # Required
+                        endpoint:             ~
 
                         # Required if exporter type is json
                         format:               ~ # One of "json"; "ndjson"; "gprc"; "protobuf"
@@ -153,10 +149,9 @@ final class ConfigurationTest extends TestCase
                                 value:                ~ # Required
                         compression:          ~ # One of "none"; "gzip"
             metrics:
-                enabled:              false
 
                 # The default meter to use among the `meters`
-                default_meter:        ~ # Required
+                default_meter:        ~
                 meters:
 
                     # Prototype
@@ -168,7 +163,7 @@ final class ConfigurationTest extends TestCase
                     # Prototype
                     provider:
                         type:                 default # One of "noop"; "default", Required
-                        exporter:             ~ # Required
+                        exporter:             ~
                         filter:               none # One of "with_sampled_trace"; "all"; "none"
                 exporters:
 
@@ -188,10 +183,9 @@ final class ConfigurationTest extends TestCase
                         compression:          ~ # One of "none"; "gzip"
                         temporality:          ~ # One of "delta"; "cumulative"; "lowmemory"
             logs:
-                enabled:              false
 
                 # The default logger to use among the `loggers`
-                default_logger:       ~ # Required
+                default_logger:       ~
                 loggers:
 
                     # Prototype
@@ -204,7 +198,7 @@ final class ConfigurationTest extends TestCase
                     # Prototype
                     provider:
                         type:                 default # One of "default"; "noop", Required
-                        processors:           [] # Required
+                        processors:           []
                 processors:
 
                     # Prototype
@@ -221,7 +215,7 @@ final class ConfigurationTest extends TestCase
                     # Prototype
                     exporter:
                         type:                 default # One of "default"; "noop"; "console"; "in_memory", Required
-                        endpoint:             ~ # Required
+                        endpoint:             ~
 
                         # Required if exporter type is json
                         format:               ~ # One of "json"; "ndjson"; "gprc"; "protobuf"
