@@ -1,28 +1,30 @@
 <?php
 
-namespace GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Log\LogExporter;
+namespace GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Metric\MetricExporter;
 
 use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\OtlpExporterCompressionEnum;
 use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\OtlpExporterFormatEnum;
 use OpenTelemetry\API\Signals;
 use OpenTelemetry\Contrib\Otlp\HttpEndpointResolver;
-use OpenTelemetry\Contrib\Otlp\LogsExporter;
+use OpenTelemetry\Contrib\Otlp\MetricExporter;
 use OpenTelemetry\Contrib\Otlp\OtlpUtil;
 use OpenTelemetry\Contrib\Otlp\Protocols;
 use OpenTelemetry\SDK\Common\Configuration\KnownValues;
-use OpenTelemetry\SDK\Logs\LogRecordExporterInterface;
+use OpenTelemetry\SDK\Metrics\Data\Temporality;
+use OpenTelemetry\SDK\Metrics\MetricExporterInterface;
 use OpenTelemetry\SDK\Registry;
 
-final class LogExporterFactory implements LogExporterFactoryInterface
+final class OtlpMetricExporterFactory implements MetricExporterFactoryInterface
 {
     public static function create(
         string $endpoint = null,
-        array $headers = [],
-        OtlpExporterFormatEnum $format = null,
+        array $headers = null,
         OtlpExporterCompressionEnum $compression = null,
-    ): LogRecordExporterInterface {
-        if (null === $endpoint || '' === $endpoint) {
-            throw new \RuntimeException('Endpoint is null or empty');
+        OtlpExporterFormatEnum $format = null,
+        MetricTemporalityEnum $temporality = null,
+    ): MetricExporterInterface {
+        if (null === $endpoint) {
+            throw new \RuntimeException('Endpoint is null');
         }
 
         $protocol = self::getProtocol($format ?? OtlpExporterFormatEnum::Json);
@@ -31,11 +33,11 @@ final class LogExporterFactory implements LogExporterFactoryInterface
         $transport = (new $factoryClass())->create(
             self::formatEndPoint($endpoint, $protocol),
             Protocols::contentType($protocol),
-            self::getHeaders($headers),
+            self::getHeaders($headers ?? []),
             self::getCompression($compression ?? OtlpExporterCompressionEnum::None),
         );
 
-        return new LogsExporter($transport);
+        return new MetricExporter($transport, self::getTemporality($temporality));
     }
 
     private static function getProtocol(OtlpExporterFormatEnum $format): string
@@ -51,10 +53,10 @@ final class LogExporterFactory implements LogExporterFactoryInterface
     private static function formatEndPoint(string $endpoint, string $protocol): string
     {
         if (Protocols::GRPC === $protocol) {
-            return $endpoint.OtlpUtil::method(Signals::LOGS);
+            return $endpoint.OtlpUtil::method(Signals::METRICS);
         }
 
-        return HttpEndpointResolver::create()->resolveToString($endpoint, Signals::LOGS);
+        return HttpEndpointResolver::create()->resolveToString($endpoint, Signals::METRICS);
     }
 
     /**
@@ -72,6 +74,15 @@ final class LogExporterFactory implements LogExporterFactoryInterface
         return match ($compression) {
             OtlpExporterCompressionEnum::Gzip => KnownValues::VALUE_GZIP,
             OtlpExporterCompressionEnum::None => KnownValues::VALUE_NONE,
+        };
+    }
+
+    private static function getTemporality(?MetricTemporalityEnum $temporality): ?string
+    {
+        return match ($temporality) {
+            MetricTemporalityEnum::Delta => Temporality::DELTA,
+            MetricTemporalityEnum::Cumulative => Temporality::CUMULATIVE,
+            MetricTemporalityEnum::LowMemory, null => null,
         };
     }
 }

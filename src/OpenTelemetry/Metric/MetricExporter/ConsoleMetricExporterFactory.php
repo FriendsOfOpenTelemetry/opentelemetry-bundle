@@ -20,7 +20,7 @@ final class ConsoleMetricExporterFactory implements MetricExporterFactoryInterfa
         return new ConsoleMetricExporter(self::getTemporality($temporality));
     }
 
-    private static function getTemporality(MetricTemporalityEnum $temporality = null): string
+    private static function getTemporality(?MetricTemporalityEnum $temporality): ?string
     {
         return match ($temporality) {
             MetricTemporalityEnum::Delta => Temporality::DELTA,

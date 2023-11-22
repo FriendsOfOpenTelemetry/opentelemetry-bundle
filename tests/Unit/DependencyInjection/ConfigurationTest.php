@@ -169,7 +169,7 @@ final class ConfigurationTest extends TestCase
 
                     # Prototype
                     exporter:
-                        type:                 default # One of "noop"; "default"; "console"; "in_memory", Required
+                        type:                 otlp # One of "noop"; "otlp"; "console"; "in_memory", Required
                         endpoint:             ~
 
                         # Required if exporter type is json
@@ -214,7 +214,7 @@ final class ConfigurationTest extends TestCase
 
                     # Prototype
                     exporter:
-                        type:                 default # One of "default"; "noop"; "console"; "in_memory", Required
+                        type:                 otlp # One of "otlp"; "noop"; "console"; "in_memory", Required
                         endpoint:             ~
 
                         # Required if exporter type is json

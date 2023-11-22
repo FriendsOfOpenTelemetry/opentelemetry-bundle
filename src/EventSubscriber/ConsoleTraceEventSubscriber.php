@@ -17,7 +17,7 @@ use Symfony\Component\Console\Event\ConsoleSignalEvent;
 use Symfony\Component\Console\Event\ConsoleTerminateEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-final class ConsoleEventSubscriber implements EventSubscriberInterface
+final class ConsoleTraceEventSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private readonly TracerInterface $tracer,

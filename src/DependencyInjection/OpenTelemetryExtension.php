@@ -4,9 +4,9 @@ namespace GaelReyrol\OpenTelemetryBundle\DependencyInjection;
 
 use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Log\LogExporter\InMemoryLogExporterFactory;
 use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Log\LogExporter\LogExporterEnum;
-use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Log\LogExporter\LogExporterFactory;
 use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Log\LogExporter\LogExporterFactoryInterface;
 use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Log\LogExporter\NoopLogExporterFactory;
+use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Log\LogExporter\OtlpLogExporterFactory;
 use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Log\LoggerProvider\LoggerProviderEnum;
 use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Log\LoggerProvider\LoggerProviderFactory;
 use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Log\LoggerProvider\LoggerProviderFactoryInterface;
@@ -23,10 +23,10 @@ use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Metric\MeterProvider\NoopMeterP
 use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Metric\MetricExporter\ConsoleMetricExporterFactory;
 use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Metric\MetricExporter\InMemoryMetricExporterFactory;
 use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Metric\MetricExporter\MetricExporterEnum;
-use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Metric\MetricExporter\MetricExporterFactory;
 use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Metric\MetricExporter\MetricExporterFactoryInterface;
 use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Metric\MetricExporter\MetricTemporalityEnum;
 use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Metric\MetricExporter\NoopMetricExporterFactory;
+use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Metric\MetricExporter\OtlpMetricExporterFactory;
 use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\OtlpExporterCompressionEnum;
 use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\OtlpExporterFormatEnum;
 use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\SpanProcessorEnum;
@@ -101,8 +101,8 @@ final class OpenTelemetryExtension extends ConfigurableExtension
         $this->loadMetrics($mergedConfig['metrics'], $container);
         $this->loadLogs($mergedConfig['logs'], $container);
 
-        $this->loadHttpKernelInstrumentation($mergedConfig['instrumentation']['http_kernel'], $container);
-        $this->loadConsoleInstrumentation($mergedConfig['instrumentation']['console'], $container);
+        $this->loadHttpKernelInstrumentation($mergedConfig, $container);
+        $this->loadConsoleInstrumentation($mergedConfig, $container);
     }
 
     /**
@@ -121,12 +121,11 @@ final class OpenTelemetryExtension extends ConfigurableExtension
         $container->setParameter('open_telemetry.service.environment', $config['environment']);
     }
 
-    /**
-     * @phpstan-param ComponentInstrumentationOptions $config
-     */
+    /** @phpstan-ignore-next-line */
     private function loadHttpKernelInstrumentation(array $config, ContainerBuilder $container): void
     {
-        if (false === $config['enabled']) {
+        $httpKernelConfig = $config['instrumentation']['http_kernel'];
+        if (false === $httpKernelConfig['enabled']) {
             return;
         }
 
@@ -134,25 +133,43 @@ final class OpenTelemetryExtension extends ConfigurableExtension
             throw new \LogicException('To configure the HttpKernel instrumentation, you must first install the symfony/http-kernel package.');
         }
 
-        $definition = $container
-            ->getDefinition('open_telemetry.instrumentation.http_kernel.event_subscriber')
-            ->setArgument('$requestHeaders', $config['request_headers'])
-            ->setArgument('$responseHeaders', $config['response_headers'])
+        $trace = $container
+            ->getDefinition('open_telemetry.instrumentation.http_kernel.trace.event_subscriber')
+            ->setArgument('$requestHeaders', $httpKernelConfig['request_headers'])
+            ->setArgument('$responseHeaders', $httpKernelConfig['response_headers'])
             ->addTag('kernel.event_subscriber');
 
-        if (isset($config['tracer'])) {
-            $definition->setArgument('$tracer', new Reference(sprintf('open_telemetry.traces.tracers.%s', $config['tracer'])));
+        if (isset($httpKernelConfig['tracer'])) {
+            $trace->setArgument('$tracer', new Reference(sprintf('open_telemetry.traces.tracers.%s', $httpKernelConfig['tracer'])));
         } else {
-            $definition->setArgument('$tracer', new Reference('open_telemetry.traces.default_tracer'));
+            $defaultTracer = $config['traces']['default_tracer'] ?? array_key_first($config['traces']['tracers']);
+            $trace->setArgument('$tracer', new Reference(sprintf('open_telemetry.traces.tracers.%s', $defaultTracer)));
+        }
+
+        $metric = $container->getDefinition('open_telemetry.instrumentation.http_kernel.metric.event_subscriber')->addTag('kernel.event_subscriber');
+        if (isset($httpKernelConfig['meter'])) {
+            $metric->setArgument('$meter', new Reference(sprintf('open_telemetry.metrics.meters.%s', $httpKernelConfig['meter'])));
+            if (!isset($config['metrics']['meters'][$httpKernelConfig['meter']]['provider'])) {
+                throw new \InvalidArgumentException('Meter provider has not found');
+            }
+            $meterProvider = $config['metrics']['meters'][$httpKernelConfig['meter']]['provider'];
+            $metric->setArgument('$meterProvider', new Reference(sprintf('open_telemetry.metrics.providers.%s', $meterProvider)));
+        } else {
+            $defaultMeter = $config['metrics']['default_meter'] ?? array_key_first($config['metrics']['meters']);
+            $metric->setArgument('$meter', new Reference(sprintf('open_telemetry.metrics.meters.%s', $defaultMeter)));
+            if (!isset($config['metrics']['meters'][$defaultMeter]['provider'])) {
+                throw new \InvalidArgumentException('Meter provider has not found');
+            }
+            $meterProvider = $config['metrics']['meters'][$defaultMeter]['provider'];
+            $metric->setArgument('$meterProvider', new Reference(sprintf('open_telemetry.metrics.providers.%s', $meterProvider)));
         }
     }
 
-    /**
-     * @phpstan-param ComponentInstrumentationOptions $config
-     */
+    /** @phpstan-ignore-next-line */
     private function loadConsoleInstrumentation(array $config, ContainerBuilder $container): void
     {
-        if (false === $config['enabled']) {
+        $consoleConfig = $config['instrumentation']['console'];
+        if (false === $consoleConfig['enabled']) {
             return;
         }
 
@@ -160,12 +177,30 @@ final class OpenTelemetryExtension extends ConfigurableExtension
             throw new \LogicException('To configure the Console instrumentation, you must first install the symfony/console package.');
         }
 
-        $definition = $container->getDefinition('open_telemetry.instrumentation.console.event_subscriber')->addTag('kernel.event_subscriber');
-
-        if (isset($config['tracer'])) {
-            $definition->setArgument('$tracer', new Reference(sprintf('open_telemetry.traces.tracers.%s', $config['tracer'])));
+        $trace = $container->getDefinition('open_telemetry.instrumentation.console.trace.event_subscriber')->addTag('kernel.event_subscriber');
+        if (isset($consoleConfig['tracer'])) {
+            $trace->setArgument('$tracer', new Reference(sprintf('open_telemetry.traces.tracers.%s', $consoleConfig['tracer'])));
         } else {
-            $definition->setArgument('$tracer', new Reference('open_telemetry.traces.default_tracer'));
+            $defaultTracer = $config['traces']['default_tracer'] ?? array_key_first($config['traces']['tracers']);
+            $trace->setArgument('$tracer', new Reference(sprintf('open_telemetry.traces.tracers.%s', $defaultTracer)));
+        }
+
+        $metric = $container->getDefinition('open_telemetry.instrumentation.console.metric.event_subscriber')->addTag('kernel.event_subscriber');
+        if (isset($config['meter'])) {
+            $metric->setArgument('$meter', new Reference(sprintf('open_telemetry.metrics.meters.%s', $config['meter'])));
+            if (!isset($config['metrics']['meters'][$consoleConfig['meter']]['provider'])) {
+                throw new \InvalidArgumentException('Meter provider has not found');
+            }
+            $meterProvider = $config['metrics']['meters'][$consoleConfig['meter']]['provider'];
+            $metric->setArgument('$meterProvider', new Reference(sprintf('open_telemetry.metrics.providers.%s', $meterProvider)));
+        } else {
+            $defaultMeter = $config['metrics']['default_meter'] ?? array_key_first($config['metrics']['meters']);
+            $metric->setArgument('$meter', new Reference(sprintf('open_telemetry.metrics.meters.%s', $defaultMeter)));
+            if (!isset($config['metrics']['meters'][$defaultMeter]['provider'])) {
+                throw new \InvalidArgumentException('Meter provider has not found');
+            }
+            $meterProvider = $config['metrics']['meters'][$defaultMeter]['provider'];
+            $metric->setArgument('$meterProvider', new Reference(sprintf('open_telemetry.metrics.providers.%s', $meterProvider)));
         }
     }
 
@@ -261,12 +296,12 @@ final class OpenTelemetryExtension extends ConfigurableExtension
             'compression' => isset($exporter['compression']) ? OtlpExporterCompressionEnum::from($exporter['compression']) : null,
         ];
 
-        if (TraceExporterEnum::Otlp === $options['type'] && null === $options['compression']) {
-            $options['compression'] = OtlpExporterCompressionEnum::None;
+        if (TraceExporterEnum::Otlp === $options['type'] && null === $options['format']) {
+            $options['format'] = OtlpExporterFormatEnum::Json;
         }
 
-        if (TraceExporterEnum::Otlp === $options['type'] && null === $options['format']) {
-            throw new \InvalidArgumentException(sprintf("Exporter is of type '%s' requires a format", $options['type']->value));
+        if (TraceExporterEnum::Otlp === $options['type'] && null === $options['compression']) {
+            $options['compression'] = OtlpExporterCompressionEnum::None;
         }
 
         $options['factory'] = match ($options['type']) {
@@ -595,14 +630,14 @@ final class OpenTelemetryExtension extends ConfigurableExtension
 
         $options['factory'] = match ($options['type']) {
             MetricExporterEnum::Noop => NoopMetricExporterFactory::class,
-            MetricExporterEnum::Default => MetricExporterFactory::class,
+            MetricExporterEnum::Otlp => OtlpMetricExporterFactory::class,
             MetricExporterEnum::InMemory => InMemoryMetricExporterFactory::class,
             MetricExporterEnum::Console => ConsoleMetricExporterFactory::class,
         };
 
         $options['class'] = match ($options['type']) {
             MetricExporterEnum::Noop => NoopMetricExporter::class,
-            MetricExporterEnum::Default => MetricExporter::class,
+            MetricExporterEnum::Otlp => MetricExporter::class,
             MetricExporterEnum::InMemory => InMemoryMetricExporterFactory::class,
             MetricExporterEnum::Console => ConsoleMetricExporterFactory::class,
         };
@@ -800,14 +835,14 @@ final class OpenTelemetryExtension extends ConfigurableExtension
 
         $options['factory'] = match ($options['type']) {
             LogExporterEnum::Noop => NoopLogExporterFactory::class,
-            LogExporterEnum::Default => LogExporterFactory::class,
+            LogExporterEnum::Otlp => OtlpLogExporterFactory::class,
             LogExporterEnum::InMemory => InMemoryLogExporterFactory::class,
             LogExporterEnum::Console => ConsoleMetricExporterFactory::class,
         };
 
         $options['class'] = match ($options['type']) {
             LogExporterEnum::Noop => NoopLogExporter::class,
-            LogExporterEnum::Default => DefautLogExporter::class,
+            LogExporterEnum::Otlp => DefautLogExporter::class,
             LogExporterEnum::InMemory => InMemoryLogExporter::class,
             LogExporterEnum::Console => ConsoleExporter::class,
         };

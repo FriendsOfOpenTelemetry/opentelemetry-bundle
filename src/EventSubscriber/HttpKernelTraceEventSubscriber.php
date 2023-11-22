@@ -25,7 +25,7 @@ use Symfony\Component\HttpKernel\Event\TerminateEvent;
 use Symfony\Component\HttpKernel\Event\ViewEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
-final class HttpKernelEventSubscriber implements EventSubscriberInterface
+final class HttpKernelTraceEventSubscriber implements EventSubscriberInterface
 {
     private const REQUEST_ATTRIBUTE_SPAN = '__opentelemetry_symfony_internal_span';
     private const REQUEST_ATTRIBUTE_SCOPE = '__opentelemetry_symfony_internal_scope';

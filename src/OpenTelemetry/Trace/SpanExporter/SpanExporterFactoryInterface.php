@@ -12,8 +12,8 @@ interface SpanExporterFactoryInterface
      * @param array<string, string> $headers
      */
     public static function create(
-        string $endpoint,
-        array $headers,
+        string $endpoint = null,
+        array $headers = null,
         OtlpExporterFormatEnum $format = null,
         OtlpExporterCompressionEnum $compression = null,
     ): SpanExporterInterface;

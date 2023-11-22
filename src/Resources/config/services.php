@@ -1,7 +1,9 @@
 <?php
 
-use GaelReyrol\OpenTelemetryBundle\EventSubscriber\ConsoleEventSubscriber;
-use GaelReyrol\OpenTelemetryBundle\EventSubscriber\HttpKernelEventSubscriber;
+use GaelReyrol\OpenTelemetryBundle\EventSubscriber\ConsoleMetricEventSubscriber;
+use GaelReyrol\OpenTelemetryBundle\EventSubscriber\ConsoleTraceEventSubscriber;
+use GaelReyrol\OpenTelemetryBundle\EventSubscriber\HttpKernelMetricEventSubscriber;
+use GaelReyrol\OpenTelemetryBundle\EventSubscriber\HttpKernelTraceEventSubscriber;
 use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Context\Propagator\HeadersPropagator;
 use GaelReyrol\OpenTelemetryBundle\OpenTelemetryBundle;
 use OpenTelemetry\Context\Propagation\NoopTextMapPropagator;
@@ -33,16 +35,16 @@ return static function (ContainerConfigurator $container): void {
         ->set('open_telemetry.text_map_propagators.noop', NoopTextMapPropagator::class)
         ->set('open_telemetry.propagation_getters.headers', HeadersPropagator::class)
 
-        ->set('open_telemetry.instrumentation.http_kernel.event_subscriber', HttpKernelEventSubscriber::class)
-            ->arg('$tracer', service('open_telemetry.traces.default_tracer'))
+        ->set('open_telemetry.instrumentation.http_kernel.trace.event_subscriber', HttpKernelTraceEventSubscriber::class)
             ->arg('$propagator', service('open_telemetry.text_map_propagators.noop'))
             ->arg('$propagationGetter', service('open_telemetry.propagation_getters.headers'))
-
             ->arg('$requestHeaders', param('open_telemetry.instrumentation.http_kernel.request_headers'))
             ->arg('$responseHeaders', param('open_telemetry.instrumentation.http_kernel.response_headers'))
 
-        ->set('open_telemetry.instrumentation.console.event_subscriber', ConsoleEventSubscriber::class)
-            ->arg('$tracer', service('open_telemetry.traces.default_tracer'))
+        ->set('open_telemetry.instrumentation.console.trace.event_subscriber', ConsoleTraceEventSubscriber::class)
+
+        ->set('open_telemetry.instrumentation.http_kernel.metric.event_subscriber', HttpKernelMetricEventSubscriber::class)
+        ->set('open_telemetry.instrumentation.console.metric.event_subscriber', ConsoleMetricEventSubscriber::class)
 
         ->set('open_telemetry.traces.samplers.always_on', AlwaysOnSampler::class)
         ->set('open_telemetry.traces.samplers.always_off', AlwaysOffSampler::class)
