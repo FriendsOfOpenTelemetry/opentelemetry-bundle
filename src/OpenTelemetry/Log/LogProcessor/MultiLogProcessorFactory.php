@@ -9,10 +9,10 @@ use OpenTelemetry\SDK\Logs\Processor\MultiLogRecordProcessor;
 final class MultiLogProcessorFactory implements LogProcessorFactoryInterface
 {
     public static function create(
-        array $processors = [],
+        array $processors = null,
         LogRecordExporterInterface $exporter = null,
     ): LogRecordProcessorInterface {
-        if (0 === count($processors)) {
+        if (null === $processors) {
             throw new \InvalidArgumentException('Processors should not be empty');
         }
 

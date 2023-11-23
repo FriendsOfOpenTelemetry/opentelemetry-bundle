@@ -9,7 +9,7 @@ use OpenTelemetry\SDK\Logs\Processor\NoopLogRecordProcessor;
 final class NoopLogProcessorFactory implements LogProcessorFactoryInterface
 {
     public static function create(
-        array $processors = [],
+        array $processors = null,
         LogRecordExporterInterface $exporter = null,
     ): LogRecordProcessorInterface {
         return new NoopLogRecordProcessor();

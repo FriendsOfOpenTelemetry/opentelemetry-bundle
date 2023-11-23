@@ -41,11 +41,23 @@ final class ConfigurationTest extends TestCase
             'instrumentation' => [
                 'http_kernel' => [
                     'enabled' => false,
-                    'request_headers' => [],
-                    'response_headers' => [],
+                    'tracing' => [
+                        'enabled' => false,
+                        'request_headers' => [],
+                        'response_headers' => [],
+                    ],
+                    'metering' => [
+                        'enabled' => false,
+                    ],
                 ],
                 'console' => [
                     'enabled' => false,
+                    'tracing' => [
+                        'enabled' => false,
+                    ],
+                    'metering' => [
+                        'enabled' => false,
+                    ],
                 ],
             ],
             'traces' => [
@@ -60,6 +72,10 @@ final class ConfigurationTest extends TestCase
                 'exporters' => [],
             ],
             'logs' => [
+                'monolog' => [
+                    'enabled' => false,
+                    'handlers' => [],
+                ],
                 'loggers' => [],
                 'providers' => [],
                 'processors' => [],
@@ -84,22 +100,30 @@ final class ConfigurationTest extends TestCase
             instrumentation:
                 http_kernel:
                     enabled:              false
+                    tracing:
+                        enabled:              false
 
-                    # The tracer to use, defaults to `default_tracer` or first tracer in `tracers`
-                    tracer:               ~
-                    request_headers:      []
-                    response_headers:     []
+                        # The tracer to use, defaults to `traces.default_tracer` or first tracer in `traces.tracers`
+                        tracer:               ~ # Required
+                        request_headers:      []
+                        response_headers:     []
+                    metering:
+                        enabled:              false
 
-                    # The meter to use, defaults to `default_meter` or first meter in `meters`
-                    meter:                ~
+                        # The meter to use, defaults to `metrics.default_meter` or first meter in `metrics.meters`
+                        meter:                ~ # Required
                 console:
                     enabled:              false
+                    tracing:
+                        enabled:              false
 
-                    # The tracer to use, defaults to `default_tracer` or first tracer in `tracers`
-                    tracer:               ~
+                        # The tracer to use, defaults to `traces.default_tracer` or first tracer in `traces.tracers`
+                        tracer:               ~ # Required
+                    metering:
+                        enabled:              false
 
-                    # The meter to use, defaults to `default_meter` or first meter in `meters`
-                    meter:                ~
+                        # The meter to use, defaults to `metrics.default_meter` or first meter in `metrics.meters`
+                        meter:                ~ # Required
             traces:
 
                 # The default tracer to use among the `tracers`
@@ -186,6 +210,15 @@ final class ConfigurationTest extends TestCase
 
                 # The default logger to use among the `loggers`
                 default_logger:       ~
+                monolog:
+                    enabled:              false
+                    handlers:
+
+                        # Prototype
+                        handler:
+                            provider:             ~ # Required
+                            level:                debug # One of "debug"; "info"; "notice"; "warning"; "error"; "critical"; "alert"; "emergency"
+                            bubble:               true
                 loggers:
 
                     # Prototype
@@ -198,7 +231,7 @@ final class ConfigurationTest extends TestCase
                     # Prototype
                     provider:
                         type:                 default # One of "default"; "noop", Required
-                        processors:           []
+                        processor:            ~
                 processors:
 
                     # Prototype

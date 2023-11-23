@@ -45,6 +45,8 @@ use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Trace\TracerProvider\TraceProvi
 use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Trace\TracerProvider\TracerProviderFactory;
 use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Trace\TracerProvider\TracerProviderFactoryInterface;
 use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Trace\TracerProvider\TraceSamplerEnum;
+use Monolog\Level;
+use OpenTelemetry\Contrib\Logs\Monolog\Handler;
 use OpenTelemetry\Contrib\Otlp\LogsExporter as DefautLogExporter;
 use OpenTelemetry\Contrib\Otlp\MetricExporter;
 use OpenTelemetry\Contrib\Otlp\SpanExporter as OtlpSpanExporter;
@@ -100,6 +102,7 @@ final class OpenTelemetryExtension extends ConfigurableExtension
         $this->loadTraces($mergedConfig['traces'], $container);
         $this->loadMetrics($mergedConfig['metrics'], $container);
         $this->loadLogs($mergedConfig['logs'], $container);
+        $this->loadMonologHandlers($mergedConfig['logs'], $container);
 
         $this->loadHttpKernelInstrumentation($mergedConfig, $container);
         $this->loadConsoleInstrumentation($mergedConfig, $container);
@@ -135,24 +138,24 @@ final class OpenTelemetryExtension extends ConfigurableExtension
 
         $trace = $container
             ->getDefinition('open_telemetry.instrumentation.http_kernel.trace.event_subscriber')
-            ->setArgument('$requestHeaders', $httpKernelConfig['request_headers'])
-            ->setArgument('$responseHeaders', $httpKernelConfig['response_headers'])
+            ->setArgument('$requestHeaders', $httpKernelConfig['tracing']['request_headers'])
+            ->setArgument('$responseHeaders', $httpKernelConfig['tracing']['response_headers'])
             ->addTag('kernel.event_subscriber');
 
-        if (isset($httpKernelConfig['tracer'])) {
-            $trace->setArgument('$tracer', new Reference(sprintf('open_telemetry.traces.tracers.%s', $httpKernelConfig['tracer'])));
+        if (isset($httpKernelConfig['tracing']['tracer'])) {
+            $trace->setArgument('$tracer', new Reference(sprintf('open_telemetry.traces.tracers.%s', $httpKernelConfig['tracing']['tracer'])));
         } else {
             $defaultTracer = $config['traces']['default_tracer'] ?? array_key_first($config['traces']['tracers']);
             $trace->setArgument('$tracer', new Reference(sprintf('open_telemetry.traces.tracers.%s', $defaultTracer)));
         }
 
         $metric = $container->getDefinition('open_telemetry.instrumentation.http_kernel.metric.event_subscriber')->addTag('kernel.event_subscriber');
-        if (isset($httpKernelConfig['meter'])) {
-            $metric->setArgument('$meter', new Reference(sprintf('open_telemetry.metrics.meters.%s', $httpKernelConfig['meter'])));
+        if (isset($httpKernelConfig['metering']['meter'])) {
+            $metric->setArgument('$meter', new Reference(sprintf('open_telemetry.metrics.meters.%s', $httpKernelConfig['metering']['meter'])));
             if (!isset($config['metrics']['meters'][$httpKernelConfig['meter']]['provider'])) {
                 throw new \InvalidArgumentException('Meter provider has not found');
             }
-            $meterProvider = $config['metrics']['meters'][$httpKernelConfig['meter']]['provider'];
+            $meterProvider = $config['metrics']['meters'][$httpKernelConfig['metering']['meter']]['provider'];
             $metric->setArgument('$meterProvider', new Reference(sprintf('open_telemetry.metrics.providers.%s', $meterProvider)));
         } else {
             $defaultMeter = $config['metrics']['default_meter'] ?? array_key_first($config['metrics']['meters']);
@@ -178,20 +181,20 @@ final class OpenTelemetryExtension extends ConfigurableExtension
         }
 
         $trace = $container->getDefinition('open_telemetry.instrumentation.console.trace.event_subscriber')->addTag('kernel.event_subscriber');
-        if (isset($consoleConfig['tracer'])) {
-            $trace->setArgument('$tracer', new Reference(sprintf('open_telemetry.traces.tracers.%s', $consoleConfig['tracer'])));
+        if (isset($consoleConfig['tracing']['tracer'])) {
+            $trace->setArgument('$tracer', new Reference(sprintf('open_telemetry.traces.tracers.%s', $consoleConfig['tracing']['tracer'])));
         } else {
             $defaultTracer = $config['traces']['default_tracer'] ?? array_key_first($config['traces']['tracers']);
             $trace->setArgument('$tracer', new Reference(sprintf('open_telemetry.traces.tracers.%s', $defaultTracer)));
         }
 
         $metric = $container->getDefinition('open_telemetry.instrumentation.console.metric.event_subscriber')->addTag('kernel.event_subscriber');
-        if (isset($config['meter'])) {
+        if (isset($consoleConfig['metering']['meter'])) {
             $metric->setArgument('$meter', new Reference(sprintf('open_telemetry.metrics.meters.%s', $config['meter'])));
-            if (!isset($config['metrics']['meters'][$consoleConfig['meter']]['provider'])) {
+            if (!isset($config['metrics']['meters'][$consoleConfig['metering']['meter']]['provider'])) {
                 throw new \InvalidArgumentException('Meter provider has not found');
             }
-            $meterProvider = $config['metrics']['meters'][$consoleConfig['meter']]['provider'];
+            $meterProvider = $config['metrics']['meters'][$consoleConfig['metering']['meter']]['provider'];
             $metric->setArgument('$meterProvider', new Reference(sprintf('open_telemetry.metrics.providers.%s', $meterProvider)));
         } else {
             $defaultMeter = $config['metrics']['default_meter'] ?? array_key_first($config['metrics']['meters']);
@@ -1014,12 +1017,45 @@ final class OpenTelemetryExtension extends ConfigurableExtension
             ->setDefinition($loggerId, new ChildDefinition('open_telemetry.logs.logger'))
             ->setPublic(true)
             ->setFactory([
-                new Reference(sprintf('open_telemetry.logs.loggers.%s', $logger['provider'])),
+                new Reference(sprintf('open_telemetry.logs.providers.%s', $logger['provider'])),
                 'getLogger',
             ])
             ->setArguments([
                 $logger['name'] ?? $container->getParameter('open_telemetry.bundle.name'),
                 $logger['version'] ?? $container->getParameter('open_telemetry.bundle.version'),
             ]);
+    }
+
+    /**
+     * @param array{
+     *     default_logger?: string,
+     *     monolog: array{enabled: bool, handlers: array<array{handler: string, provider: string, level: string, bubble: bool}>},
+     *     loggers: array<string, mixed>,
+     *     exporters: array<string, mixed>,
+     *     processors: array<string, mixed>,
+     *     providers: array<string, mixed>
+     * } $config
+     */
+    private function loadMonologHandlers(array $config, ContainerBuilder $container): void
+    {
+        if (false === $config['monolog']['enabled']) {
+            return;
+        }
+
+        if (!class_exists(Handler::class)) {
+            throw new \LogicException('To configure the Monolog handler, you must first install the open-telemetry/opentelemetry-logger-monolog package.');
+        }
+
+        foreach ($config['monolog']['handlers'] as $name => $handler) {
+            $handlerId = sprintf('open_telemetry.logs.monolog.handlers.%s', $name);
+            $container
+                ->setDefinition($handlerId, new ChildDefinition('open_telemetry.logs.monolog.handler'))
+                ->setPublic(true)
+                ->setArguments([
+                    '$loggerProvider' => new Reference(sprintf('open_telemetry.logs.providers.%s', $handler['provider'])),
+                    '$level' => Level::fromName(ucfirst($handler['level'])),
+                    '$bubble' => $handler['bubble'],
+                ]);
+        }
     }
 }

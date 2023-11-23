@@ -7,6 +7,7 @@ use GaelReyrol\OpenTelemetryBundle\EventSubscriber\HttpKernelTraceEventSubscribe
 use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Context\Propagator\HeadersPropagator;
 use GaelReyrol\OpenTelemetryBundle\OpenTelemetryBundle;
 use OpenTelemetry\Context\Propagation\NoopTextMapPropagator;
+use OpenTelemetry\Contrib\Logs\Monolog\Handler as MonologHandler;
 use OpenTelemetry\SDK\Logs\Logger;
 use OpenTelemetry\SDK\Metrics\Exemplar\ExemplarFilter\AllExemplarFilter;
 use OpenTelemetry\SDK\Metrics\Exemplar\ExemplarFilter\NoneExemplarFilter;
@@ -46,10 +47,10 @@ return static function (ContainerConfigurator $container): void {
         ->set('open_telemetry.instrumentation.http_kernel.metric.event_subscriber', HttpKernelMetricEventSubscriber::class)
         ->set('open_telemetry.instrumentation.console.metric.event_subscriber', ConsoleMetricEventSubscriber::class)
 
-        ->set('open_telemetry.traces.samplers.always_on', AlwaysOnSampler::class)
-        ->set('open_telemetry.traces.samplers.always_off', AlwaysOffSampler::class)
-        ->set('open_telemetry.traces.samplers.trace_id_ratio_based', TraceIdRatioBasedSampler::class)
-        ->set('open_telemetry.traces.samplers.parent_based', ParentBased::class)
+        ->set('open_telemetry.traces.samplers.always_on', AlwaysOnSampler::class)->public()
+        ->set('open_telemetry.traces.samplers.always_off', AlwaysOffSampler::class)->public()
+        ->set('open_telemetry.traces.samplers.trace_id_ratio_based', TraceIdRatioBasedSampler::class)->public()
+        ->set('open_telemetry.traces.samplers.parent_based', ParentBased::class)->public()
 
         ->set('open_telemetry.traces.exporter' /* , SpanExporterInterface::class */)
             ->synthetic()
@@ -60,9 +61,9 @@ return static function (ContainerConfigurator $container): void {
         ->set('open_telemetry.traces.tracer', Tracer::class)
             ->synthetic()
 
-        ->set('open_telemetry.metrics.exemplar_filters.with_sampled_trace', WithSampledTraceExemplarFilter::class)
-        ->set('open_telemetry.metrics.exemplar_filters.all', AllExemplarFilter::class)
-        ->set('open_telemetry.metrics.exemplar_filters.none', NoneExemplarFilter::class)
+        ->set('open_telemetry.metrics.exemplar_filters.with_sampled_trace', WithSampledTraceExemplarFilter::class)->public()
+        ->set('open_telemetry.metrics.exemplar_filters.all', AllExemplarFilter::class)->public()
+        ->set('open_telemetry.metrics.exemplar_filters.none', NoneExemplarFilter::class)->public()
 
         ->set('open_telemetry.metrics.exporter' /* , MetricExporterInterface::class */)
             ->synthetic()
@@ -79,5 +80,7 @@ return static function (ContainerConfigurator $container): void {
             ->synthetic()
         ->set('open_telemetry.logs.logger', Logger::class)
             ->synthetic()
+
+        ->set('open_telemetry.logs.monolog.handler', MonologHandler::class)
     ;
 };

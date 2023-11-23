@@ -15,6 +15,7 @@ use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\SpanProcessorEnum;
 use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Trace\SpanExporter\TraceExporterEnum;
 use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Trace\TracerProvider\TraceProviderEnum;
 use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Trace\TracerProvider\TraceSamplerEnum;
+use Monolog\Level;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
@@ -79,23 +80,33 @@ final class Configuration implements ConfigurationInterface
                         ->addDefaultsIfNotSet()
                         ->canBeEnabled()
                         ->children()
-                            ->scalarNode('tracer')
-                                ->info('The tracer to use, defaults to `default_tracer` or first tracer in `tracers`')
-                                ->cannotBeEmpty()
-                            ->end()
-                            ->arrayNode('request_headers')
-                                ->defaultValue([])
-                                ->scalarPrototype()
+                            ->arrayNode('tracing')
+                                ->canBeEnabled()
+                                ->children()
+                                    ->scalarNode('tracer')
+                                        ->info('The tracer to use, defaults to `traces.default_tracer` or first tracer in `traces.tracers`')
+                                        ->cannotBeEmpty()
+                                        ->isRequired()
+                                    ->end()
+                                    ->arrayNode('request_headers')
+                                        ->defaultValue([])
+                                        ->scalarPrototype()->end()
+                                    ->end()
+                                    ->arrayNode('response_headers')
+                                        ->defaultValue([])
+                                        ->scalarPrototype()->end()
+                                    ->end()
                                 ->end()
                             ->end()
-                            ->arrayNode('response_headers')
-                                ->defaultValue([])
-                                ->scalarPrototype()
+                            ->arrayNode('metering')
+                                ->canBeEnabled()
+                                ->children()
+                                    ->scalarNode('meter')
+                                        ->info('The meter to use, defaults to `metrics.default_meter` or first meter in `metrics.meters`')
+                                        ->cannotBeEmpty()
+                                        ->isRequired()
+                                    ->end()
                                 ->end()
-                            ->end()
-                            ->scalarNode('meter')
-                                ->info('The meter to use, defaults to `default_meter` or first meter in `meters`')
-                                ->cannotBeEmpty()
                             ->end()
                         ->end()
                     ->end()
@@ -103,13 +114,25 @@ final class Configuration implements ConfigurationInterface
                         ->addDefaultsIfNotSet()
                         ->canBeEnabled()
                         ->children()
-                            ->scalarNode('tracer')
-                                ->info('The tracer to use, defaults to `default_tracer` or first tracer in `tracers`')
-                                ->cannotBeEmpty()
+                            ->arrayNode('tracing')
+                                ->canBeEnabled()
+                                ->children()
+                                    ->scalarNode('tracer')
+                                        ->info('The tracer to use, defaults to `traces.default_tracer` or first tracer in `traces.tracers`')
+                                        ->cannotBeEmpty()
+                                        ->isRequired()
+                                    ->end()
+                                ->end()
                             ->end()
-                            ->scalarNode('meter')
-                                ->info('The meter to use, defaults to `default_meter` or first meter in `meters`')
-                                ->cannotBeEmpty()
+                            ->arrayNode('metering')
+                                ->canBeEnabled()
+                                ->children()
+                                    ->scalarNode('meter')
+                                        ->info('The meter to use, defaults to `metrics.default_meter` or first meter in `metrics.meters`')
+                                        ->cannotBeEmpty()
+                                        ->isRequired()
+                                    ->end()
+                                ->end()
                             ->end()
                         ->end()
                     ->end()
@@ -383,6 +406,7 @@ final class Configuration implements ConfigurationInterface
                         ->info('The default logger to use among the `loggers`')
                         ->cannotBeEmpty()
                     ->end()
+                    ->append($this->getLogsMonologNode())
                     ->append($this->getLogsLoggersNode())
                     ->append($this->getLogsProvidersNode())
                     ->append($this->getLogsProcessorsNode())
@@ -390,6 +414,32 @@ final class Configuration implements ConfigurationInterface
                 ->end()
             ->end()
         ;
+    }
+
+    private function getLogsMonologNode(): ArrayNodeDefinition
+    {
+        $treeBuilder = new TreeBuilder('monolog');
+
+        $node = $treeBuilder->getRootNode()
+            ->canBeEnabled()
+            ->children()
+                ->arrayNode('handlers')
+                    ->requiresAtLeastOneElement()
+                    ->useAttributeAsKey('handler')
+                    ->arrayPrototype()
+                        ->children()
+                            ->scalarNode('provider')->cannotBeEmpty()->isRequired()->end()
+                            ->enumNode('level')
+                                ->defaultValue(strtolower(Level::Debug->name))
+                                ->values(array_map(fn (Level $level) => strtolower($level->name), Level::cases()))
+                            ->end()
+                            ->booleanNode('bubble')->defaultValue(true)->end()
+                        ->end()
+                    ->end()
+                ->end()
+            ->end();
+
+        return $node;
     }
 
     private function getLogsLoggersNode(): ArrayNodeDefinition
@@ -427,10 +477,7 @@ final class Configuration implements ConfigurationInterface
                         ->values(array_map(fn (LoggerProviderEnum $enum) => $enum->value, LoggerProviderEnum::cases()))
                         ->isRequired()
                     ->end()
-                    ->arrayNode('processors')
-                        ->requiresAtLeastOneElement()
-                        ->scalarPrototype()->cannotBeEmpty()->isRequired()->end()
-                    ->end()
+                    ->scalarNode('processor')->cannotBeEmpty()->end()
                 ->end()
             ->end();
 
