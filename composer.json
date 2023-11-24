@@ -42,7 +42,7 @@
         "php": "^8.2",
         "open-telemetry/api": "^1.0",
         "open-telemetry/sdk": "^1.0",
-        "open-telemetry/sem-conv": "^1.22",
+        "open-telemetry/sem-conv": "^1.23",
         "symfony/config": "^6.3",
         "symfony/dependency-injection": "^6.3"
     },

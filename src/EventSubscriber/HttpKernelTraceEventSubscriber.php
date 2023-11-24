@@ -187,6 +187,7 @@ final class HttpKernelTraceEventSubscriber implements EventSubscriberInterface
 
         $response = $event->getResponse();
         $span->setAttribute(TraceAttributes::HTTP_RESPONSE_BODY_SIZE, $response->headers->get('Content-Length'));
+        $span->setAttribute(TraceAttributes::NETWORK_PROTOCOL_VERSION, $response->getProtocolVersion());
         $span->setAttribute(TraceAttributes::HTTP_RESPONSE_STATUS_CODE, $response->getStatusCode());
         if ($response->getStatusCode() >= 500 && $response->getStatusCode() < 600) {
             $span->setStatus(StatusCode::STATUS_ERROR);
@@ -268,23 +269,24 @@ final class HttpKernelTraceEventSubscriber implements EventSubscriberInterface
     private function requestAttributes(Request $request): iterable
     {
         return [
+            TraceAttributes::URL_FULL => $request->getUri(),
             TraceAttributes::HTTP_REQUEST_METHOD => $request->getMethod(),
-            TraceAttributes::URL_PATH => $request->getRequestUri(),
+            TraceAttributes::URL_PATH => $request->getPathInfo(),
             HttpKernelTraceAttributeEnum::HttpHost->toString() => $request->getHttpHost(),
             TraceAttributes::URL_SCHEME => $request->getScheme(),
             TraceAttributes::NETWORK_PROTOCOL_VERSION => ($protocolVersion = $request->getProtocolVersion()) !== null
                 ? strtr($protocolVersion, ['HTTP/' => ''])
                 : null,
-            HttpKernelTraceAttributeEnum::HttpUserAgent->toString() => $request->headers->get('User-Agent'),
+            TraceAttributes::USER_AGENT_ORIGINAL => $request->headers->get('User-Agent'),
             TraceAttributes::HTTP_REQUEST_BODY_SIZE => $request->headers->get('Content-Length'),
             TraceAttributes::NETWORK_PEER_ADDRESS => $request->getClientIp(),
 
             HttpKernelTraceAttributeEnum::NetPeerIp->toString() => $request->server->get('REMOTE_ADDR'),
-            TraceAttributes::CLIENT_PORT => $request->server->get('REMOTE_PORT'),
             TraceAttributes::CLIENT_ADDRESS => $request->server->get('REMOTE_HOST'),
+            TraceAttributes::CLIENT_PORT => $request->server->get('REMOTE_PORT'),
             HttpKernelTraceAttributeEnum::NetHostIp->toString() => $request->server->get('SERVER_ADDR'),
-            TraceAttributes::SERVER_PORT => $request->server->get('SERVER_PORT'),
             TraceAttributes::SERVER_ADDRESS => $request->server->get('SERVER_NAME'),
+            TraceAttributes::SERVER_PORT => $request->server->get('SERVER_PORT'),
         ];
     }
 
