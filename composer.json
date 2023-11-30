@@ -1,5 +1,5 @@
 {
-    "name": "gaelreyrol/opentelemetry-bundle",
+    "name": "friendsofopentelemetry/opentelemetry-bundle",
     "description": "Symfony Bundle for OpenTelemetry PHP",
     "keywords": ["symfony", "bundle", "opentelemetry", "otel", "metrics", "tracing", "logging", "apm", "otlp"],
     "type": "symfony-bundle",
@@ -39,12 +39,12 @@
     "minimum-stability": "stable",
     "prefer-stable": true,
     "require": {
-        "php": "^8.2",
+        "php": "~8.2 | ~8.3",
         "open-telemetry/api": "^1.0",
         "open-telemetry/sdk": "^1.0",
         "open-telemetry/sem-conv": "^1.23",
-        "symfony/config": "^6.3",
-        "symfony/dependency-injection": "^6.3"
+        "symfony/config": "^6.4 | ^7.0",
+        "symfony/dependency-injection": "^6.4 | ^7.0"
     },
     "require-dev": {
         "ext-ffi": "*",
@@ -66,12 +66,12 @@
         "phpstan/phpstan-strict-rules": "^1.5",
         "phpstan/phpstan-symfony": "^1.3",
         "phpunit/phpunit": "^9.6",
-        "roave/security-advisories": "dev-latest",
-        "symfony/framework-bundle": "^6.3",
-        "symfony/http-kernel": "^6.3",
+        "roave/security-advisories": "dev-master",
+        "symfony/framework-bundle": "^6.4 | ^7.0",
+        "symfony/http-kernel": "^6.4 | ^7.0",
         "symfony/monolog-bundle": "^3.10",
-        "symfony/phpunit-bridge": "^6.3",
-        "symfony/yaml": "^6.3"
+        "symfony/phpunit-bridge": "^6.4 | ^7.0",
+        "symfony/yaml": "^6.4 | ^7.0"
     },
     "config": {
         "allow-plugins": {
