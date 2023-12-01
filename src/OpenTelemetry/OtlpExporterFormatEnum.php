@@ -1,6 +1,6 @@
 <?php
 
-namespace GaelReyrol\OpenTelemetryBundle\OpenTelemetry;
+namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry;
 
 enum OtlpExporterFormatEnum: string
 {

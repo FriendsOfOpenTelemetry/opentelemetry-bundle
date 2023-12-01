@@ -1,8 +1,8 @@
 <?php
 
-namespace GaelReyrol\OpenTelemetryBundle\Tests\Application;
+namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\Tests\Application;
 
-use GaelReyrol\OpenTelemetryBundle\OpenTelemetryBundle;
+use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetryBundle;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
 use Symfony\Component\Config\Loader\LoaderInterface;

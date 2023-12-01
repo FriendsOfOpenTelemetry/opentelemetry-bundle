@@ -1,8 +1,8 @@
 <?php
 
-namespace GaelReyrol\OpenTelemetryBundle\Tests\Unit\DependencyInjection;
+namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\Tests\Unit\DependencyInjection;
 
-use GaelReyrol\OpenTelemetryBundle\DependencyInjection\OpenTelemetryExtension;
+use FriendsOfOpenTelemetry\OpenTelemetryBundle\DependencyInjection\OpenTelemetryExtension;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ParameterBag\EnvPlaceholderParameterBag;
 

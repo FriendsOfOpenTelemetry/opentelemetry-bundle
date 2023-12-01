@@ -1,6 +1,6 @@
 <?php
 
-namespace GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Context\Attribute;
+namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Context\Attribute;
 
 enum ConsoleTraceAttributeEnum: string
 {

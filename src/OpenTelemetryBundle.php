@@ -1,6 +1,6 @@
 <?php
 
-namespace GaelReyrol\OpenTelemetryBundle;
+namespace FriendsOfOpenTelemetry\OpenTelemetryBundle;
 
 use Composer\InstalledVersions;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
@@ -9,7 +9,7 @@ final class OpenTelemetryBundle extends Bundle
 {
     public static function name(): string
     {
-        return 'gaelreyrol/opentelemetry-bundle';
+        return 'friendsofopentelemetry/opentelemetry-bundle';
     }
 
     public static function version(): string

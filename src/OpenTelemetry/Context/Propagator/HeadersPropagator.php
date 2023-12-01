@@ -1,6 +1,6 @@
 <?php
 
-namespace GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Context\Propagator;
+namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Context\Propagator;
 
 use OpenTelemetry\Context\Propagation\PropagationGetterInterface;
 use Symfony\Component\HttpFoundation\Request;

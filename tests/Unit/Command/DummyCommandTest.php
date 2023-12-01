@@ -1,14 +1,14 @@
 <?php
 
-namespace GaelReyrol\OpenTelemetryBundle\Tests\Unit\Command;
+namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\Tests\Unit\Command;
 
-use GaelReyrol\OpenTelemetryBundle\Tests\Application\Command\DummyCommand;
+use FriendsOfOpenTelemetry\OpenTelemetryBundle\Tests\Application\Command\DummyCommand;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Tester\CommandTester;
 
 /**
- * @coversDefaultClass \GaelReyrol\OpenTelemetryBundle\Tests\Application\Command\DummyCommand
+ * @coversDefaultClass \FriendsOfOpenTelemetry\OpenTelemetryBundle\Tests\Application\Command\DummyCommand
  */
 final class DummyCommandTest extends TestCase
 {

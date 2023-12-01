@@ -1,6 +1,6 @@
 open_telemetry:
   service:
-    namespace: 'GaelReyrol/OpenTelemetry'
+    namespace: 'FriendsOfOpenTelemetry/OpenTelemetry'
     name: 'Test'
     version: '0.0.0'
     environment: test

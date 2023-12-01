@@ -8,12 +8,12 @@ services:
     autoconfigure: true
     public: true
 
-  GaelReyrol\OpenTelemetryBundle\Tests\Application\:
+  FriendsOfOpenTelemetry\OpenTelemetryBundle\Tests\Application\:
     resource: '%kernel.project_dir%/src'
 
 open_telemetry:
   service:
-    namespace: 'GaelReyrol'
+    namespace: 'FriendsOfOpenTelemetry'
     name: 'Symfony Application'
     version: '0.0.0'
     environment: '%kernel.environment%'

@@ -15,7 +15,7 @@
         <ini name="error_reporting" value="-1"/>
         <env name="SYMFONY_DEPRECATIONS_HELPER" value="max[self]=0&amp;max[direct]=0&amp;quiet[]=indirect&amp;quiet[]=other"/>
         <env name="APP_DEBUG" value="0"/>
-        <env name="KERNEL_CLASS" value="GaelReyrol\OpenTelemetryBundle\Tests\Application\AppKernel"/>
+        <env name="KERNEL_CLASS" value="FriendsOfOpenTelemetry\OpenTelemetryBundle\Tests\Application\AppKernel"/>
     </php>
 
     <testsuites>

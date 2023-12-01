@@ -1,11 +1,11 @@
 <?php
 
-use GaelReyrol\OpenTelemetryBundle\EventSubscriber\ConsoleMetricEventSubscriber;
-use GaelReyrol\OpenTelemetryBundle\EventSubscriber\ConsoleTraceEventSubscriber;
-use GaelReyrol\OpenTelemetryBundle\EventSubscriber\HttpKernelMetricEventSubscriber;
-use GaelReyrol\OpenTelemetryBundle\EventSubscriber\HttpKernelTraceEventSubscriber;
-use GaelReyrol\OpenTelemetryBundle\OpenTelemetry\Context\Propagator\HeadersPropagator;
-use GaelReyrol\OpenTelemetryBundle\OpenTelemetryBundle;
+use FriendsOfOpenTelemetry\OpenTelemetryBundle\EventSubscriber\ConsoleMetricEventSubscriber;
+use FriendsOfOpenTelemetry\OpenTelemetryBundle\EventSubscriber\ConsoleTraceEventSubscriber;
+use FriendsOfOpenTelemetry\OpenTelemetryBundle\EventSubscriber\HttpKernelMetricEventSubscriber;
+use FriendsOfOpenTelemetry\OpenTelemetryBundle\EventSubscriber\HttpKernelTraceEventSubscriber;
+use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Context\Propagator\HeadersPropagator;
+use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetryBundle;
 use OpenTelemetry\Context\Propagation\NoopTextMapPropagator;
 use OpenTelemetry\Contrib\Logs\Monolog\Handler as MonologHandler;
 use OpenTelemetry\SDK\Logs\Logger;

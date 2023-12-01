@@ -1,6 +1,6 @@
 <?php
 
-namespace GaelReyrol\OpenTelemetryBundle\Tests\Unit\DependencyInjection;
+namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\Tests\Unit\DependencyInjection;
 
 use PHPUnit\Framework\TestCase;
 

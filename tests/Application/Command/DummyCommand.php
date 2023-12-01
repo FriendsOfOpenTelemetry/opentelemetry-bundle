@@ -1,6 +1,6 @@
 <?php
 
-namespace GaelReyrol\OpenTelemetryBundle\Tests\Application\Command;
+namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\Tests\Application\Command;
 
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;

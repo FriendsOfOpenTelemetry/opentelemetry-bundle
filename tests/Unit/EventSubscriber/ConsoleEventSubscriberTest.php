@@ -1,9 +1,9 @@
 <?php
 
-namespace GaelReyrol\OpenTelemetryBundle\Tests\Unit\EventSubscriber;
+namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\Tests\Unit\EventSubscriber;
 
-use GaelReyrol\OpenTelemetryBundle\EventSubscriber\ConsoleTraceEventSubscriber;
-use GaelReyrol\OpenTelemetryBundle\Tests\Application\Command\DummyCommand;
+use FriendsOfOpenTelemetry\OpenTelemetryBundle\EventSubscriber\ConsoleTraceEventSubscriber;
+use FriendsOfOpenTelemetry\OpenTelemetryBundle\Tests\Application\Command\DummyCommand;
 use OpenTelemetry\API\Trace\Span;
 use OpenTelemetry\API\Trace\TracerInterface;
 use OpenTelemetry\Context\Context;
@@ -17,7 +17,7 @@ use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\NullOutput;
 
 /**
- * @coversDefaultClass \GaelReyrol\OpenTelemetryBundle\EventSubscriber\ConsoleTraceEventSubscriber
+ * @coversDefaultClass \FriendsOfOpenTelemetry\OpenTelemetryBundle\EventSubscriber\ConsoleTraceEventSubscriber
  */
 final class ConsoleEventSubscriberTest extends TestCase
 {
@@ -25,7 +25,7 @@ final class ConsoleEventSubscriberTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->tracer = (new TracerProvider())->getTracer('gaelreyrol/opentelemetry-bundle');
+        $this->tracer = (new TracerProvider())->getTracer('friendsofopentelemetry/opentelemetry-bundle');
     }
 
     protected function tearDown(): void

@@ -28,12 +28,12 @@
     },
     "autoload": {
         "psr-4": {
-            "GaelReyrol\\OpenTelemetryBundle\\": "src/"
+            "FriendsOfOpenTelemetry\\OpenTelemetryBundle\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "GaelReyrol\\OpenTelemetryBundle\\Tests\\": "tests/"
+            "FriendsOfOpenTelemetry\\OpenTelemetryBundle\\Tests\\": "tests/"
         }
     },
     "minimum-stability": "stable",

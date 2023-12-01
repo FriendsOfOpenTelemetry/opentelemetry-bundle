@@ -1,6 +1,6 @@
 <?php
 
-namespace GaelReyrol\OpenTelemetryBundle\EventSubscriber;
+namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\EventSubscriber;
 
 use OpenTelemetry\API\Metrics\MeterInterface;
 use Symfony\Component\Console\Command\Command;

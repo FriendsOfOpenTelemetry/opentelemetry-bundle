@@ -1,15 +1,15 @@
 <?php
 
-namespace GaelReyrol\OpenTelemetryBundle\Tests\Unit\DependencyInjection;
+namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\Tests\Unit\DependencyInjection;
 
-use GaelReyrol\OpenTelemetryBundle\DependencyInjection\Configuration;
+use FriendsOfOpenTelemetry\OpenTelemetryBundle\DependencyInjection\Configuration;
 use Matthias\SymfonyConfigTest\PhpUnit\ConfigurationTestCaseTrait;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Definition\Dumper\YamlReferenceDumper;
 use Symfony\Component\Config\Definition\Processor;
 
 /**
- * @coversDefaultClass \GaelReyrol\OpenTelemetryBundle\DependencyInjection\Configuration
+ * @coversDefaultClass \FriendsOfOpenTelemetry\OpenTelemetryBundle\DependencyInjection\Configuration
  */
 final class ConfigurationTest extends TestCase
 {

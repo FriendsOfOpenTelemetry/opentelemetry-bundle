@@ -1,6 +1,6 @@
 <?php
 
-namespace GaelReyrol\OpenTelemetryBundle\Attribute;
+namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\Attribute;
 
 #[\Attribute(\Attribute::TARGET_CLASS)]
 final class TracableCommand
