@@ -52,7 +52,7 @@
         "ext-mbstring": "*",
         "ext-opentelemetry": "*",
         "ext-xdebug": "*",
-        "friendsofphp/php-cs-fixer": "^3.39",
+        "friendsofphp/php-cs-fixer": "^3.41",
         "matthiasnoback/symfony-config-test": "^5.1",
         "matthiasnoback/symfony-dependency-injection-test": "^5.0",
         "open-telemetry/exporter-otlp": "^1.0",
