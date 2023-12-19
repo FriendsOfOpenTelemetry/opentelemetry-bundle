@@ -30,12 +30,24 @@ class DsnTest extends TestCase
      */
     public static function fromStringProvider(): iterable
     {
+        yield 'gRPC Transport, OTLP Exporter' => [
+            'grpc+otlp://localhost:4317',
+            new Dsn('grpc+otlp', 'localhost', null, null, 4317),
+        ];
         yield 'HTTP Transport, OTLP Exporter with JSON Content-Type, Compression GZIP' => [
             'http+otlp://localhost:4318/v1/traces?content-type=application/json&compression=gzip',
             new Dsn('http+otlp', 'localhost', null, null, 4318, '/v1/traces', [
                 'content-type' => 'application/json',
                 'compression' => 'gzip',
             ]),
+        ];
+        yield 'HTTP Transport, Zipkin Exporter with basic authentication' => [
+            'http+zipkin://user:password@localhost:9411/api/v2/spans',
+            new Dsn('http+zipkin', 'localhost', 'user', 'password', 9411, '/api/v2/spans'),
+        ];
+        yield 'Stream Transport, Console Exporter' => [
+            'stream+console://default',
+            new Dsn('stream+console', 'default'),
         ];
     }
 
