@@ -3,8 +3,6 @@
 namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\Tests\Unit\DependencyInjection;
 
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\DependencyInjection\OpenTelemetryExtension;
-use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\OtlpExporterCompressionEnum;
-use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\OtlpExporterFormatEnum;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Trace\SpanExporter\OtlpSpanExporterFactory;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Trace\SpanProcessor\SimpleSpanProcessorFactory;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -22,10 +20,15 @@ abstract class FixtureOpenTelemetryExtensionTest extends DependencyInjectionTest
 
         $exporter = $container->getDefinition('open_telemetry.traces.exporters.otlp_json');
         self::assertEquals([OtlpSpanExporterFactory::class, 'create'], $exporter->getFactory());
-        self::assertEquals('http://localhost:4318/v1/traces', $exporter->getArgument('$endpoint'));
-        self::assertIsArray($exporter->getArgument('$headers'));
-        self::assertSame(OtlpExporterFormatEnum::Json, $exporter->getArgument('$format'));
-        self::assertSame(OtlpExporterCompressionEnum::None, $exporter->getArgument('$compression'));
+        self::assertEquals(['http+otlp://localhost:4318/v1/traces'], $exporter->getArgument('$dsn')->getArguments());
+        self::assertEquals([[
+            'format' => 'json',
+            'compression' => 'none',
+            'headers' => [],
+            'timeout' => 0.1,
+            'retry' => 100,
+            'max' => 3,
+        ]], $exporter->getArgument('$options')->getArguments());
 
         $processor = $container->getDefinition('open_telemetry.traces.processors.simple');
         self::assertEquals([SimpleSpanProcessorFactory::class, 'create'], $processor->getFactory());

@@ -2,25 +2,18 @@
 
 namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Trace\SpanExporter;
 
-use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\OtlpExporterCompressionEnum;
-use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\OtlpExporterFormatEnum;
+use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Exporter\ExporterDsn;
+use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Exporter\ExporterOptionsInterface;
+use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Trace\TraceExporterEndpoint;
+use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Transport\PsrHttpTransportFactory;
 use OpenTelemetry\Contrib\Zipkin\Exporter;
-use OpenTelemetry\SDK\Common\Export\Http\PsrTransportFactory;
-use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 
 final readonly class ZipkinSpanExporterFactory implements SpanExporterFactoryInterface
 {
-    public static function create(
-        string $endpoint = null,
-        array $headers = null,
-        OtlpExporterFormatEnum $format = null,
-        OtlpExporterCompressionEnum $compression = null,
-    ): SpanExporterInterface {
-        if (null === $endpoint) {
-            throw new \RuntimeException('Endpoint is null');
-        }
-        $transport = PsrTransportFactory::discover()->create($endpoint, 'application/json');
+    public static function create(ExporterDsn $dsn, ExporterOptionsInterface $options): Exporter
+    {
+        $transportFactory = PsrHttpTransportFactory::fromExporter(TraceExporterEndpoint::fromDsn($dsn), $options);
 
-        return new Exporter($transport);
+        return new Exporter($transportFactory->create());
     }
 }

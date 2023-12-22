@@ -2,20 +2,14 @@
 
 namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Metric\MetricExporter;
 
-use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\OtlpExporterCompressionEnum;
-use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\OtlpExporterFormatEnum;
+use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Exporter\ExporterDsn;
+use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Exporter\ExporterOptionsInterface;
 use OpenTelemetry\SDK\Metrics\MetricExporter\NoopMetricExporter;
-use OpenTelemetry\SDK\Metrics\MetricExporterInterface;
 
 final class NoopMetricExporterFactory implements MetricExporterFactoryInterface
 {
-    public static function create(
-        string $endpoint = null,
-        array $headers = null,
-        OtlpExporterCompressionEnum $compression = null,
-        OtlpExporterFormatEnum $format = null,
-        MetricTemporalityEnum $temporality = null,
-    ): MetricExporterInterface {
+    public static function create(ExporterDsn $dsn, ExporterOptionsInterface $options): NoopMetricExporter
+    {
         return new NoopMetricExporter();
     }
 }

@@ -1,8 +1,8 @@
 <?php
 
-namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry;
+namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Exporter;
 
-final class Dsn
+final class ExporterDsn
 {
     public function __construct(
         private readonly string $scheme,
@@ -75,5 +75,39 @@ final class Dsn
     public function getOption(string $key, mixed $default = null): mixed
     {
         return $this->options[$key] ?? $default;
+    }
+
+    /**
+     * @return string[]
+     */
+    private function parseScheme(): array
+    {
+        return explode('+', $this->getScheme(), 2);
+    }
+
+    public function getExporter(): string
+    {
+        $parts = $this->parseScheme();
+
+        $exporter = null;
+        if (2 === count($parts)) {
+            $exporter = $parts[1];
+        }
+        if (1 === count($parts)) {
+            $exporter = $parts[0];
+        }
+
+        if ('' === $exporter || null === $exporter) {
+            throw new \InvalidArgumentException('The DSN scheme must contain an exporter.');
+        }
+
+        return $exporter;
+    }
+
+    public function getTransport(): ?string
+    {
+        $parts = $this->parseScheme();
+
+        return 2 === count($parts) ? $parts[0] : null;
     }
 }
