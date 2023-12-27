@@ -141,7 +141,7 @@ final class ConfigurationTest extends TestCase
                     provider:
                         type:                 default # One of "default"; "noop", Required
                         sampler:
-                            type:                 always_on # One of "always_on"; "always_off"; "trace_id_ratio"; "parent_based", Required
+                            type:                 always_on # One of "always_off"; "always_on"; "parent_based"; "trace_id_ratio", Required
                             ratio:                ~
                             parent:               ~
                         processors:           []
@@ -192,7 +192,7 @@ final class ConfigurationTest extends TestCase
                     provider:
                         type:                 default # One of "noop"; "default", Required
                         exporter:             ~
-                        filter:               none # One of "with_sampled_trace"; "all"; "none"
+                        filter:               none # One of "all"; "none"; "with_sampled_trace"
                 exporters:
 
                     # Prototype

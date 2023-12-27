@@ -10,5 +10,5 @@ interface ExporterFactoryInterface
     /**
      * @return T
      */
-    public static function create(ExporterDsn $dsn, ExporterOptionsInterface $options);
+    public static function createExporter(ExporterDsn $dsn, ExporterOptionsInterface $options);
 }

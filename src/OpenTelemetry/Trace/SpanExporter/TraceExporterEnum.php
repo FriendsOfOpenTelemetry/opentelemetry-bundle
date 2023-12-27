@@ -2,6 +2,7 @@
 
 namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Trace\SpanExporter;
 
+use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Exporter\ExporterDsn;
 use OpenTelemetry\Contrib\Otlp\SpanExporter as OtlpSpanExporter;
 use OpenTelemetry\Contrib\Zipkin\Exporter as ZipkinSpanExporter;
 use OpenTelemetry\SDK\Trace\SpanExporter\ConsoleSpanExporter;
@@ -10,7 +11,7 @@ use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 
 enum TraceExporterEnum: string
 {
-    case InMemory = 'in_memory';
+    case InMemory = 'in-memory';
     case Console = 'console';
     case Otlp = 'otlp';
     case Zipkin = 'zipkin';
@@ -39,5 +40,16 @@ enum TraceExporterEnum: string
             self::Otlp => OtlpSpanExporter::class,
             self::Zipkin => ZipkinSpanExporter::class,
         };
+    }
+
+    public static function fromDsn(ExporterDsn $dsn): self
+    {
+        $exporter = self::tryFrom($dsn->getExporter());
+
+        if (null === $exporter) {
+            throw new \InvalidArgumentException('Unsupported DSN exporter.');
+        }
+
+        return $exporter;
     }
 }

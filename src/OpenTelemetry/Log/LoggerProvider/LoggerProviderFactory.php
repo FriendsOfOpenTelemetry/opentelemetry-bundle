@@ -10,7 +10,7 @@ use OpenTelemetry\SDK\Logs\LogRecordProcessorInterface;
 
 final class LoggerProviderFactory implements LoggerProviderFactoryInterface
 {
-    public static function create(LogRecordProcessorInterface $processor): LoggerProviderInterface
+    public static function createProvider(LogRecordProcessorInterface $processor): LoggerProviderInterface
     {
         $instrumentationScopeFactory = new InstrumentationScopeFactory((new LogRecordLimitsBuilder())->build()->getAttributeFactory());
 

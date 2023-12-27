@@ -9,7 +9,7 @@ use OpenTelemetry\SDK\Metrics\MetricExporter\InMemoryExporter;
 
 final class InMemoryMetricExporterFactory implements MetricExporterFactoryInterface
 {
-    public static function create(ExporterDsn $dsn, ExporterOptionsInterface $options): InMemoryExporter
+    public static function createExporter(ExporterDsn $dsn, ExporterOptionsInterface $options): InMemoryExporter
     {
         assert($options instanceof MetricExporterOptions);
 

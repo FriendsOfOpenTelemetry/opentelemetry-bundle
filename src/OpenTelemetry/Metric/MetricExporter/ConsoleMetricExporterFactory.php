@@ -9,7 +9,7 @@ use OpenTelemetry\SDK\Metrics\MetricExporter\ConsoleMetricExporter;
 
 final class ConsoleMetricExporterFactory implements MetricExporterFactoryInterface
 {
-    public static function create(ExporterDsn $dsn, ExporterOptionsInterface $options): ConsoleMetricExporter
+    public static function createExporter(ExporterDsn $dsn, ExporterOptionsInterface $options): ConsoleMetricExporter
     {
         assert($options instanceof MetricExporterOptions);
 

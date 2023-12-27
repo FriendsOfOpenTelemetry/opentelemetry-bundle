@@ -15,5 +15,5 @@ interface TransportFactoryInterface
     /**
      * @return TransportInterface<string>
      */
-    public function create(): TransportInterface;
+    public function createTransport(): TransportInterface;
 }

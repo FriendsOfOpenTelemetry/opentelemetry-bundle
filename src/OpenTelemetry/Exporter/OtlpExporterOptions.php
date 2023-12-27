@@ -18,7 +18,7 @@ final class OtlpExporterOptions implements ExporterOptionsInterface
     /**
      * @param array<string, mixed> $headers
      */
-    private function __construct(
+    public function __construct(
         private OtlpExporterFormatEnum $format = OtlpExporterFormatEnum::Json,
         private array $headers = [],
         private OtlpExporterCompressionEnum $compression = OtlpExporterCompressionEnum::None,
@@ -84,7 +84,10 @@ final class OtlpExporterOptions implements ExporterOptionsInterface
      */
     public function getHeaders(): array
     {
-        return $this->headers + OtlpUtil::getUserAgentHeader();
+        $otlpHeaders = OtlpUtil::getUserAgentHeader();
+        $otlpHeaders['User-Agent'] .= ', Symfony OTEL Bundle';
+
+        return $this->headers + $otlpHeaders;
     }
 
     public function getCompression(): OtlpExporterCompressionEnum

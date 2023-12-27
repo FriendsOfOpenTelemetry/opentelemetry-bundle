@@ -20,7 +20,7 @@ final readonly class StreamTransportFactory implements TransportFactoryInterface
     public static function fromExporter(ExporterEndpointInterface $endpoint, ExporterOptionsInterface $options): self
     {
         if (false === self::supportExporter($endpoint, $options)) {
-            throw new \RuntimeException('Unsupported exporter endpoint or options for this transport.');
+            throw new \InvalidArgumentException('Unsupported exporter endpoint or options for this transport.');
         }
 
         $params = new TransportParams();
@@ -36,7 +36,7 @@ final readonly class StreamTransportFactory implements TransportFactoryInterface
         return 'stream' === $endpoint->getTransport();
     }
 
-    public function create(): TransportInterface
+    public function createTransport(): TransportInterface
     {
         $format = OtlpExporterFormatEnum::tryFrom($this->params->contentType) ?? OtlpExporterFormatEnum::Json;
         $compression = OtlpExporterCompressionEnum::tryFrom($this->params->compression) ?? OtlpExporterCompressionEnum::None;

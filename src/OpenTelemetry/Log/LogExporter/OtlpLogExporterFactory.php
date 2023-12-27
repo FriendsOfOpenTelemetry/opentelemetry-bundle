@@ -11,16 +11,25 @@ use OpenTelemetry\Contrib\Otlp\LogsExporter;
 
 final class OtlpLogExporterFactory implements LogExporterFactoryInterface
 {
-    public static function create(ExporterDsn $dsn, ExporterOptionsInterface $options): LogsExporter
+    public static function createExporter(ExporterDsn $dsn, ExporterOptionsInterface $options): LogsExporter
     {
-        $transportFactoryClass = TransportEnum::from($dsn->getTransport())->getFactoryClass();
+        $exporter = LogExporterEnum::fromDsn($dsn);
+        if (LogExporterEnum::Otlp !== $exporter) {
+            throw new \InvalidArgumentException('DSN exporter must be of type Otlp.');
+        }
+
+        $transport = TransportEnum::fromDsn($dsn);
+        if (null === $transport) {
+            throw new \InvalidArgumentException('Could not find a transport from DSN for this exporter factory.');
+        }
+
         /** @var TransportFactoryInterface $transportFactory */
         $transportFactory = call_user_func(
-            [$transportFactoryClass, 'fromExporter'],
+            [$transport->getFactoryClass(), 'fromExporter'],
             LogExporterEndpoint::fromDsn($dsn),
             $options,
         );
 
-        return new LogsExporter($transportFactory->create());
+        return new LogsExporter($transportFactory->createTransport());
     }
 }

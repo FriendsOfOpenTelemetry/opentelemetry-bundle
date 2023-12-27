@@ -98,7 +98,7 @@ final class ExporterDsn
         }
 
         if ('' === $exporter || null === $exporter) {
-            throw new \InvalidArgumentException('The DSN scheme must contain an exporter.');
+            throw new \InvalidArgumentException('The DSN scheme does not contain an exporter.');
         }
 
         return $exporter;

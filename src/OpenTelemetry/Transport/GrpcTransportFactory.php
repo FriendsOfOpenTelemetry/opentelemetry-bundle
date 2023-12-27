@@ -36,7 +36,7 @@ final readonly class GrpcTransportFactory implements TransportFactoryInterface
         return str_contains($endpoint->getTransport() ?? '', 'grpc');
     }
 
-    public function create(): TransportInterface
+    public function createTransport(): TransportInterface
     {
         $format = OtlpExporterFormatEnum::Grpc;
         $compression = OtlpExporterCompressionEnum::tryFrom($this->params->compression) ?? OtlpExporterCompressionEnum::None;

@@ -10,9 +10,9 @@ use OpenTelemetry\SDK\Trace\SpanExporter\ConsoleSpanExporter;
 
 final readonly class ConsoleSpanExporterFactory implements SpanExporterFactoryInterface
 {
-    public static function create(ExporterDsn $dsn, ExporterOptionsInterface $options): ConsoleSpanExporter
+    public static function createExporter(ExporterDsn $dsn, ExporterOptionsInterface $options): ConsoleSpanExporter
     {
-        $transport = StreamTransportFactory::fromExporter(TraceExporterEndpoint::fromDsn($dsn), $options)->create();
+        $transport = StreamTransportFactory::fromExporter(TraceExporterEndpoint::fromDsn($dsn), $options)->createTransport();
 
         return new ConsoleSpanExporter($transport);
     }

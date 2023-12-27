@@ -8,7 +8,7 @@ use OpenTelemetry\SDK\Logs\Exporter\NoopExporter;
 
 final class NoopLogExporterFactory implements LogExporterFactoryInterface
 {
-    public static function create(ExporterDsn $dsn, ExporterOptionsInterface $options): NoopExporter
+    public static function createExporter(ExporterDsn $dsn = null, ExporterOptionsInterface $options = null): NoopExporter
     {
         return new NoopExporter();
     }

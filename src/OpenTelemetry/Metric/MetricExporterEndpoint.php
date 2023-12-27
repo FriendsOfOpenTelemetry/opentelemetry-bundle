@@ -13,12 +13,12 @@ use OpenTelemetry\API\Signals;
 final class MetricExporterEndpoint implements ExporterEndpointInterface
 {
     private MetricExporterEnum $exporter;
-    private TransportEnum $transport;
+    private ?TransportEnum $transport;
 
     private function __construct(private readonly ExporterDsn $dsn)
     {
-        $this->exporter = MetricExporterEnum::from($this->dsn->getExporter());
-        $this->transport = TransportEnum::from($this->dsn->getTransport());
+        $this->exporter = MetricExporterEnum::fromDsn($this->dsn);
+        $this->transport = TransportEnum::fromDsn($this->dsn);
     }
 
     public static function fromDsn(ExporterDsn $dsn): self
@@ -36,11 +36,15 @@ final class MetricExporterEndpoint implements ExporterEndpointInterface
             return (string) OtlpExporterEndpoint::fromDsn($this->dsn)->withSignal(Signals::METRICS);
         }
 
-        throw new \RuntimeException('Unsupported DSN for Metric endpoint');
+        if (in_array($this->exporter, [MetricExporterEnum::InMemory, MetricExporterEnum::Noop], true)) {
+            return '';
+        }
+
+        throw new \InvalidArgumentException('Unsupported DSN for Metric endpoint');
     }
 
     public function getTransport(): ?string
     {
-        return $this->transport->value;
+        return $this->transport?->value;
     }
 }

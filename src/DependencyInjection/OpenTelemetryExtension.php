@@ -219,7 +219,7 @@ final class OpenTelemetryExtension extends ConfigurableExtension
         $container
             ->setDefinition($exporterId, new ChildDefinition('open_telemetry.traces.exporter'))
             ->setClass($exporter->getClass())
-            ->setFactory([$exporter->getFactoryClass(), 'create'])
+            ->setFactory([$exporter->getFactoryClass(), 'createExporter'])
             ->setArguments([
                 '$dsn' => $this->createExporterDsnDefinition($options['dsn'], $container),
                 '$options' => $this->createExporterOptionsDefinition($options['options'] ?? [], $container),
@@ -241,7 +241,7 @@ final class OpenTelemetryExtension extends ConfigurableExtension
         $container
             ->setDefinition($processorId, new ChildDefinition('open_telemetry.traces.processor'))
             ->setClass($options['class'])
-            ->setFactory([$options['factory'], 'create'])
+            ->setFactory([$options['factory'], 'createProcessor'])
             ->setArguments([
                 '$processors' => $options['processors'],
                 '$exporter' => $options['exporter'],
@@ -319,7 +319,7 @@ final class OpenTelemetryExtension extends ConfigurableExtension
         $container
             ->setDefinition($providerId, new ChildDefinition('open_telemetry.traces.provider'))
             ->setClass($options['class'])
-            ->setFactory([$options['factory'], 'create'])
+            ->setFactory([$options['factory'], 'createProvider'])
             ->setArguments([
                 '$sampler' => $sampler,
                 '$processors' => $options['processors'],
@@ -466,7 +466,7 @@ final class OpenTelemetryExtension extends ConfigurableExtension
         $container
             ->setDefinition($exporterId, new ChildDefinition('open_telemetry.metrics.exporter'))
             ->setClass($exporter->getClass())
-            ->setFactory([$exporter->getFactoryClass(), 'create'])
+            ->setFactory([$exporter->getFactoryClass(), 'createExporter'])
             ->setArguments([
                 '$dsn' => $this->createExporterDsnDefinition($options['dsn'], $container),
                 '$options' => $this->createExporterOptionsDefinition(
@@ -493,7 +493,7 @@ final class OpenTelemetryExtension extends ConfigurableExtension
         $container
             ->setDefinition($providerId, new ChildDefinition('open_telemetry.metrics.provider'))
             ->setClass($options['class'])
-            ->setFactory([$options['factory'], 'create'])
+            ->setFactory([$options['factory'], 'createProvider'])
             ->setArguments([
                 '$exporter' => $options['exporter'],
                 '$filter' => $options['filter'],
@@ -617,7 +617,7 @@ final class OpenTelemetryExtension extends ConfigurableExtension
         $container
             ->setDefinition($exporterId, new ChildDefinition('open_telemetry.logs.exporter'))
             ->setClass($exporter->getClass())
-            ->setFactory([$exporter->getFactoryClass(), 'create'])
+            ->setFactory([$exporter->getFactoryClass(), 'createExporter'])
             ->setArguments([
                 '$dsn' => $this->createExporterDsnDefinition($options['dsn'], $container),
                 '$options' => $this->createExporterOptionsDefinition($options['options'] ?? [], $container),
@@ -639,7 +639,7 @@ final class OpenTelemetryExtension extends ConfigurableExtension
         $container
             ->setDefinition($processorId, new ChildDefinition('open_telemetry.logs.processor'))
             ->setClass($options['class'])
-            ->setFactory([$options['factory'], 'create'])
+            ->setFactory([$options['factory'], 'createProcessor'])
             ->setArguments([
                 '$processors' => $options['processors'],
                 '$exporter' => $options['exporter'],
@@ -714,7 +714,7 @@ final class OpenTelemetryExtension extends ConfigurableExtension
         $container
             ->setDefinition($providerId, new ChildDefinition('open_telemetry.logs.provider'))
             ->setClass($options['class'])
-            ->setFactory([$options['factory'], 'create'])
+            ->setFactory([$options['factory'], 'createProvider'])
             ->setArguments([
                 '$processor' => $options['processor'],
             ]);

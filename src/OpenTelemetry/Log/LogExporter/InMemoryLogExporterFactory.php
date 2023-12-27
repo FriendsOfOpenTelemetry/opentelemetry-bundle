@@ -8,7 +8,7 @@ use OpenTelemetry\SDK\Logs\Exporter\InMemoryExporter;
 
 final class InMemoryLogExporterFactory implements LogExporterFactoryInterface
 {
-    public static function create(ExporterDsn $dsn, ExporterOptionsInterface $options): InMemoryExporter
+    public static function createExporter(ExporterDsn $dsn = null, ExporterOptionsInterface $options = null): InMemoryExporter
     {
         return new InMemoryExporter();
     }

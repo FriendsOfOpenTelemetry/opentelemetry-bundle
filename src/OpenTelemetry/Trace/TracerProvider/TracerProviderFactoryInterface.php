@@ -9,7 +9,7 @@ use OpenTelemetry\SDK\Trace\TracerProviderInterface;
 interface TracerProviderFactoryInterface
 {
     /**
-     * @param ?SpanProcessorInterface[] $processors
+     * @param SpanProcessorInterface[] $processors
      */
-    public static function create(SamplerInterface $sampler = null, array $processors = null): TracerProviderInterface;
+    public static function createProvider(SamplerInterface $sampler = null, array $processors = []): TracerProviderInterface;
 }

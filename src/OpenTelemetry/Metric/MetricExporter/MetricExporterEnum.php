@@ -2,6 +2,7 @@
 
 namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Metric\MetricExporter;
 
+use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Exporter\ExporterDsn;
 use OpenTelemetry\Contrib\Otlp\MetricExporter;
 use OpenTelemetry\SDK\Metrics\MetricExporter\ConsoleMetricExporter;
 use OpenTelemetry\SDK\Metrics\MetricExporter\InMemoryExporter;
@@ -13,7 +14,7 @@ enum MetricExporterEnum: string
     case Otlp = 'otlp';
 
     case Console = 'console';
-    case InMemory = 'in_memory';
+    case InMemory = 'in-memory';
 
     public function getFactoryClass(): string
     {
@@ -33,5 +34,16 @@ enum MetricExporterEnum: string
             self::Otlp => MetricExporter::class,
             self::Noop => NoopMetricExporter::class,
         };
+    }
+
+    public static function fromDsn(ExporterDsn $dsn): self
+    {
+        $exporter = self::tryFrom($dsn->getExporter());
+
+        if (null === $exporter) {
+            throw new \InvalidArgumentException('Unsupported DSN exporter.');
+        }
+
+        return $exporter;
     }
 }

@@ -10,10 +10,15 @@ use OpenTelemetry\Contrib\Zipkin\Exporter;
 
 final readonly class ZipkinSpanExporterFactory implements SpanExporterFactoryInterface
 {
-    public static function create(ExporterDsn $dsn, ExporterOptionsInterface $options): Exporter
+    public static function createExporter(ExporterDsn $dsn, ExporterOptionsInterface $options): Exporter
     {
+        $exporter = TraceExporterEnum::fromDsn($dsn);
+        if (TraceExporterEnum::Zipkin !== $exporter) {
+            throw new \InvalidArgumentException('DSN exporter must be of type Zipkin.');
+        }
+
         $transportFactory = PsrHttpTransportFactory::fromExporter(TraceExporterEndpoint::fromDsn($dsn), $options);
 
-        return new Exporter($transportFactory->create());
+        return new Exporter($transportFactory->createTransport());
     }
 }

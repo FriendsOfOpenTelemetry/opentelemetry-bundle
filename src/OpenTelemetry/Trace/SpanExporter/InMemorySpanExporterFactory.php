@@ -8,7 +8,7 @@ use OpenTelemetry\SDK\Trace\SpanExporter\InMemoryExporter;
 
 final readonly class InMemorySpanExporterFactory implements SpanExporterFactoryInterface
 {
-    public static function create(ExporterDsn $dsn, ExporterOptionsInterface $options): InMemoryExporter
+    public static function createExporter(ExporterDsn $dsn = null, ExporterOptionsInterface $options = null): InMemoryExporter
     {
         return new InMemoryExporter();
     }

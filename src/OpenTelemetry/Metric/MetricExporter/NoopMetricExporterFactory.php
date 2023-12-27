@@ -8,7 +8,7 @@ use OpenTelemetry\SDK\Metrics\MetricExporter\NoopMetricExporter;
 
 final class NoopMetricExporterFactory implements MetricExporterFactoryInterface
 {
-    public static function create(ExporterDsn $dsn, ExporterOptionsInterface $options): NoopMetricExporter
+    public static function createExporter(ExporterDsn $dsn = null, ExporterOptionsInterface $options = null): NoopMetricExporter
     {
         return new NoopMetricExporter();
     }

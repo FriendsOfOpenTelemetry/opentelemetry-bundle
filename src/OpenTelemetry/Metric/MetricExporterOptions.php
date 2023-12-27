@@ -8,9 +8,9 @@ use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Metric\MetricExport
 
 final class MetricExporterOptions implements ExporterOptionsInterface
 {
-    private function __construct(
+    public function __construct(
         private MetricTemporalityEnum $temporality = MetricTemporalityEnum::Delta,
-        private ?OtlpExporterOptions $otlpOptions = null,
+        private ?OtlpExporterOptions $otlpOptions = new OtlpExporterOptions(),
     ) {
     }
 

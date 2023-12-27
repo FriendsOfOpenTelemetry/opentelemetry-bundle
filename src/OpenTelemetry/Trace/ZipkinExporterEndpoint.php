@@ -12,17 +12,17 @@ use Psr\Http\Message\UriFactoryInterface;
 final class ZipkinExporterEndpoint implements ExporterEndpointInterface
 {
     private UriFactoryInterface $uriFactory;
-    private TransportEnum $transport;
+    private ?TransportEnum $transport;
 
     private function __construct(
         private readonly ExporterDsn $dsn,
         UriFactoryInterface $uriFactory = null,
     ) {
-        if (TraceExporterEnum::Zipkin !== TraceExporterEnum::from($this->dsn->getExporter())) {
-            throw new \RuntimeException('Provided DSN exporter is not compatible with this endpoint.');
+        if (TraceExporterEnum::Zipkin !== TraceExporterEnum::fromDsn($this->dsn)) {
+            throw new \InvalidArgumentException('Unsupported DSN exporter for this endpoint.');
         }
         $this->uriFactory = $uriFactory ?? Psr17FactoryDiscovery::findUriFactory();
-        $this->transport = TransportEnum::from($this->dsn->getTransport());
+        $this->transport = TransportEnum::fromDsn($this->dsn);
     }
 
     public static function fromDsn(ExporterDsn $dsn): self

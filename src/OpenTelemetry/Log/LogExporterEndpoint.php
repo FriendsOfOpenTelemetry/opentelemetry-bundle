@@ -14,13 +14,13 @@ final class LogExporterEndpoint implements ExporterEndpointInterface
 {
     private LogExporterEnum $exporter;
 
-    private TransportEnum $transport;
+    private ?TransportEnum $transport;
 
     private function __construct(
         private readonly ExporterDsn $dsn,
     ) {
-        $this->exporter = LogExporterEnum::from($this->dsn->getExporter());
-        $this->transport = TransportEnum::from($this->dsn->getTransport());
+        $this->exporter = LogExporterEnum::fromDsn($dsn);
+        $this->transport = TransportEnum::fromDsn($dsn);
     }
 
     public static function fromDsn(ExporterDsn $dsn): self
@@ -38,11 +38,15 @@ final class LogExporterEndpoint implements ExporterEndpointInterface
             return (string) OtlpExporterEndpoint::fromDsn($this->dsn)->withSignal(Signals::LOGS);
         }
 
-        throw new \RuntimeException('Unsupported DSN for Log endpoint');
+        if (in_array($this->exporter, [LogExporterEnum::InMemory, LogExporterEnum::Noop], true)) {
+            return '';
+        }
+
+        throw new \InvalidArgumentException('Unsupported DSN for Log endpoint');
     }
 
     public function getTransport(): ?string
     {
-        return $this->transport->value;
+        return $this->transport?->value;
     }
 }

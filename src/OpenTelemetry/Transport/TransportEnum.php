@@ -2,6 +2,8 @@
 
 namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Transport;
 
+use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Exporter\ExporterDsn;
+
 enum TransportEnum: string
 {
     case Grpc = 'grpc';
@@ -38,5 +40,10 @@ enum TransportEnum: string
             self::Http, self::Https => 4318,
             default => null,
         };
+    }
+
+    public static function fromDsn(ExporterDsn $dsn): ?self
+    {
+        return TransportEnum::tryFrom($dsn->getTransport() ?? '');
     }
 }

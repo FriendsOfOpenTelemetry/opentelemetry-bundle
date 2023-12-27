@@ -11,8 +11,13 @@ use OpenTelemetry\Contrib\Otlp\SpanExporter;
 
 final readonly class OtlpSpanExporterFactory implements SpanExporterFactoryInterface
 {
-    public static function create(ExporterDsn $dsn, ExporterOptionsInterface $options): SpanExporter
+    public static function createExporter(ExporterDsn $dsn, ExporterOptionsInterface $options): SpanExporter
     {
+        $exporter = TraceExporterEnum::fromDsn($dsn);
+        if (TraceExporterEnum::Otlp !== $exporter) {
+            throw new \InvalidArgumentException('DSN exporter must be of type Otlp.');
+        }
+
         $transportFactoryClass = TransportEnum::from($dsn->getTransport())->getFactoryClass();
         /** @var TransportFactoryInterface $transportFactory */
         $transportFactory = call_user_func(
@@ -21,6 +26,6 @@ final readonly class OtlpSpanExporterFactory implements SpanExporterFactoryInter
             $options,
         );
 
-        return new SpanExporter($transportFactory->create());
+        return new SpanExporter($transportFactory->createTransport());
     }
 }

@@ -15,9 +15,9 @@ enum OtlpExporterFormatEnum: string
     public function toContentType(): string
     {
         return match ($this) {
-            self::Json, self::Grpc => ContentTypes::JSON,
+            self::Json => ContentTypes::JSON,
             self::Ndjson => ContentTypes::NDJSON,
-            self::Protobuf => ContentTypes::PROTOBUF,
+            self::Grpc, self::Protobuf => ContentTypes::PROTOBUF,
         };
     }
 

@@ -36,7 +36,7 @@ final readonly class OtlpHttpTransportFactory implements TransportFactoryInterfa
         return str_contains($endpoint->getTransport() ?? '', 'http');
     }
 
-    public function create(): TransportInterface
+    public function createTransport(): TransportInterface
     {
         $format = OtlpExporterFormatEnum::tryFrom($this->params->contentType) ?? OtlpExporterFormatEnum::Json;
         $compression = OtlpExporterCompressionEnum::tryFrom($this->params->contentType) ?? OtlpExporterCompressionEnum::None;
