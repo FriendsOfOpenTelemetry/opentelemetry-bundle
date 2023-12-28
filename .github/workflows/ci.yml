@@ -42,7 +42,7 @@ jobs:
         run: php -m
       - name: Update project dependencies
         run: |
-          composer update --no-interaction --no-progress --ansi
+          composer update --ignore-platform-req=ext-xdebug --no-interaction --no-progress --ansi
       - name: Run PHP-CS-Fixer fix
         run: vendor/bin/php-cs-fixer fix --dry-run --diff --ansi
 
@@ -79,7 +79,7 @@ jobs:
         run: php -m
       - name: Update project dependencies
         run: |
-          composer update --no-interaction --no-progress --ansi
+          composer update --ignore-platform-req=ext-xdebug --no-interaction --no-progress --ansi
       - name: Cache PHPStan results
         uses: actions/cache@v3
         with:
@@ -132,6 +132,6 @@ jobs:
       - name: List PHP extensions
         run: php -m
       - name: Update project dependencies
-        run: composer update --no-interaction --no-progress --ansi
+        run: composer update --ignore-platform-req=ext-xdebug --no-interaction --no-progress --ansi
       - name: Run PHPUnit tests
         run: vendor/bin/phpunit
