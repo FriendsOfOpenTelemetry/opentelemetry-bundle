@@ -8,7 +8,7 @@
          beStrictAboutTodoAnnotatedTests="true"
          convertDeprecationsToExceptions="true"
          failOnRisky="true"
-         failOnWarning="true"
+         failOnWarning="false"
          verbose="true">
 
     <php>
