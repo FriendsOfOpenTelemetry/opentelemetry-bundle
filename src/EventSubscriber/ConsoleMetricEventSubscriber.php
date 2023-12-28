@@ -2,7 +2,6 @@
 
 namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\EventSubscriber;
 
-use OpenTelemetry\API\Metrics\MeterInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
@@ -13,11 +12,6 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final class ConsoleMetricEventSubscriber implements EventSubscriberInterface
 {
-    public function __construct(
-        private readonly MeterInterface $meter,
-    ) {
-    }
-
     public static function getSubscribedEvents(): array
     {
         return [

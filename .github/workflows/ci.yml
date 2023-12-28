@@ -1,0 +1,137 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  php-cs-fixer:
+    name: PHP CS Fixer (PHP ${{ matrix.php }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      matrix:
+        php:
+          - '8.3'
+      fail-fast: false
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: ffi, grpc, mbstring, opentelemetry, grpc
+          ini-values: memory_limit=-1
+          tools: pecl, composer
+          coverage: none
+      - name: Get composer cache directory
+        id: composercache
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+      - name: Cache dependencies
+        uses: actions/cache@v3
+        with:
+          path: ${{ steps.composercache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
+          restore-keys: ${{ runner.os }}-composer-
+      - name: List PHP extensions
+        run: php -m
+      - name: Update project dependencies
+        run: |
+          composer update --ignore-platform-req=ext-xdebug --no-interaction --no-progress --ansi
+      - name: Run PHP-CS-Fixer fix
+        run: vendor/bin/php-cs-fixer fix --dry-run --diff --ansi
+
+  phpstan:
+    name: PHPStan (PHP ${{ matrix.php }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      matrix:
+        php:
+          - '8.3'
+      fail-fast: false
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          tools: pecl, composer
+          extensions: ffi, grpc, mbstring, opentelemetry, grpc
+          coverage: none
+          ini-values: memory_limit=-1
+      - name: Get composer cache directory
+        id: composercache
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+      - name: Cache dependencies
+        uses: actions/cache@v3
+        with:
+          path: ${{ steps.composercache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
+          restore-keys: ${{ runner.os }}-composer-
+      - name: List PHP extensions
+        run: php -m
+      - name: Update project dependencies
+        run: |
+          composer update --ignore-platform-req=ext-xdebug --no-interaction --no-progress --ansi
+      - name: Cache PHPStan results
+        uses: actions/cache@v3
+        with:
+          path: /tmp/phpstan
+          key: phpstan-php${{ matrix.php }}-${{ github.sha }}
+          restore-keys: |
+            phpstan-php${{ matrix.php }}-
+            phpstan-
+        continue-on-error: true
+      - name: Run PHPStan analysis
+        run: |
+          ./vendor/bin/phpstan --version
+          ./vendor/bin/phpstan analyse --no-interaction --no-progress --ansi
+
+  phpunit:
+    name: PHPUnit (PHP ${{ matrix.php }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      matrix:
+        php:
+          - '8.2'
+          - '8.3'
+        include:
+          - php: '8.2'
+            coverage: true
+          - php: '8.3'
+            coverage: true
+      fail-fast: false
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          tools: pecl, composer
+          extensions: ffi, grpc, mbstring, opentelemetry, grpc
+          coverage: none
+          ini-values: memory_limit=-1
+      - name: Get composer cache directory
+        id: composercache
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+      - name: Cache dependencies
+        uses: actions/cache@v3
+        with:
+          path: ${{ steps.composercache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
+          restore-keys: ${{ runner.os }}-composer-
+      - name: List PHP extensions
+        run: php -m
+      - name: Update project dependencies
+        run: composer update --ignore-platform-req=ext-xdebug --no-interaction --no-progress --ansi
+      - name: Run PHPUnit tests
+        run: vendor/bin/phpunit
