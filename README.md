@@ -6,8 +6,8 @@
 
 > [WIP] Symfony Bundle for OpenTelemetry PHP
 
-[github-actions-ci-badge]: https://github.com/FriendsOfOpenTelemtry/opentelemetry-bundle/workflows/CI/badge.svg?branch=main
-[github-actions-ci-page]: https://github.com/FriendsOfOpenTelemtry/opentelemetry-bundle/actions?query=workflow%3ACI+branch%3Amain
+[github-actions-ci-badge]: https://github.com/FriendsOfOpenTelemetry/opentelemetry-bundle/actions/workflows/ci.yml/badge.svg
+[github-actions-ci-page]: https://github.com/FriendsOfOpenTelemetry/opentelemetry-bundle/actions/workflows/ci.yml
 [build-with-nix-badge]: https://img.shields.io/badge/Built_With-Nix-5277C3.svg?logo=nixos
 [build-with-nix-page]: https://builtwithnix.org/
 [project-stage-badge]: https://img.shields.io/badge/Project_Stage-Research-orange.svg
