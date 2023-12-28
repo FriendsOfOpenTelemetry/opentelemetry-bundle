@@ -25,7 +25,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
-          extensions: ffi, grpc, mbstring, opentelemetry, grpc, xdebug
+          extensions: ffi, grpc, mbstring, opentelemetry, grpc
           ini-values: memory_limit=-1
           tools: pecl, composer
           coverage: none
@@ -63,7 +63,7 @@ jobs:
         with:
           php-version: ${{ matrix.php }}
           tools: pecl, composer
-          extensions: ffi, grpc, mbstring, opentelemetry, grpc, xdebug
+          extensions: ffi, grpc, mbstring, opentelemetry, grpc
           coverage: none
           ini-values: memory_limit=-1
       - name: Get composer cache directory
@@ -117,7 +117,7 @@ jobs:
         with:
           php-version: ${{ matrix.php }}
           tools: pecl, composer
-          extensions: ffi, grpc, mbstring, opentelemetry, grpc, xdebug
+          extensions: ffi, grpc, mbstring, opentelemetry, grpc
           coverage: none
           ini-values: memory_limit=-1
       - name: Get composer cache directory
