@@ -27,10 +27,22 @@ jobs:
           php-version: ${{ matrix.php }}
           extensions: ffi, grpc, mbstring, opentelemetry, grpc, xdebug
           ini-values: memory_limit=-1
-          tools: pecl, composer, php-cs-fixer
+          tools: pecl, composer
           coverage: none
+      - name: Get composer cache directory
+        id: composercache
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+      - name: Cache dependencies
+        uses: actions/cache@v3
+        with:
+          path: ${{ steps.composercache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
+          restore-keys: ${{ runner.os }}-composer-
+      - name: Update project dependencies
+        run: |
+          composer update --no-interaction --no-progress --ansi
       - name: Run PHP-CS-Fixer fix
-        run: php-cs-fixer fix --dry-run --diff --ansi
+        run: vendor/bin/php-cs-fixer fix --dry-run --diff --ansi
 
   phpstan:
     name: PHPStan (PHP ${{ matrix.php }})
@@ -102,7 +114,7 @@ jobs:
           php-version: ${{ matrix.php }}
           tools: pecl, composer
           extensions: ffi, grpc, mbstring, opentelemetry, grpc, xdebug
-          coverage: false
+          coverage: none
           ini-values: memory_limit=-1
       - name: Get composer cache directory
         id: composercache
