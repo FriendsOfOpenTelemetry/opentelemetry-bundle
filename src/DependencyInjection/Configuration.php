@@ -2,17 +2,15 @@
 
 namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\DependencyInjection;
 
-use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Log\LogExporter\LogExporterEnum;
+use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Exporter\OtlpExporterCompressionEnum;
+use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Exporter\OtlpExporterFormatEnum;
+use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Exporter\OtlpExporterOptions;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Log\LoggerProvider\LoggerProviderEnum;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Log\LogProcessor\LogProcessorEnum;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Metric\MeterProvider\ExemplarFilterEnum;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Metric\MeterProvider\MeterProviderEnum;
-use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Metric\MetricExporter\MetricExporterEnum;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Metric\MetricExporter\MetricTemporalityEnum;
-use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\OtlpExporterCompressionEnum;
-use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\OtlpExporterFormatEnum;
-use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\SpanProcessorEnum;
-use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Trace\SpanExporter\TraceExporterEnum;
+use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Trace\SpanProcessor\SpanProcessorEnum;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Trace\TracerProvider\TraceProviderEnum;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Trace\TracerProvider\TraceSamplerEnum;
 use Monolog\Level;
@@ -256,29 +254,11 @@ final class Configuration implements ConfigurationInterface
             ->useAttributeAsKey('exporter')
             ->arrayPrototype()
                 ->children()
-                    ->enumNode('type')
-                        ->defaultValue(TraceExporterEnum::Otlp->value)
-                        ->values(array_map(fn (TraceExporterEnum $enum) => $enum->value, TraceExporterEnum::cases()))
+                    ->scalarNode('dsn')
                         ->isRequired()
-                    ->end()
-                    ->scalarNode('endpoint')
                         ->cannotBeEmpty()
                     ->end()
-                    ->enumNode('format')
-                        ->info(sprintf('Required if exporter type is %s', OtlpExporterFormatEnum::Json->value))
-                        ->values(array_map(fn (OtlpExporterFormatEnum $enum) => $enum->value, OtlpExporterFormatEnum::cases()))
-                    ->end()
-                    ->arrayNode('headers')
-                        ->arrayPrototype()
-                            ->children()
-                                ->scalarNode('name')->isRequired()->cannotBeEmpty()->end()
-                                ->scalarNode('value')->isRequired()->cannotBeEmpty()->end()
-                            ->end()
-                        ->end()
-                    ->end()
-                    ->enumNode('compression')
-                        ->values(array_map(fn (OtlpExporterCompressionEnum $enum) => $enum->value, OtlpExporterCompressionEnum::cases()))
-                    ->end()
+                    ->append($this->getOtlpExportersOptionsNode())
                 ->end()
             ->end()
         ;
@@ -362,32 +342,15 @@ final class Configuration implements ConfigurationInterface
             ->useAttributeAsKey('exporter')
             ->arrayPrototype()
                 ->children()
-                    ->enumNode('type')
-                        ->defaultValue(MetricExporterEnum::Otlp->value)
-                        ->values(array_map(fn (MetricExporterEnum $enum) => $enum->value, MetricExporterEnum::cases()))
+                    ->scalarNode('dsn')
                         ->isRequired()
-                    ->end()
-                    ->scalarNode('endpoint')
                         ->cannotBeEmpty()
                     ->end()
-                    ->enumNode('format')
-                        ->info(sprintf('Required if exporter type is %s', OtlpExporterFormatEnum::Json->value))
-                        ->values(array_map(fn (OtlpExporterFormatEnum $enum) => $enum->value, OtlpExporterFormatEnum::cases()))
-                    ->end()
-                    ->arrayNode('headers')
-                        ->arrayPrototype()
-                        ->children()
-                            ->scalarNode('name')->isRequired()->cannotBeEmpty()->end()
-                            ->scalarNode('value')->isRequired()->cannotBeEmpty()->end()
-                        ->end()
-                    ->end()
-                    ->end()
-                    ->enumNode('compression')
-                        ->values(array_map(fn (OtlpExporterCompressionEnum $enum) => $enum->value, OtlpExporterCompressionEnum::cases()))
-                    ->end()
                     ->enumNode('temporality')
-                        ->values(array_map(fn (MetricTemporalityEnum $enum) => $enum->value, MetricTemporalityEnum::cases()))
+                        ->defaultValue(MetricTemporalityEnum::Delta->value)
+                        ->values(array_map(fn (MetricTemporalityEnum $temporality) => $temporality->value, MetricTemporalityEnum::cases()))
                     ->end()
+                    ->append($this->getOtlpExportersOptionsNode())
                 ->end()
             ->end()
         ;
@@ -519,29 +482,57 @@ final class Configuration implements ConfigurationInterface
             ->useAttributeAsKey('exporter')
             ->arrayPrototype()
                 ->children()
-                    ->enumNode('type')
-                        ->defaultValue(LogExporterEnum::Otlp->value)
-                        ->values(array_map(fn (LogExporterEnum $enum) => $enum->value, LogExporterEnum::cases()))
+                    ->scalarNode('dsn')
                         ->isRequired()
-                    ->end()
-                    ->scalarNode('endpoint')
                         ->cannotBeEmpty()
                     ->end()
-                    ->enumNode('format')
-                        ->info(sprintf('Required if exporter type is %s', OtlpExporterFormatEnum::Json->value))
-                        ->values(array_map(fn (OtlpExporterFormatEnum $enum) => $enum->value, OtlpExporterFormatEnum::cases()))
-                    ->end()
-                    ->arrayNode('headers')
-                        ->arrayPrototype()
-                            ->children()
-                                ->scalarNode('name')->isRequired()->cannotBeEmpty()->end()
-                                ->scalarNode('value')->isRequired()->cannotBeEmpty()->end()
-                            ->end()
+                    ->append($this->getOtlpExportersOptionsNode())
+                ->end()
+            ->end()
+        ;
+
+        return $node;
+    }
+
+    private function getOtlpExportersOptionsNode(): ArrayNodeDefinition
+    {
+        $treeBuilder = new TreeBuilder('options');
+
+        $node = $treeBuilder->getRootNode()
+            ->children()
+                ->enumNode('format')
+                    ->defaultValue(OtlpExporterFormatEnum::Json->value)
+                    ->values(array_map(fn (OtlpExporterFormatEnum $format) => $format->value, OtlpExporterFormatEnum::cases()))
+                ->end()
+                ->enumNode('compression')
+                    ->defaultValue(OtlpExporterCompressionEnum::None->value)
+                    ->values(array_map(fn (OtlpExporterCompressionEnum $format) => $format->value, OtlpExporterCompressionEnum::cases()))
+                ->end()
+                ->arrayNode('headers')
+                    ->arrayPrototype()
+                        ->children()
+                            ->scalarNode('name')->isRequired()->cannotBeEmpty()->end()
+                            ->scalarNode('value')->isRequired()->cannotBeEmpty()->end()
                         ->end()
                     ->end()
-                    ->enumNode('compression')
-                        ->values(array_map(fn (OtlpExporterCompressionEnum $enum) => $enum->value, OtlpExporterCompressionEnum::cases()))
-                    ->end()
+                ->end()
+                ->floatNode('timeout')
+                    ->defaultValue(OtlpExporterOptions::DEFAULT_TIMEOUT)
+                ->end()
+                ->integerNode('retry')
+                    ->defaultValue(OtlpExporterOptions::DEFAULT_RETRY_DELAY)
+                ->end()
+                ->integerNode('max')
+                    ->defaultValue(OtlpExporterOptions::DEFAULT_MAX_RETRIES)
+                ->end()
+                ->scalarNode('ca')
+                    ->cannotBeEmpty()
+                ->end()
+                ->scalarNode('cert')
+                    ->cannotBeEmpty()
+                ->end()
+                ->scalarNode('key')
+                    ->cannotBeEmpty()
                 ->end()
             ->end()
         ;

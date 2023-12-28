@@ -1,0 +1,25 @@
+open_telemetry:
+  service:
+    namespace: 'FriendsOfOpenTelemetry/OpenTelemetry'
+    name: 'Test'
+    version: '0.0.0'
+    environment: test
+  traces:
+    tracers:
+      main:
+        provider: noop
+  metrics:
+    meters:
+      main:
+        provider: default
+    providers:
+      default:
+        type: default
+        exporter: otlp
+    exporters:
+      otlp:
+        dsn: http+otlp://localhost
+  logs:
+    loggers:
+      main:
+        provider: noop

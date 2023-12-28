@@ -2,19 +2,12 @@
 
 namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Trace\SpanExporter;
 
-use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\OtlpExporterCompressionEnum;
-use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\OtlpExporterFormatEnum;
+use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Exporter\ExporterFactoryInterface;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 
-interface SpanExporterFactoryInterface
+/**
+ * @extends ExporterFactoryInterface<SpanExporterInterface>
+ */
+interface SpanExporterFactoryInterface extends ExporterFactoryInterface
 {
-    /**
-     * @param array<string, string> $headers
-     */
-    public static function create(
-        string $endpoint = null,
-        array $headers = null,
-        OtlpExporterFormatEnum $format = null,
-        OtlpExporterCompressionEnum $compression = null,
-    ): SpanExporterInterface;
 }

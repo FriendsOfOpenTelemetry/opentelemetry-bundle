@@ -8,12 +8,12 @@ use OpenTelemetry\SDK\Logs\Processor\SimpleLogRecordProcessor;
 
 final class SimpleLogProcessorFactory implements LogProcessorFactoryInterface
 {
-    public static function create(
-        array $processors = null,
+    public static function createProcessor(
+        array $processors = [],
         LogRecordExporterInterface $exporter = null,
     ): LogRecordProcessorInterface {
         if (null === $exporter) {
-            throw new \RuntimeException('Exporter is null');
+            throw new \InvalidArgumentException('Exporter is null');
         }
 
         return new SimpleLogRecordProcessor($exporter);

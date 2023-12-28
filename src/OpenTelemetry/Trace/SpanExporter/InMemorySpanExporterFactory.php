@@ -2,19 +2,14 @@
 
 namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Trace\SpanExporter;
 
-use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\OtlpExporterCompressionEnum;
-use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\OtlpExporterFormatEnum;
+use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Exporter\ExporterDsn;
+use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Exporter\ExporterOptionsInterface;
 use OpenTelemetry\SDK\Trace\SpanExporter\InMemoryExporter;
-use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 
 final readonly class InMemorySpanExporterFactory implements SpanExporterFactoryInterface
 {
-    public static function create(
-        string $endpoint = null,
-        array $headers = null,
-        OtlpExporterFormatEnum $format = null,
-        OtlpExporterCompressionEnum $compression = null,
-    ): SpanExporterInterface {
+    public static function createExporter(ExporterDsn $dsn = null, ExporterOptionsInterface $options = null): InMemoryExporter
+    {
         return new InMemoryExporter();
     }
 }

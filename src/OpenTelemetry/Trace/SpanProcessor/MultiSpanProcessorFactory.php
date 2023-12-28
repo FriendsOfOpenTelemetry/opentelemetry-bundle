@@ -8,11 +8,11 @@ use OpenTelemetry\SDK\Trace\SpanProcessorInterface;
 
 final class MultiSpanProcessorFactory implements SpanProcessorFactoryInterface
 {
-    public static function create(
-        array $processors = null,
+    public static function createProcessor(
+        array $processors = [],
         SpanExporterInterface $exporter = null
     ): SpanProcessorInterface {
-        if (null === $processors || 0 === count($processors)) {
+        if (0 >= count($processors)) {
             throw new \InvalidArgumentException('Processors should not be empty');
         }
 

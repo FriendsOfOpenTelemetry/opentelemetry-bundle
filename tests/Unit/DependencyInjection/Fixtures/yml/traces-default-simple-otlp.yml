@@ -17,12 +17,10 @@ open_telemetry:
     processors:
       simple:
         type: simple
-        exporter: json
+        exporter: otlp
     exporters:
-      otlp_json:
-        type: otlp
-        endpoint: http://localhost:4318/v1/traces
-        format: json
+      otlp:
+        dsn: http+otlp://localhost
   metrics:
     meters:
       main:

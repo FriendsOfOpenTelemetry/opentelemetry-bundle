@@ -2,80 +2,29 @@
 
 namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\DependencyInjection;
 
-use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Log\LogExporter\InMemoryLogExporterFactory;
+use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Exporter\ExporterDsn;
+use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Exporter\ExporterOptionsInterface;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Log\LogExporter\LogExporterEnum;
-use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Log\LogExporter\LogExporterFactoryInterface;
-use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Log\LogExporter\NoopLogExporterFactory;
-use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Log\LogExporter\OtlpLogExporterFactory;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Log\LoggerProvider\LoggerProviderEnum;
-use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Log\LoggerProvider\LoggerProviderFactory;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Log\LoggerProvider\LoggerProviderFactoryInterface;
-use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Log\LoggerProvider\NoopLoggerProviderFactory;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Log\LogProcessor\LogProcessorEnum;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Log\LogProcessor\LogProcessorFactoryInterface;
-use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Log\LogProcessor\MultiLogProcessorFactory;
-use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Log\LogProcessor\SimpleLogProcessorFactory;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Metric\MeterProvider\ExemplarFilterEnum;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Metric\MeterProvider\MeterProviderEnum;
-use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Metric\MeterProvider\MeterProviderFactory;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Metric\MeterProvider\MeterProviderFactoryInterface;
-use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Metric\MeterProvider\NoopMeterProviderFactory;
-use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Metric\MetricExporter\ConsoleMetricExporterFactory;
-use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Metric\MetricExporter\InMemoryMetricExporterFactory;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Metric\MetricExporter\MetricExporterEnum;
-use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Metric\MetricExporter\MetricExporterFactoryInterface;
-use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Metric\MetricExporter\MetricTemporalityEnum;
-use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Metric\MetricExporter\NoopMetricExporterFactory;
-use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Metric\MetricExporter\OtlpMetricExporterFactory;
-use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\OtlpExporterCompressionEnum;
-use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\OtlpExporterFormatEnum;
-use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\SpanProcessorEnum;
-use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Trace\SpanExporter\ConsoleSpanExporterFactory;
-use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Trace\SpanExporter\InMemorySpanExporterFactory;
-use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Trace\SpanExporter\OtlpSpanExporterFactory;
-use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Trace\SpanExporter\SpanExporterFactoryInterface;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Trace\SpanExporter\TraceExporterEnum;
-use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Trace\SpanExporter\ZipkinSpanExporterFactory;
-use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Trace\SpanProcessor\MultiSpanProcessorFactory;
-use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Trace\SpanProcessor\NoopSpanProcessorFactory;
-use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Trace\SpanProcessor\SimpleSpanProcessorFactory;
+use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Trace\SpanProcessor\SpanProcessorEnum;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Trace\SpanProcessor\SpanProcessorFactoryInterface;
-use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Trace\TracerProvider\NoopTracerProviderFactory;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Trace\TracerProvider\TraceProviderEnum;
-use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Trace\TracerProvider\TracerProviderFactory;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Trace\TracerProvider\TracerProviderFactoryInterface;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Trace\TracerProvider\TraceSamplerEnum;
 use Monolog\Level;
 use OpenTelemetry\Contrib\Logs\Monolog\Handler;
-use OpenTelemetry\Contrib\Otlp\LogsExporter as DefautLogExporter;
-use OpenTelemetry\Contrib\Otlp\MetricExporter;
-use OpenTelemetry\Contrib\Otlp\SpanExporter as OtlpSpanExporter;
-use OpenTelemetry\Contrib\Zipkin\Exporter as ZipkinSpanExporter;
-use OpenTelemetry\SDK\Logs\Exporter\ConsoleExporter;
-use OpenTelemetry\SDK\Logs\Exporter\InMemoryExporter as InMemoryLogExporter;
-use OpenTelemetry\SDK\Logs\Exporter\NoopExporter as NoopLogExporter;
-use OpenTelemetry\SDK\Logs\LoggerProvider;
 use OpenTelemetry\SDK\Logs\LoggerProviderInterface;
-use OpenTelemetry\SDK\Logs\LogRecordExporterInterface;
 use OpenTelemetry\SDK\Logs\LogRecordProcessorInterface;
-use OpenTelemetry\SDK\Logs\NoopLoggerProvider;
-use OpenTelemetry\SDK\Logs\Processor\MultiLogRecordProcessor;
-use OpenTelemetry\SDK\Logs\Processor\NoopLogRecordProcessor;
-use OpenTelemetry\SDK\Logs\Processor\SimpleLogRecordProcessor;
-use OpenTelemetry\SDK\Metrics\MeterProvider;
 use OpenTelemetry\SDK\Metrics\MeterProviderInterface;
-use OpenTelemetry\SDK\Metrics\MetricExporter\NoopMetricExporter;
-use OpenTelemetry\SDK\Metrics\MetricExporterInterface;
-use OpenTelemetry\SDK\Metrics\NoopMeterProvider;
-use OpenTelemetry\SDK\Trace\NoopTracerProvider;
-use OpenTelemetry\SDK\Trace\SpanExporter\ConsoleSpanExporter;
-use OpenTelemetry\SDK\Trace\SpanExporter\InMemoryExporter;
-use OpenTelemetry\SDK\Trace\SpanExporterInterface;
-use OpenTelemetry\SDK\Trace\SpanProcessor\MultiSpanProcessor;
-use OpenTelemetry\SDK\Trace\SpanProcessor\NoopSpanProcessor;
-use OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor;
 use OpenTelemetry\SDK\Trace\SpanProcessorInterface;
-use OpenTelemetry\SDK\Trace\TracerProvider;
 use OpenTelemetry\SDK\Trace\TracerProviderInterface;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Console\Application;
@@ -88,10 +37,21 @@ use Symfony\Component\HttpKernel\DependencyInjection\ConfigurableExtension;
 use Symfony\Component\HttpKernel\HttpKernel;
 
 /**
- * @phpstan-type ComponentInstrumentationOptions array{enabled: bool, tracer?: string, request_headers?: string[], response_headers?: string[], meter?: string}
+ * @phpstan-type ComponentInstrumentationOptions array{
+ *     enabled: bool,
+ *     tracer?: string,
+ *     request_headers?: string[],
+ *     response_headers?: string[],
+ *     meter?: string,
+ * }
+ *
+ * @phpstan-import-type ExporterOptions from ExporterOptionsInterface
  */
 final class OpenTelemetryExtension extends ConfigurableExtension
 {
+    public const EXPORTER_OPTIONS = ['format', 'headers', 'compression', 'timeout', 'retry', 'max', 'ca', 'cert', 'key'];
+    public const METRIC_EXPORTER_OPTIONS = ['temporality'];
+
     /** @phpstan-ignore-next-line */
     protected function loadInternal(array $mergedConfig, ContainerBuilder $container): void
     {
@@ -246,82 +206,24 @@ final class OpenTelemetryExtension extends ConfigurableExtension
 
     /**
      * @param array{
-     *      type: string,
-     *      endpoint?: string,
-     *      headers?: array<string, string>,
-     *      format?: string,
-     *      compression?: string
-     * } $exporter
+     *      dsn: string,
+     *      options?: ExporterOptions
+     *  } $options
      */
-    private function loadTraceExporter(string $name, array $exporter, ContainerBuilder $container): void
+    private function loadTraceExporter(string $name, array $options, ContainerBuilder $container): void
     {
         $exporterId = sprintf('open_telemetry.traces.exporters.%s', $name);
-        $options = $this->getTraceExporterOptions($exporter);
+        $dsn = ExporterDsn::fromString($options['dsn']);
+        $exporter = TraceExporterEnum::from($dsn->getExporter());
 
         $container
             ->setDefinition($exporterId, new ChildDefinition('open_telemetry.traces.exporter'))
-            ->setClass($options['class'])
-            ->setFactory([$options['factory'], 'create'])
+            ->setClass($exporter->getClass())
+            ->setFactory([$exporter->getFactoryClass(), 'createExporter'])
             ->setArguments([
-                '$endpoint' => $options['endpoint'],
-                '$headers' => $options['headers'],
-                '$format' => $options['format'],
-                '$compression' => $options['compression'],
+                '$dsn' => $this->createExporterDsnDefinition($options['dsn'], $container),
+                '$options' => $this->createExporterOptionsDefinition($options['options'] ?? [], $container),
             ]);
-    }
-
-    /**
-     * @param array{
-     *     type: string,
-     *     endpoint?: string,
-     *     headers?: array<string, string>,
-     *     format?: string,
-     *     compression?: string
-     * } $exporter
-     *
-     * @return array{
-     *     type: TraceExporterEnum,
-     *     endpoint: ?string,
-     *     headers: ?array<string, string>,
-     *     format: ?OtlpExporterFormatEnum,
-     *     compression: ?OtlpExporterCompressionEnum,
-     *     factory: class-string<SpanExporterFactoryInterface>,
-     *     class: class-string<SpanExporterInterface>
-     * }
-     */
-    private function getTraceExporterOptions(array $exporter): array
-    {
-        $options = [
-            'type' => TraceExporterEnum::from($exporter['type']),
-            'endpoint' => $exporter['endpoint'] ?? null,
-            'headers' => $exporter['headers'] ?? [],
-            'format' => isset($exporter['format']) ? OtlpExporterFormatEnum::from($exporter['format']) : null,
-            'compression' => isset($exporter['compression']) ? OtlpExporterCompressionEnum::from($exporter['compression']) : null,
-        ];
-
-        if (TraceExporterEnum::Otlp === $options['type'] && null === $options['format']) {
-            $options['format'] = OtlpExporterFormatEnum::Json;
-        }
-
-        if (TraceExporterEnum::Otlp === $options['type'] && null === $options['compression']) {
-            $options['compression'] = OtlpExporterCompressionEnum::None;
-        }
-
-        $options['factory'] = match ($options['type']) {
-            TraceExporterEnum::InMemory => InMemorySpanExporterFactory::class,
-            TraceExporterEnum::Console => ConsoleSpanExporterFactory::class,
-            TraceExporterEnum::Otlp => OtlpSpanExporterFactory::class,
-            TraceExporterEnum::Zipkin => ZipkinSpanExporterFactory::class,
-        };
-
-        $options['class'] = match ($options['type']) {
-            TraceExporterEnum::InMemory => InMemoryExporter::class,
-            TraceExporterEnum::Console => ConsoleSpanExporter::class,
-            TraceExporterEnum::Otlp => OtlpSpanExporter::class,
-            TraceExporterEnum::Zipkin => ZipkinSpanExporter::class,
-        };
-
-        return $options;
     }
 
     /**
@@ -339,7 +241,7 @@ final class OpenTelemetryExtension extends ConfigurableExtension
         $container
             ->setDefinition($processorId, new ChildDefinition('open_telemetry.traces.processor'))
             ->setClass($options['class'])
-            ->setFactory([$options['factory'], 'create'])
+            ->setFactory([$options['factory'], 'createProcessor'])
             ->setArguments([
                 '$processors' => $options['processors'],
                 '$exporter' => $options['exporter'],
@@ -354,17 +256,18 @@ final class OpenTelemetryExtension extends ConfigurableExtension
      * } $processor
      *
      * @return array{
-     *     type: SpanProcessorEnum,
+     *     factory: class-string<SpanProcessorFactoryInterface>,
+     *     class: class-string<SpanProcessorInterface>,
      *     processors: ?Reference[],
      *     exporter: ?Reference,
-     *     factory: class-string<SpanProcessorFactoryInterface>,
-     *     class: class-string<SpanProcessorInterface>
      * }
      */
     private function getTraceProcessorOptions(array $processor): array
     {
+        $processorEnum = SpanProcessorEnum::from($processor['type']);
         $options = [
-            'type' => SpanProcessorEnum::from($processor['type']),
+            'factory' => $processorEnum->getFactoryClass(),
+            'class' => $processorEnum->getClass(),
             'processors' => null,
             'exporter' => null,
         ];
@@ -379,7 +282,7 @@ final class OpenTelemetryExtension extends ConfigurableExtension
         //     auto_flush: true
         // }
 
-        if (SpanProcessorEnum::Multi === $options['type']) {
+        if (SpanProcessorEnum::Multi === $processorEnum) {
             if (!isset($processor['processors']) || 0 === count($processor['processors'])) {
                 throw new \InvalidArgumentException('Processors are not set or empty');
             }
@@ -389,26 +292,12 @@ final class OpenTelemetryExtension extends ConfigurableExtension
             );
         }
 
-        if (SpanProcessorEnum::Simple === $options['type']) {
+        if (SpanProcessorEnum::Simple === $processorEnum) {
             if (!isset($processor['exporter'])) {
                 throw new \InvalidArgumentException('Exporter is not set');
             }
             $options['exporter'] = new Reference(sprintf('open_telemetry.traces.exporters.%s', $processor['exporter']));
         }
-
-        $options['factory'] = match ($options['type']) {
-            SpanProcessorEnum::Noop => NoopSpanProcessorFactory::class,
-            SpanProcessorEnum::Simple => SimpleSpanProcessorFactory::class,
-            SpanProcessorEnum::Multi => MultiSpanProcessorFactory::class,
-            // SpanProcessorEnum::Batch => BatchSpanProcessorFactory::class,
-        };
-
-        $options['class'] = match ($options['type']) {
-            SpanProcessorEnum::Noop => NoopSpanProcessor::class,
-            SpanProcessorEnum::Simple => SimpleSpanProcessor::class,
-            SpanProcessorEnum::Multi => MultiSpanProcessor::class,
-            // SpanProcessorEnum::Batch => BatchSpanProcessor::class,
-        };
 
         return $options;
     }
@@ -430,7 +319,7 @@ final class OpenTelemetryExtension extends ConfigurableExtension
         $container
             ->setDefinition($providerId, new ChildDefinition('open_telemetry.traces.provider'))
             ->setClass($options['class'])
-            ->setFactory([$options['factory'], 'create'])
+            ->setFactory([$options['factory'], 'createProvider'])
             ->setArguments([
                 '$sampler' => $sampler,
                 '$processors' => $options['processors'],
@@ -440,7 +329,7 @@ final class OpenTelemetryExtension extends ConfigurableExtension
     /**
      * @param array{type: string, ratio?: float, parent?: string} $sampler
      */
-    private function getTraceSamplerDefinition(?array $sampler, ContainerBuilder $container): Definition
+    private function getTraceSamplerDefinition(array $sampler, ContainerBuilder $container): Definition
     {
         $type = TraceSamplerEnum::from($sampler['type']);
 
@@ -479,20 +368,21 @@ final class OpenTelemetryExtension extends ConfigurableExtension
      * } $provider
      *
      * @return array{
-     *     type: TraceProviderEnum,
-     *     processors: ?Reference[],
      *     factory: class-string<TracerProviderFactoryInterface>,
-     *     class: class-string<TracerProviderInterface>
+     *     class: class-string<TracerProviderInterface>,
+     *     processors: ?Reference[],
      * }
      */
     private function getTraceProviderOptions(array $provider): array
     {
+        $providerEnum = TraceProviderEnum::from($provider['type']);
         $options = [
-            'type' => TraceProviderEnum::from($provider['type']),
+            'factory' => $providerEnum->getFactoryClass(),
+            'class' => $providerEnum->getClass(),
             'processors' => null,
         ];
 
-        if (TraceProviderEnum::Default === $options['type']) {
+        if (TraceProviderEnum::Default === $providerEnum) {
             if (!isset($provider['processors']) || 0 === count($provider['processors'])) {
                 throw new \InvalidArgumentException('Processors are not set or empty');
             }
@@ -501,16 +391,6 @@ final class OpenTelemetryExtension extends ConfigurableExtension
                 $provider['processors']
             );
         }
-
-        $options['factory'] = match ($options['type']) {
-            TraceProviderEnum::Default => TracerProviderFactory::class,
-            TraceProviderEnum::Noop => NoopTracerProviderFactory::class,
-        };
-
-        $options['class'] = match ($options['type']) {
-            TraceProviderEnum::Default => TracerProvider::class,
-            TraceProviderEnum::Noop => NoopTracerProvider::class,
-        };
 
         return $options;
     }
@@ -573,79 +453,29 @@ final class OpenTelemetryExtension extends ConfigurableExtension
 
     /**
      * @param array{
-     *     type: string,
-     *     endpoint?: string,
-     *     format?: string,
-     *     headers?: array<string, string>,
-     *     compression?: string,
-     *     temporality?: string,
-     * } $exporter
+     *     dsn: string,
+     *     options?: ExporterOptions
+     * } $options
      */
-    private function loadMetricExporter(string $name, array $exporter, ContainerBuilder $container): void
+    private function loadMetricExporter(string $name, array $options, ContainerBuilder $container): void
     {
         $exporterId = sprintf('open_telemetry.metrics.exporters.%s', $name);
-        $options = $this->getMetricExporterOptions($exporter);
+        $dsn = ExporterDsn::fromString($options['dsn']);
+        $exporter = MetricExporterEnum::from($dsn->getExporter());
 
         $container
             ->setDefinition($exporterId, new ChildDefinition('open_telemetry.metrics.exporter'))
-            ->setClass($options['class'])
-            ->setFactory([$options['factory'], 'create'])
+            ->setClass($exporter->getClass())
+            ->setFactory([$exporter->getFactoryClass(), 'createExporter'])
             ->setArguments([
-                '$endpoint' => $options['endpoint'],
-                '$format' => $options['format'],
-                '$headers' => $options['headers'],
-                '$compression' => $options['compression'],
-                '$temporality' => $options['temporality'],
+                '$dsn' => $this->createExporterDsnDefinition($options['dsn'], $container),
+                '$options' => $this->createExporterOptionsDefinition(
+                    $options['options'] ?? [],
+                    $container,
+                    'open_telemetry.metric_exporter_options',
+                    self::METRIC_EXPORTER_OPTIONS
+                ),
             ]);
-    }
-
-    /**
-     * @param array{
-     *     type: string,
-     *     endpoint?: string,
-     *     format?: string,
-     *     headers?: array<string, string>,
-     *     compression?: string,
-     *     temporality?: string,
-     * } $exporter
-     *
-     * @return array{
-     *     type: MetricExporterEnum,
-     *     endpoint: ?string,
-     *     headers: ?array<string, string>,
-     *     format: ?OtlpExporterFormatEnum,
-     *     compression: ?OtlpExporterCompressionEnum,
-     *     temporality: ?MetricTemporalityEnum,
-     *     factory: class-string<MetricExporterFactoryInterface>,
-     *     class: class-string<MetricExporterInterface>
-     * }
-     */
-    private function getMetricExporterOptions(array $exporter): array
-    {
-        $options = [
-            'type' => MetricExporterEnum::from($exporter['type']),
-            'endpoint' => $exporter['endpoint'] ?? null,
-            'headers' => $exporter['headers'] ?? [],
-            'format' => isset($exporter['format']) ? OtlpExporterFormatEnum::from($exporter['format']) : null,
-            'compression' => isset($exporter['compression']) ? OtlpExporterCompressionEnum::from($exporter['compression']) : null,
-            'temporality' => isset($exporter['temporality']) ? MetricTemporalityEnum::from($exporter['temporality']) : null,
-        ];
-
-        $options['factory'] = match ($options['type']) {
-            MetricExporterEnum::Noop => NoopMetricExporterFactory::class,
-            MetricExporterEnum::Otlp => OtlpMetricExporterFactory::class,
-            MetricExporterEnum::InMemory => InMemoryMetricExporterFactory::class,
-            MetricExporterEnum::Console => ConsoleMetricExporterFactory::class,
-        };
-
-        $options['class'] = match ($options['type']) {
-            MetricExporterEnum::Noop => NoopMetricExporter::class,
-            MetricExporterEnum::Otlp => MetricExporter::class,
-            MetricExporterEnum::InMemory => InMemoryMetricExporterFactory::class,
-            MetricExporterEnum::Console => ConsoleMetricExporterFactory::class,
-        };
-
-        return $options;
     }
 
     /**
@@ -663,7 +493,7 @@ final class OpenTelemetryExtension extends ConfigurableExtension
         $container
             ->setDefinition($providerId, new ChildDefinition('open_telemetry.metrics.provider'))
             ->setClass($options['class'])
-            ->setFactory([$options['factory'], 'create'])
+            ->setFactory([$options['factory'], 'createProvider'])
             ->setArguments([
                 '$exporter' => $options['exporter'],
                 '$filter' => $options['filter'],
@@ -678,22 +508,23 @@ final class OpenTelemetryExtension extends ConfigurableExtension
      * } $provider
      *
      * @return array{
-     *     type: MeterProviderEnum,
+     *     factory: class-string<MeterProviderFactoryInterface>,
+     *     class: class-string<MeterProviderInterface>,
      *     exporter: ?Reference,
      *     filter: ?Reference,
-     *     factory: class-string<MeterProviderFactoryInterface>,
-     *     class: class-string<MeterProviderInterface>
      * }
      */
     private function getMetricProviderOptions(array $provider): array
     {
+        $providerEnum = MeterProviderEnum::from($provider['type']);
         $options = [
-            'type' => MeterProviderEnum::from($provider['type']),
+            'factory' => $providerEnum->getFactoryClass(),
+            'class' => $providerEnum->getClass(),
             'exporter' => null,
             'filter' => null,
         ];
 
-        if (MeterProviderEnum::Default === $options['type']) {
+        if (MeterProviderEnum::Default === $providerEnum) {
             if (!isset($provider['exporter'])) {
                 throw new \InvalidArgumentException('Exporter is not set');
             }
@@ -705,16 +536,6 @@ final class OpenTelemetryExtension extends ConfigurableExtension
             ExemplarFilterEnum::WithSampledTrace => new Reference('open_telemetry.metrics.exemplar_filters.with_sampled_trace'),
             ExemplarFilterEnum::All => new Reference('open_telemetry.metrics.exemplar_filters.all'),
             ExemplarFilterEnum::None => new Reference('open_telemetry.metrics.exemplar_filters.none'),
-        };
-
-        $options['factory'] = match ($options['type']) {
-            MeterProviderEnum::Default => MeterProviderFactory::class,
-            MeterProviderEnum::Noop => NoopMeterProviderFactory::class,
-        };
-
-        $options['class'] = match ($options['type']) {
-            MeterProviderEnum::Default => MeterProvider::class,
-            MeterProviderEnum::Noop => NoopMeterProvider::class,
         };
 
         return $options;
@@ -783,74 +604,24 @@ final class OpenTelemetryExtension extends ConfigurableExtension
 
     /**
      * @param array{
-     *     type: string,
-     *     endpoint?: string,
-     *     format?: string,
-     *     headers?: array<string, string>,
-     *     compression?: string,
-     * } $exporter
+     *      dsn: string,
+     *      options?: ExporterOptions
+     *  } $options
      */
-    private function loadLogExporter(string $name, array $exporter, ContainerBuilder $container): void
+    private function loadLogExporter(string $name, array $options, ContainerBuilder $container): void
     {
         $exporterId = sprintf('open_telemetry.logs.exporters.%s', $name);
-        $options = $this->getLogExporterOptions($exporter);
+        $dsn = ExporterDsn::fromString($options['dsn']);
+        $exporter = LogExporterEnum::from($dsn->getExporter());
 
         $container
             ->setDefinition($exporterId, new ChildDefinition('open_telemetry.logs.exporter'))
-            ->setClass($options['class'])
-            ->setFactory([$options['factory'], 'create'])
+            ->setClass($exporter->getClass())
+            ->setFactory([$exporter->getFactoryClass(), 'createExporter'])
             ->setArguments([
-                '$endpoint' => $options['endpoint'],
-                '$format' => $options['format'],
-                '$headers' => $options['headers'],
-                '$compression' => $options['compression'],
+                '$dsn' => $this->createExporterDsnDefinition($options['dsn'], $container),
+                '$options' => $this->createExporterOptionsDefinition($options['options'] ?? [], $container),
             ]);
-    }
-
-    /**
-     * @param array{
-     *     type: string,
-     *     endpoint?: string,
-     *     format?: string,
-     *     headers?: array<string, string>,
-     *     compression?: string,
-     * } $exporter
-     *
-     * @return array{
-     *     type: LogExporterEnum,
-     *     endpoint: ?string,
-     *     headers: ?array<string, string>,
-     *     format: ?OtlpExporterFormatEnum,
-     *     compression: ?OtlpExporterCompressionEnum,
-     *     factory: class-string<LogExporterFactoryInterface>,
-     *     class: class-string<LogRecordExporterInterface>
-     * }
-     */
-    private function getLogExporterOptions(array $exporter): array
-    {
-        $options = [
-            'type' => LogExporterEnum::from($exporter['type']),
-            'endpoint' => $exporter['endpoint'] ?? null,
-            'headers' => $exporter['headers'] ?? null,
-            'format' => isset($exporter['format']) ? OtlpExporterFormatEnum::from($exporter['format']) : null,
-            'compression' => isset($exporter['compression']) ? OtlpExporterCompressionEnum::from($exporter['compression']) : null,
-        ];
-
-        $options['factory'] = match ($options['type']) {
-            LogExporterEnum::Noop => NoopLogExporterFactory::class,
-            LogExporterEnum::Otlp => OtlpLogExporterFactory::class,
-            LogExporterEnum::InMemory => InMemoryLogExporterFactory::class,
-            LogExporterEnum::Console => ConsoleMetricExporterFactory::class,
-        };
-
-        $options['class'] = match ($options['type']) {
-            LogExporterEnum::Noop => NoopLogExporter::class,
-            LogExporterEnum::Otlp => DefautLogExporter::class,
-            LogExporterEnum::InMemory => InMemoryLogExporter::class,
-            LogExporterEnum::Console => ConsoleExporter::class,
-        };
-
-        return $options;
     }
 
     /**
@@ -868,7 +639,7 @@ final class OpenTelemetryExtension extends ConfigurableExtension
         $container
             ->setDefinition($processorId, new ChildDefinition('open_telemetry.logs.processor'))
             ->setClass($options['class'])
-            ->setFactory([$options['factory'], 'create'])
+            ->setFactory([$options['factory'], 'createProcessor'])
             ->setArguments([
                 '$processors' => $options['processors'],
                 '$exporter' => $options['exporter'],
@@ -883,22 +654,23 @@ final class OpenTelemetryExtension extends ConfigurableExtension
      * } $processor
      *
      * @return array{
-     *     type: LogProcessorEnum,
+     *     factory: class-string<LogProcessorFactoryInterface>,
+     *     class: class-string<LogRecordProcessorInterface>,
      *     processors: ?Reference[],
      *     exporter: ?Reference,
-     *     factory: class-string<LogProcessorFactoryInterface>,
-     *     class: class-string<LogRecordProcessorInterface>
      * }
      */
     private function getLogProcessorOptions(array $processor): array
     {
+        $processorEnum = LogProcessorEnum::from($processor['type']);
         $options = [
-            'type' => LogProcessorEnum::from($processor['type']),
+            'factory' => $processorEnum->getFactoryClass(),
+            'class' => $processorEnum->getClass(),
             'processors' => null,
             'exporter' => null,
         ];
 
-        // if (LogProcessorEnum::Batch === $options['type']) {
+        // if (LogProcessorEnum::Batch === $processorEnum) {
         //     // TODO: Check batch options
         //     clock: OpenTelemetry\SDK\Common\Time\SystemClock
         //     max_queue_size: 2048
@@ -908,7 +680,7 @@ final class OpenTelemetryExtension extends ConfigurableExtension
         //     auto_flush: true
         // }
 
-        if (LogProcessorEnum::Multi === $options['type']) {
+        if (LogProcessorEnum::Multi === $processorEnum) {
             if (!isset($processor['processors']) || 0 === count($processor['processors'])) {
                 throw new \InvalidArgumentException('Processors are not set or empty');
             }
@@ -918,26 +690,12 @@ final class OpenTelemetryExtension extends ConfigurableExtension
             );
         }
 
-        if (LogProcessorEnum::Simple === $options['type']) {
+        if (LogProcessorEnum::Simple === $processorEnum) {
             if (!isset($processor['exporter'])) {
                 throw new \InvalidArgumentException('Exporter is not set');
             }
             $options['exporter'] = new Reference(sprintf('open_telemetry.logs.exporters.%s', $processor['exporter']));
         }
-
-        $options['factory'] = match ($options['type']) {
-            LogProcessorEnum::Noop => NoopLogExporterFactory::class,
-            LogProcessorEnum::Simple => SimpleLogProcessorFactory::class,
-            LogProcessorEnum::Multi => MultiLogProcessorFactory::class,
-            // LogProcessorEnum::Batch => BatchLogRecordProcessorFactory::class,
-        };
-
-        $options['class'] = match ($options['type']) {
-            LogProcessorEnum::Noop => NoopLogRecordProcessor::class,
-            LogProcessorEnum::Simple => SimpleLogRecordProcessor::class,
-            LogProcessorEnum::Multi => MultiLogRecordProcessor::class,
-            // LogProcessorEnum::Batch => BatchLogRecordProcessor::class,
-        };
 
         return $options;
     }
@@ -956,7 +714,7 @@ final class OpenTelemetryExtension extends ConfigurableExtension
         $container
             ->setDefinition($providerId, new ChildDefinition('open_telemetry.logs.provider'))
             ->setClass($options['class'])
-            ->setFactory([$options['factory'], 'create'])
+            ->setFactory([$options['factory'], 'createProvider'])
             ->setArguments([
                 '$processor' => $options['processor'],
             ]);
@@ -969,35 +727,26 @@ final class OpenTelemetryExtension extends ConfigurableExtension
      * } $provider
      *
      * @return array{
-     *     type: LoggerProviderEnum,
-     *     processor: ?Reference,
      *     factory: class-string<LoggerProviderFactoryInterface>,
-     *     class: class-string<LoggerProviderInterface>
+     *     class: class-string<LoggerProviderInterface>,
+     *     processor: ?Reference,
      * }
      */
     private function getLoggerProviderOptions(array $provider): array
     {
+        $providerEnum = LoggerProviderEnum::from($provider['type']);
         $options = [
-            'type' => LoggerProviderEnum::from($provider['type']),
+            'factory' => $providerEnum->getFactoryClass(),
+            'class' => $providerEnum->getClass(),
             'processor' => null,
         ];
 
-        if (LoggerProviderEnum::Default === $options['type']) {
+        if (LoggerProviderEnum::Default === $providerEnum) {
             if (!isset($provider['processor'])) {
                 throw new \InvalidArgumentException('Processor is not set');
             }
             $options['processor'] = new Reference(sprintf('open_telemetry.logs.processors.%s', $provider['processor']));
         }
-
-        $options['factory'] = match ($options['type']) {
-            LoggerProviderEnum::Default => LoggerProviderFactory::class,
-            LoggerProviderEnum::Noop => NoopLoggerProviderFactory::class,
-        };
-
-        $options['class'] = match ($options['type']) {
-            LoggerProviderEnum::Default => LoggerProvider::class,
-            LoggerProviderEnum::Noop => NoopLoggerProvider::class,
-        };
 
         return $options;
     }
@@ -1057,5 +806,34 @@ final class OpenTelemetryExtension extends ConfigurableExtension
                     '$bubble' => $handler['bubble'],
                 ]);
         }
+    }
+
+    private function createExporterDsnDefinition(string $dsn, ContainerBuilder $container): Definition
+    {
+        return $container
+            ->getDefinition('open_telemetry.exporter_dsn')
+            ->setArguments([$dsn]);
+    }
+
+    /**
+     * @param array<string, mixed> $configuration
+     * @param string[]             $extraOptions
+     */
+    private function createExporterOptionsDefinition(
+        array $configuration,
+        ContainerBuilder $container,
+        string $definition = 'open_telemetry.exporter_options',
+        array $extraOptions = [],
+    ): Definition {
+        return $container
+            ->getDefinition($definition)
+            ->setArguments([array_filter(
+                $configuration,
+                fn (string $key) => in_array(
+                    $key,
+                    self::EXPORTER_OPTIONS + $extraOptions,
+                    true,
+                ), ARRAY_FILTER_USE_KEY),
+            ]);
     }
 }

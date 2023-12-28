@@ -141,7 +141,7 @@ final class ConfigurationTest extends TestCase
                     provider:
                         type:                 default # One of "default"; "noop", Required
                         sampler:
-                            type:                 always_on # One of "always_on"; "always_off"; "trace_id_ratio"; "parent_based", Required
+                            type:                 always_on # One of "always_off"; "always_on"; "parent_based"; "trace_id_ratio", Required
                             ratio:                ~
                             parent:               ~
                         processors:           []
@@ -160,18 +160,22 @@ final class ConfigurationTest extends TestCase
 
                     # Prototype
                     exporter:
-                        type:                 otlp # One of "in_memory"; "console"; "otlp"; "zipkin", Required
-                        endpoint:             ~
+                        dsn:                  ~ # Required
+                        options:
+                            format:               json # One of "json"; "ndjson"; "gprc"; "protobuf"
+                            compression:          none # One of "gzip"; "none"
+                            headers:
 
-                        # Required if exporter type is json
-                        format:               ~ # One of "json"; "ndjson"; "gprc"; "protobuf"
-                        headers:
-
-                            # Prototype
-                            -
-                                name:                 ~ # Required
-                                value:                ~ # Required
-                        compression:          ~ # One of "none"; "gzip"
+                                # Prototype
+                                -
+                                    name:                 ~ # Required
+                                    value:                ~ # Required
+                            timeout:              0.1
+                            retry:                100
+                            max:                  3
+                            ca:                   ~
+                            cert:                 ~
+                            key:                  ~
             metrics:
 
                 # The default meter to use among the `meters`
@@ -188,24 +192,28 @@ final class ConfigurationTest extends TestCase
                     provider:
                         type:                 default # One of "noop"; "default", Required
                         exporter:             ~
-                        filter:               none # One of "with_sampled_trace"; "all"; "none"
+                        filter:               none # One of "all"; "none"; "with_sampled_trace"
                 exporters:
 
                     # Prototype
                     exporter:
-                        type:                 otlp # One of "noop"; "otlp"; "console"; "in_memory", Required
-                        endpoint:             ~
+                        dsn:                  ~ # Required
+                        temporality:          delta # One of "delta"; "cumulative"; "low_memory"
+                        options:
+                            format:               json # One of "json"; "ndjson"; "gprc"; "protobuf"
+                            compression:          none # One of "gzip"; "none"
+                            headers:
 
-                        # Required if exporter type is json
-                        format:               ~ # One of "json"; "ndjson"; "gprc"; "protobuf"
-                        headers:
-
-                            # Prototype
-                            -
-                                name:                 ~ # Required
-                                value:                ~ # Required
-                        compression:          ~ # One of "none"; "gzip"
-                        temporality:          ~ # One of "delta"; "cumulative"; "lowmemory"
+                                # Prototype
+                                -
+                                    name:                 ~ # Required
+                                    value:                ~ # Required
+                            timeout:              0.1
+                            retry:                100
+                            max:                  3
+                            ca:                   ~
+                            cert:                 ~
+                            key:                  ~
             logs:
 
                 # The default logger to use among the `loggers`
@@ -236,7 +244,7 @@ final class ConfigurationTest extends TestCase
 
                     # Prototype
                     processor:
-                        type:                 simple # One of "multi"; "simple"; "noop", Required
+                        type:                 simple # One of "multi"; "noop"; "simple", Required
 
                         # Required if processor type is multi
                         processors:           []
@@ -247,18 +255,22 @@ final class ConfigurationTest extends TestCase
 
                     # Prototype
                     exporter:
-                        type:                 otlp # One of "otlp"; "noop"; "console"; "in_memory", Required
-                        endpoint:             ~
+                        dsn:                  ~ # Required
+                        options:
+                            format:               json # One of "json"; "ndjson"; "gprc"; "protobuf"
+                            compression:          none # One of "gzip"; "none"
+                            headers:
 
-                        # Required if exporter type is json
-                        format:               ~ # One of "json"; "ndjson"; "gprc"; "protobuf"
-                        headers:
-
-                            # Prototype
-                            -
-                                name:                 ~ # Required
-                                value:                ~ # Required
-                        compression:          ~ # One of "none"; "gzip"
+                                # Prototype
+                                -
+                                    name:                 ~ # Required
+                                    value:                ~ # Required
+                            timeout:              0.1
+                            retry:                100
+                            max:                  3
+                            ca:                   ~
+                            cert:                 ~
+                            key:                  ~
 
         YML, $output);
     }

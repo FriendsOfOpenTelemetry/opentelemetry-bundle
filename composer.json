@@ -40,11 +40,13 @@
     "prefer-stable": true,
     "require": {
         "php": "~8.2 | ~8.3",
+        "nyholm/psr7": "^1.8",
         "open-telemetry/api": "^1.0",
         "open-telemetry/sdk": "^1.0",
         "open-telemetry/sem-conv": "^1.23",
         "symfony/config": "^6.4 | ^7.0",
-        "symfony/dependency-injection": "^6.4 | ^7.0"
+        "symfony/dependency-injection": "^6.4 | ^7.0",
+        "symfony/http-client": "^6.4 | ^7.0"
     },
     "require-dev": {
         "ext-ffi": "*",
@@ -53,12 +55,14 @@
         "ext-opentelemetry": "*",
         "ext-xdebug": "*",
         "friendsofphp/php-cs-fixer": "^3.41",
+        "guzzlehttp/promises": "^2.0",
         "matthiasnoback/symfony-config-test": "^5.1",
         "matthiasnoback/symfony-dependency-injection-test": "^5.0",
         "open-telemetry/exporter-otlp": "^1.0",
         "open-telemetry/exporter-zipkin": "^1.0",
         "open-telemetry/opentelemetry-logger-monolog": "^1.0",
         "open-telemetry/transport-grpc": "^1.0",
+        "php-http/httplug": "^2.4",
         "phpstan/extension-installer": "^1.3",
         "phpstan/phpstan": "^1.10",
         "phpstan/phpstan-deprecation-rules": "^1.1",
@@ -76,7 +80,7 @@
     "config": {
         "allow-plugins": {
             "phpstan/extension-installer": true,
-            "php-http/discovery": false
+            "php-http/discovery": true
         },
         "sort-packages": true
     },

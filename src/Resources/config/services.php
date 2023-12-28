@@ -5,6 +5,10 @@ use FriendsOfOpenTelemetry\OpenTelemetryBundle\EventSubscriber\ConsoleTraceEvent
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\EventSubscriber\HttpKernelMetricEventSubscriber;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\EventSubscriber\HttpKernelTraceEventSubscriber;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Context\Propagator\HeadersPropagator;
+use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Exporter\ExporterDsn;
+use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Exporter\ExporterOptionsInterface;
+use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Exporter\OtlpExporterOptions;
+use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Metric\MetricExporterOptions;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetryBundle;
 use OpenTelemetry\Context\Propagation\NoopTextMapPropagator;
 use OpenTelemetry\Contrib\Logs\Monolog\Handler as MonologHandler;
@@ -32,6 +36,14 @@ return static function (ContainerConfigurator $container): void {
     $container->services()
         ->defaults()
         ->private()
+
+        ->set('open_telemetry.exporter_dsn', ExporterDsn::class)
+            ->factory([ExporterDsn::class, 'fromString'])
+
+        ->set('open_telemetry.exporter_options', ExporterOptionsInterface::class)
+            ->factory([OtlpExporterOptions::class, 'fromConfiguration'])
+        ->set('open_telemetry.metric_exporter_options', ExporterOptionsInterface::class)
+            ->factory([MetricExporterOptions::class, 'fromConfiguration'])
 
         ->set('open_telemetry.text_map_propagators.noop', NoopTextMapPropagator::class)
         ->set('open_telemetry.propagation_getters.headers', HeadersPropagator::class)

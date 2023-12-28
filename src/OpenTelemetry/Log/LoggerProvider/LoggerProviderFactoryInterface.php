@@ -7,5 +7,5 @@ use OpenTelemetry\SDK\Logs\LogRecordProcessorInterface;
 
 interface LoggerProviderFactoryInterface
 {
-    public static function create(LogRecordProcessorInterface $processor): LoggerProviderInterface;
+    public static function createProvider(LogRecordProcessorInterface $processor): LoggerProviderInterface;
 }

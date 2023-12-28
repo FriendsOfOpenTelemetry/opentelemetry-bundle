@@ -10,8 +10,8 @@ interface LogProcessorFactoryInterface
     /**
      * @param LogRecordProcessorInterface[] $processors
      */
-    public static function create(
-        array $processors = null,
+    public static function createProcessor(
+        array $processors = [],
         LogRecordExporterInterface $exporter = null,
     ): LogRecordProcessorInterface;
 }
