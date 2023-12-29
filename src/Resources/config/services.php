@@ -53,10 +53,9 @@ return static function (ContainerConfigurator $container): void {
             ->arg('$propagationGetter', service('open_telemetry.propagation_getters.headers'))
             ->arg('$requestHeaders', param('open_telemetry.instrumentation.http_kernel.request_headers'))
             ->arg('$responseHeaders', param('open_telemetry.instrumentation.http_kernel.response_headers'))
+        ->set('open_telemetry.instrumentation.http_kernel.metric.event_subscriber', HttpKernelMetricEventSubscriber::class)
 
         ->set('open_telemetry.instrumentation.console.trace.event_subscriber', ConsoleTraceEventSubscriber::class)
-
-        ->set('open_telemetry.instrumentation.http_kernel.metric.event_subscriber', HttpKernelMetricEventSubscriber::class)
         ->set('open_telemetry.instrumentation.console.metric.event_subscriber', ConsoleMetricEventSubscriber::class)
 
         ->set('open_telemetry.traces.samplers.always_on', AlwaysOnSampler::class)->public()

@@ -96,26 +96,54 @@ final class OpenTelemetryExtension extends ConfigurableExtension
             throw new \LogicException('To configure the HttpKernel instrumentation, you must first install the symfony/http-kernel package.');
         }
 
+        $this->loadHttpKernelTracingInstrumentation($config, $container);
+        $this->loadHttpKernelMeteringInstrumentation($config, $container);
+    }
+
+    /** @phpstan-ignore-next-line */
+    public function loadHttpKernelTracingInstrumentation(array $config, ContainerBuilder $container): void
+    {
+        $httpKernelConfig = $config['instrumentation']['http_kernel'];
+        $tracingHttpKernel = $httpKernelConfig['tracing'];
+
+        if (false === $tracingHttpKernel['enabled']) {
+            return;
+        }
+
         $trace = $container
             ->getDefinition('open_telemetry.instrumentation.http_kernel.trace.event_subscriber')
-            ->setArgument('$requestHeaders', $httpKernelConfig['tracing']['request_headers'])
-            ->setArgument('$responseHeaders', $httpKernelConfig['tracing']['response_headers'])
+            ->setArgument('$requestHeaders', $tracingHttpKernel['request_headers'])
+            ->setArgument('$responseHeaders', $tracingHttpKernel['response_headers'])
             ->addTag('kernel.event_subscriber');
 
-        if (isset($httpKernelConfig['tracing']['tracer'])) {
-            $trace->setArgument('$tracer', new Reference(sprintf('open_telemetry.traces.tracers.%s', $httpKernelConfig['tracing']['tracer'])));
+        if (isset($tracingHttpKernel['tracer'])) {
+            $trace->setArgument('$tracer', new Reference(sprintf('open_telemetry.traces.tracers.%s', $tracingHttpKernel['tracer'])));
         } else {
             $defaultTracer = $config['traces']['default_tracer'] ?? array_key_first($config['traces']['tracers']);
             $trace->setArgument('$tracer', new Reference(sprintf('open_telemetry.traces.tracers.%s', $defaultTracer)));
         }
+    }
 
-        $metric = $container->getDefinition('open_telemetry.instrumentation.http_kernel.metric.event_subscriber')->addTag('kernel.event_subscriber');
-        if (isset($httpKernelConfig['metering']['meter'])) {
-            $metric->setArgument('$meter', new Reference(sprintf('open_telemetry.metrics.meters.%s', $httpKernelConfig['metering']['meter'])));
-            if (!isset($config['metrics']['meters'][$httpKernelConfig['meter']]['provider'])) {
+    /** @phpstan-ignore-next-line */
+    public function loadHttpKernelMeteringInstrumentation(array $config, ContainerBuilder $container): void
+    {
+        $httpKernelConfig = $config['instrumentation']['http_kernel'];
+        $meteringHttpKernel = $httpKernelConfig['metering'];
+
+        if (false === $meteringHttpKernel['enabled']) {
+            return;
+        }
+
+        $metric = $container
+            ->getDefinition('open_telemetry.instrumentation.http_kernel.metric.event_subscriber')
+            ->addTag('kernel.event_subscriber');
+
+        if (isset($meteringHttpKernel['meter'])) {
+            $metric->setArgument('$meter', new Reference(sprintf('open_telemetry.metrics.meters.%s', $meteringHttpKernel['meter'])));
+            if (!isset($config['metrics']['meters'][$meteringHttpKernel['meter']]['provider'])) {
                 throw new \InvalidArgumentException('Meter provider has not found');
             }
-            $meterProvider = $config['metrics']['meters'][$httpKernelConfig['metering']['meter']]['provider'];
+            $meterProvider = $config['metrics']['meters'][$meteringHttpKernel['meter']]['provider'];
             $metric->setArgument('$meterProvider', new Reference(sprintf('open_telemetry.metrics.providers.%s', $meterProvider)));
         } else {
             $defaultMeter = $config['metrics']['default_meter'] ?? array_key_first($config['metrics']['meters']);
@@ -140,21 +168,50 @@ final class OpenTelemetryExtension extends ConfigurableExtension
             throw new \LogicException('To configure the Console instrumentation, you must first install the symfony/console package.');
         }
 
-        $trace = $container->getDefinition('open_telemetry.instrumentation.console.trace.event_subscriber')->addTag('kernel.event_subscriber');
-        if (isset($consoleConfig['tracing']['tracer'])) {
-            $trace->setArgument('$tracer', new Reference(sprintf('open_telemetry.traces.tracers.%s', $consoleConfig['tracing']['tracer'])));
+        $this->loadConsoleTracingInstrumentation($config, $container);
+        $this->loadConsoleMeteringInstrumentation($config, $container);
+    }
+
+    /** @phpstan-ignore-next-line */
+    public function loadConsoleTracingInstrumentation(array $config, ContainerBuilder $container): void
+    {
+        $consoleConfig = $config['instrumentation']['console'];
+        $tracingConsoleConfig = $consoleConfig['tracing'];
+        if (false === $consoleConfig['enabled']) {
+            return;
+        }
+
+        $trace = $container
+            ->getDefinition('open_telemetry.instrumentation.console.trace.event_subscriber')
+            ->addTag('kernel.event_subscriber');
+
+        if (isset($tracingConsoleConfig['tracer'])) {
+            $trace->setArgument('$tracer', new Reference(sprintf('open_telemetry.traces.tracers.%s', $tracingConsoleConfig['tracer'])));
         } else {
             $defaultTracer = $config['traces']['default_tracer'] ?? array_key_first($config['traces']['tracers']);
             $trace->setArgument('$tracer', new Reference(sprintf('open_telemetry.traces.tracers.%s', $defaultTracer)));
         }
+    }
 
-        $metric = $container->getDefinition('open_telemetry.instrumentation.console.metric.event_subscriber')->addTag('kernel.event_subscriber');
-        if (isset($consoleConfig['metering']['meter'])) {
+    /** @phpstan-ignore-next-line */
+    public function loadConsoleMeteringInstrumentation(array $config, ContainerBuilder $container): void
+    {
+        $consoleConfig = $config['instrumentation']['console'];
+        $meteringConsoleConfig = $consoleConfig['metering'];
+        if (false === $consoleConfig['enabled']) {
+            return;
+        }
+
+        $metric = $container
+            ->getDefinition('open_telemetry.instrumentation.console.metric.event_subscriber')
+            ->addTag('kernel.event_subscriber');
+
+        if (isset($meteringConsoleConfig['meter'])) {
             $metric->setArgument('$meter', new Reference(sprintf('open_telemetry.metrics.meters.%s', $config['meter'])));
-            if (!isset($config['metrics']['meters'][$consoleConfig['metering']['meter']]['provider'])) {
+            if (!isset($config['metrics']['meters'][$meteringConsoleConfig['meter']]['provider'])) {
                 throw new \InvalidArgumentException('Meter provider has not found');
             }
-            $meterProvider = $config['metrics']['meters'][$consoleConfig['metering']['meter']]['provider'];
+            $meterProvider = $config['metrics']['meters'][$meteringConsoleConfig['meter']]['provider'];
             $metric->setArgument('$meterProvider', new Reference(sprintf('open_telemetry.metrics.providers.%s', $meterProvider)));
         } else {
             $defaultMeter = $config['metrics']['default_meter'] ?? array_key_first($config['metrics']['meters']);
