@@ -75,4 +75,9 @@ final class OtlpExporterEndpoint implements ExporterEndpointInterface
     {
         return $this->transport->value;
     }
+
+    public function getExporter(): string
+    {
+        return 'otlp';
+    }
 }

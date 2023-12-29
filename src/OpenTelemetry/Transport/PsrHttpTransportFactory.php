@@ -6,7 +6,6 @@ use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Exporter\ExporterEn
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Exporter\ExporterOptionsInterface;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Exporter\OtlpExporterCompressionEnum;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Exporter\OtlpExporterFormatEnum;
-use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Exporter\OtlpExporterOptions;
 use OpenTelemetry\SDK\Common\Export\Http\PsrTransportFactory;
 use OpenTelemetry\SDK\Common\Export\TransportInterface;
 
@@ -21,15 +20,10 @@ final readonly class PsrHttpTransportFactory implements TransportFactoryInterfac
     public static function fromExporter(ExporterEndpointInterface $endpoint, ExporterOptionsInterface $options): self
     {
         if (false === self::supportExporter($endpoint, $options)) {
-            throw new \RuntimeException('Unsupported exporter endpoint or options for this transport.');
+            throw new \InvalidArgumentException('Unsupported exporter endpoint or options for this transport.');
         }
 
-        $params = new TransportParams();
-        if ($options instanceof OtlpExporterOptions) {
-            $params = TransportParams::fromOtlpExporterOptions($options);
-        }
-
-        return new self((string) $endpoint, $params);
+        return new self((string) $endpoint, $options->toTransportParams());
     }
 
     public static function supportExporter(ExporterEndpointInterface $endpoint, ExporterOptionsInterface $options): bool

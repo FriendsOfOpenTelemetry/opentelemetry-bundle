@@ -49,4 +49,9 @@ final class LogExporterEndpoint implements ExporterEndpointInterface
     {
         return $this->transport?->value;
     }
+
+    public function getExporter(): string
+    {
+        return $this->exporter->value;
+    }
 }

@@ -5,6 +5,7 @@ namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Metric;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Exporter\ExporterOptionsInterface;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Exporter\OtlpExporterOptions;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Metric\MetricExporter\MetricTemporalityEnum;
+use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Transport\TransportParams;
 
 final class MetricExporterOptions implements ExporterOptionsInterface
 {
@@ -35,5 +36,10 @@ final class MetricExporterOptions implements ExporterOptionsInterface
     public function getOtlpOptions(): ?OtlpExporterOptions
     {
         return $this->otlpOptions;
+    }
+
+    public function toTransportParams(): TransportParams
+    {
+        return $this->otlpOptions->toTransportParams();
     }
 }

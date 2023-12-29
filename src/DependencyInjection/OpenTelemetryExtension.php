@@ -268,7 +268,7 @@ final class OpenTelemetryExtension extends ConfigurableExtension
         $options = [
             'factory' => $processorEnum->getFactoryClass(),
             'class' => $processorEnum->getClass(),
-            'processors' => null,
+            'processors' => [],
             'exporter' => null,
         ];
 
@@ -379,7 +379,7 @@ final class OpenTelemetryExtension extends ConfigurableExtension
         $options = [
             'factory' => $providerEnum->getFactoryClass(),
             'class' => $providerEnum->getClass(),
-            'processors' => null,
+            'processors' => [],
         ];
 
         if (TraceProviderEnum::Default === $providerEnum) {
@@ -666,7 +666,7 @@ final class OpenTelemetryExtension extends ConfigurableExtension
         $options = [
             'factory' => $processorEnum->getFactoryClass(),
             'class' => $processorEnum->getClass(),
-            'processors' => null,
+            'processors' => [],
             'exporter' => null,
         ];
 

@@ -47,6 +47,11 @@ final class TraceExporterEndpoint implements ExporterEndpointInterface
         throw new \RuntimeException('Unsupported DSN for Trace endpoint');
     }
 
+    public function getExporter(): string
+    {
+        return $this->exporter->value;
+    }
+
     public function getTransport(): ?string
     {
         return $this->transport?->value;
