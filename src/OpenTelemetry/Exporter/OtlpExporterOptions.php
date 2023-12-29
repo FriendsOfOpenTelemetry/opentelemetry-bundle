@@ -2,6 +2,7 @@
 
 namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Exporter;
 
+use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Transport\TransportParams;
 use OpenTelemetry\Contrib\Otlp\OtlpUtil;
 
 final class OtlpExporterOptions implements ExporterOptionsInterface
@@ -43,6 +44,10 @@ final class OtlpExporterOptions implements ExporterOptionsInterface
             $options->headers = $configuration['headers'];
         }
 
+        $otlpHeaders = OtlpUtil::getUserAgentHeader();
+        $otlpHeaders['User-Agent'] .= ', Symfony OTEL Bundle';
+        $options->headers += $otlpHeaders;
+
         if (isset($configuration['compression']) && null !== OtlpExporterCompressionEnum::tryFrom($configuration['compression'])) {
             $options->compression = OtlpExporterCompressionEnum::from($configuration['compression']);
         }
@@ -72,6 +77,21 @@ final class OtlpExporterOptions implements ExporterOptionsInterface
         }
 
         return $options;
+    }
+
+    public function toTransportParams(): TransportParams
+    {
+        return new TransportParams(
+            $this->getFormat()->toContentType(),
+            $this->getHeaders(),
+            $this->getCompression()->toKnownValue(),
+            $this->getTimeout(),
+            $this->getRetryDelay(),
+            $this->getMaxRetries(),
+            $this->getCaCertificate(),
+            $this->getCertificate(),
+            $this->getKey(),
+        );
     }
 
     public function getFormat(): OtlpExporterFormatEnum

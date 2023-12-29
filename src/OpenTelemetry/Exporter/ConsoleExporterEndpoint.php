@@ -25,4 +25,9 @@ final readonly class ConsoleExporterEndpoint implements ExporterEndpointInterfac
     {
         return null;
     }
+
+    public function getExporter(): string
+    {
+        return $this->dsn->getExporter();
+    }
 }
