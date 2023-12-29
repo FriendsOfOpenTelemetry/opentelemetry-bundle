@@ -64,7 +64,7 @@ class OtlpExporterOptionsTest extends TestCase
             ['headers' => ['X-Foo' => 'Bar']],
             fn (OtlpExporterOptions $options) => self::assertSame([
                 'X-Foo' => 'Bar',
-                'User-Agent' => 'OTel OTLP Exporter PHP/1.0.3, Symfony OTEL Bundle',
+                'User-Agent' => 'OTel OTLP Exporter PHP/1.0.4, Symfony OTEL Bundle',
             ], $options->getHeaders()),
         ];
 
