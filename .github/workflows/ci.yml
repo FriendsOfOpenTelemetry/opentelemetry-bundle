@@ -1,13 +1,10 @@
 name: CI
-
 on:
   push:
   pull_request:
-
 concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
   cancel-in-progress: true
-
 jobs:
   php-cs-fixer:
     name: PHP CS Fixer (PHP ${{ matrix.php }})
@@ -43,7 +40,6 @@ jobs:
           composer update --no-interaction --no-progress --ansi
       - name: Run PHP-CS-Fixer fix
         run: vendor/bin/php-cs-fixer fix --dry-run --diff --ansi
-
   phpstan:
     name: PHPStan (PHP ${{ matrix.php }})
     runs-on: ubuntu-latest
@@ -89,7 +85,6 @@ jobs:
         run: |
           ./vendor/bin/phpstan --version
           ./vendor/bin/phpstan analyse --no-interaction --no-progress --ansi
-
   phpunit:
     name: PHPUnit (PHP ${{ matrix.php }})
     runs-on: ubuntu-latest
