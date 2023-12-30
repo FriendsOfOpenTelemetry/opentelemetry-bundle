@@ -21,14 +21,12 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: ${{ matrix.php }}
-          extensions: ffi, grpc, mbstring, opentelemetry, grpc
-          ini-values: memory_limit=-1
-          tools: pecl, composer
-          coverage: none
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@v9
+      - name: Setup Nix magic cache
+        uses: DeterminateSystems/magic-nix-cache-action@v2
+      - name: Instantiate Nix develop
+        uses: nicknovitski/nix-develop@v1
       - name: Get composer cache directory
         id: composercache
         run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
@@ -42,7 +40,7 @@ jobs:
         run: php -m
       - name: Update project dependencies
         run: |
-          composer update --ignore-platform-req=ext-xdebug --no-interaction --no-progress --ansi
+          composer update --no-interaction --no-progress --ansi
       - name: Run PHP-CS-Fixer fix
         run: vendor/bin/php-cs-fixer fix --dry-run --diff --ansi
 
@@ -58,14 +56,12 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: ${{ matrix.php }}
-          tools: pecl, composer
-          extensions: ffi, grpc, mbstring, opentelemetry, grpc
-          coverage: none
-          ini-values: memory_limit=-1
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@v9
+      - name: Setup Nix magic cache
+        uses: DeterminateSystems/magic-nix-cache-action@v2
+      - name: Instantiate Nix develop
+        uses: nicknovitski/nix-develop@v1
       - name: Get composer cache directory
         id: composercache
         run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
@@ -79,7 +75,7 @@ jobs:
         run: php -m
       - name: Update project dependencies
         run: |
-          composer update --ignore-platform-req=ext-xdebug --no-interaction --no-progress --ansi
+          composer update --no-interaction --no-progress --ansi
       - name: Cache PHPStan results
         uses: actions/cache@v3
         with:
@@ -112,14 +108,12 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: ${{ matrix.php }}
-          tools: pecl, composer
-          extensions: ffi, grpc, mbstring, opentelemetry, grpc
-          coverage: pcov
-          ini-values: memory_limit=-1
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@v9
+      - name: Setup Nix magic cache
+        uses: DeterminateSystems/magic-nix-cache-action@v2
+      - name: Instantiate Nix develop
+        uses: nicknovitski/nix-develop@v1
       - name: Get composer cache directory
         id: composercache
         run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
@@ -132,7 +126,7 @@ jobs:
       - name: List PHP installed extensions
         run: php -m
       - name: Update project dependencies
-        run: composer update --ignore-platform-req=ext-xdebug --no-interaction --no-progress --ansi
+        run: composer update --no-interaction --no-progress --ansi
       - name: Run PHPUnit tests
         run: vendor/bin/phpunit --log-junit build/logs/phpunit/junit.xml ${{ matrix.coverage && '--coverage-clover build/logs/phpunit/clover.xml' || '' }}
       - name: Upload test artifacts
