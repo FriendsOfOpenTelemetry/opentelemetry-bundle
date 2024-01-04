@@ -39,14 +39,14 @@
     "minimum-stability": "stable",
     "prefer-stable": true,
     "require": {
-        "php": "~8.2 | ~8.3",
+        "php": "~8.2 || ~8.3",
         "nyholm/psr7": "^1.8",
         "open-telemetry/api": "^1.0",
         "open-telemetry/sdk": "^1.0",
         "open-telemetry/sem-conv": "^1.23",
-        "symfony/config": "^6.4 | ^7.0",
-        "symfony/dependency-injection": "^6.4 | ^7.0",
-        "symfony/http-client": "^6.4 | ^7.0"
+        "symfony/config": "^6.4 || ^7.0",
+        "symfony/dependency-injection": "^6.4 || ^7.0",
+        "symfony/http-client": "^6.4 || ^7.0"
     },
     "require-dev": {
         "ext-ffi": "*",
@@ -71,11 +71,11 @@
         "phpstan/phpstan-symfony": "^1.3",
         "phpunit/phpunit": "^9.6",
         "roave/security-advisories": "dev-master",
-        "symfony/framework-bundle": "^6.4 | ^7.0",
-        "symfony/http-kernel": "^6.4 | ^7.0",
+        "symfony/framework-bundle": "^6.4 || ^7.0",
+        "symfony/http-kernel": "^6.4 || ^7.0",
         "symfony/monolog-bundle": "^3.10",
-        "symfony/phpunit-bridge": "^6.4 | ^7.0",
-        "symfony/yaml": "^6.4 | ^7.0"
+        "symfony/phpunit-bridge": "^6.4 || ^7.0",
+        "symfony/yaml": "^6.4 || ^7.0"
     },
     "config": {
         "allow-plugins": {
