@@ -70,6 +70,7 @@
         "phpstan/phpstan-strict-rules": "^1.5",
         "phpstan/phpstan-symfony": "^1.3",
         "phpunit/phpunit": "^9.6",
+        "pyrech/composer-changelogs": "^2.1",
         "roave/security-advisories": "dev-master",
         "symfony/framework-bundle": "^6.4 || ^7.0",
         "symfony/http-kernel": "^6.4 || ^7.0",
@@ -80,7 +81,8 @@
     "config": {
         "allow-plugins": {
             "phpstan/extension-installer": true,
-            "php-http/discovery": true
+            "php-http/discovery": true,
+            "pyrech/composer-changelogs": true
         },
         "sort-packages": true
     },
