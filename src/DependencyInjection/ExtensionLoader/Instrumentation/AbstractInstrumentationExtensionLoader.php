@@ -4,6 +4,7 @@ namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\DependencyInjection\Extensi
 
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\DependencyInjection\ExtensionLoader\ExtensionLoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Reference;
 
 abstract class AbstractInstrumentationExtensionLoader implements ExtensionLoaderInterface
 {
@@ -58,6 +59,19 @@ abstract class AbstractInstrumentationExtensionLoader implements ExtensionLoader
         return $this->getConfigInstrumentationSection()['tracing'];
     }
 
+    protected function getInstrumentationTracerOrDefaultTracer(): Reference
+    {
+        $tracingConfigInstrumentationSection = $this->getTracingConfigInstrumentationSection();
+
+        if (isset($tracingConfigInstrumentationSection['tracer'])) {
+            return new Reference(sprintf('open_telemetry.traces.tracers.%s', $tracingConfigInstrumentationSection['tracer']));
+        }
+
+        $defaultTracer = $this->config['traces']['default_tracer'] ?? array_key_first($this->config['traces']['tracers']);
+
+        return new Reference(sprintf('open_telemetry.traces.tracers.%s', $defaultTracer));
+    }
+
     private function loadTracingInstrumentation(): void
     {
         if (false === $this->isTracingConfigInstrumentationSectionEnabled()) {
@@ -75,6 +89,41 @@ abstract class AbstractInstrumentationExtensionLoader implements ExtensionLoader
     protected function getMeteringConfigInstrumentationSection(): array
     {
         return $this->getConfigInstrumentationSection()['metering'];
+    }
+
+    protected function getInstrumentationMeterOrDefaultMeter(): Reference
+    {
+        $meteringConfigInstrumentationSection = $this->getConfigInstrumentationSection();
+
+        if (isset($meteringConfigInstrumentationSection['meter'])) {
+            return new Reference(sprintf('open_telemetry.metrics.meters.%s', $this->config['meter']));
+        }
+
+        $defaultMeter = $this->config['metrics']['default_meter'] ?? array_key_first($this->config['metrics']['meters']);
+
+        return new Reference(sprintf('open_telemetry.metrics.meters.%s', $defaultMeter));
+    }
+
+    protected function getInstrumentationMeterProviderOrDefaultMeterProvider(): Reference
+    {
+        $meteringConfigInstrumentationSection = $this->getConfigInstrumentationSection();
+
+        if (isset($meteringConfigInstrumentationSection['meter'])) {
+            if (!isset($this->config['metrics']['meters'][$meteringConfigInstrumentationSection['meter']]['provider'])) {
+                throw new \InvalidArgumentException('Meter provider has not found');
+            }
+            $meterProvider = $this->config['metrics']['meters'][$meteringConfigInstrumentationSection['meter']]['provider'];
+
+            return new Reference(sprintf('open_telemetry.metrics.providers.%s', $meterProvider));
+        }
+
+        $defaultMeter = $this->config['metrics']['default_meter'] ?? array_key_first($this->config['metrics']['meters']);
+        if (!isset($this->config['metrics']['meters'][$defaultMeter]['provider'])) {
+            throw new \InvalidArgumentException('Meter provider has not found');
+        }
+        $meterProvider = $this->config['metrics']['meters'][$defaultMeter]['provider'];
+
+        return new Reference(sprintf('open_telemetry.metrics.providers.%s', $meterProvider));
     }
 
     private function loadMeteringInstrumentation(): void
