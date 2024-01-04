@@ -46,7 +46,8 @@
         "open-telemetry/sem-conv": "^1.23",
         "symfony/config": "^6.4 || ^7.0",
         "symfony/dependency-injection": "^6.4 || ^7.0",
-        "symfony/http-client": "^6.4 || ^7.0"
+        "symfony/http-client": "^6.4 || ^7.0",
+        "zenstruck/dsn": "^0.2"
     },
     "require-dev": {
         "ext-ffi": "*",
