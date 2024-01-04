@@ -20,6 +20,11 @@ jobs:
         uses: actions/checkout@v4
       - name: Install Nix
         uses: DeterminateSystems/nix-installer-action@v9
+      - name: Setup Cachix
+        uses: cachix/cachix-action@v12
+        with:
+          name: nix-shell
+          extraPullNames: php-src-nix
       - name: Setup Nix magic cache
         uses: DeterminateSystems/magic-nix-cache-action@v2
       - name: Instantiate Nix develop
