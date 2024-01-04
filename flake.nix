@@ -25,6 +25,9 @@
           default = pkgs.mkShell {
             packages = [
               pkgs.cachix
+              pkgs.yamlfmt
+              pkgs.actionlint
+
               php
               php.packages.composer
             ];
