@@ -35,11 +35,6 @@ final class ExporterDsn
         return new self($parsedDsn);
     }
 
-    public function getScheme(): string
-    {
-        return $this->uri->scheme()->toString();
-    }
-
     public function getHost(): string
     {
         return $this->uri->host()->toString();

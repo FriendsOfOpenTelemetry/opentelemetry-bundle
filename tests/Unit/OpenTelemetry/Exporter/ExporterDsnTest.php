@@ -92,5 +92,10 @@ class ExporterDsnTest extends TestCase
             'file:///some/path',
             'The DSN must contain a host (use "default" by default).',
         ];
+
+        yield [
+            'mailto:john@doe.com',
+            'The DSN is not an Uri.',
+        ];
     }
 }
