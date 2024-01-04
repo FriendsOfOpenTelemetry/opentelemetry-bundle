@@ -2,81 +2,51 @@
 
 namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\Middleware\Doctrine\Trace;
 
-use Doctrine\DBAL\Connection as ConnectionInterface;
 use Doctrine\DBAL\Driver as DriverInterface;
 use Doctrine\DBAL\Driver\Middleware\AbstractDriverMiddleware;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Platforms\AbstractMySQLPlatform;
-use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Platforms\DB2Platform;
 use Doctrine\DBAL\Platforms\OraclePlatform;
 use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Doctrine\DBAL\Platforms\SqlitePlatform;
 use Doctrine\DBAL\Platforms\SQLServerPlatform;
+use OpenTelemetry\API\Trace\SpanInterface;
 use OpenTelemetry\API\Trace\SpanKind;
 use OpenTelemetry\API\Trace\TracerInterface;
 use OpenTelemetry\Context\Context;
+use OpenTelemetry\Context\ScopeInterface;
 use OpenTelemetry\SemConv\TraceAttributes;
 
 /**
- * Types extracted from \Doctrine\DBAL\DriverManager.
- *
- * @phpstan-type OverrideParams array{
- *     application_name?: string,
- *     charset?: string,
- *     dbname?: string,
- *     default_dbname?: string,
- *     driver?: key-of<DriverManager::DRIVER_MAP>,
- *     driverClass?: class-string<DriverInterface>,
- *     driverOptions?: array<int, mixed>,
- *     host?: string,
- *     password?: string,
- *     path?: string,
- *     persistent?: bool,
- *     platform?: AbstractPlatform,
- *     port?: int,
- *     serverVersion?: string,
- *     url?: string,
- *     user?: string,
- *     unix_socket?: string,
- * }
- * @phpstan-type Params array{
- *     application_name?: string,
- *     charset?: string,
- *     dbname?: string,
- *     defaultTableOptions?: array<string, mixed>,
- *     default_dbname?: string,
- *     driver?: key-of<DriverManager::DRIVER_MAP>,
- *     driverClass?: class-string<DriverInterface>,
- *     driverOptions?: array<int, mixed>,
- *     host?: string,
- *     keepSlave?: bool,
- *     keepReplica?: bool,
- *     master?: OverrideParams,
- *     memory?: bool,
- *     password?: string,
- *     path?: string,
- *     persistent?: bool,
- *     platform?: AbstractPlatform,
- *     port?: int,
- *     primary?: OverrideParams,
- *     replica?: array<OverrideParams>,
- *     serverVersion?: string,
- *     sharding?: array<string,mixed>,
- *     slaves?: array<OverrideParams>,
- *     url?: string,
- *     user?: string,
- *     wrapperClass?: class-string<ConnectionInterface>,
- *     unix_socket?: string,
- * }
+ * @phpstan-import-type OverrideParams from DriverManager
+ * @phpstan-import-type Params from DriverManager
  */
 final class Driver extends AbstractDriverMiddleware
 {
+    private ?ScopeInterface $scope = null;
+    private ?SpanInterface $span = null;
+
     public function __construct(
+        private readonly TracerInterface $tracer,
         DriverInterface $driver,
-        private TracerInterface $tracer
     ) {
         parent::__construct($driver);
+    }
+
+    public function __destruct()
+    {
+        if (null === $this->scope) {
+            return;
+        }
+
+        $this->scope->detach();
+
+        if (null === $this->span) {
+            return;
+        }
+
+        $this->span->end();
     }
 
     /**
@@ -86,9 +56,8 @@ final class Driver extends AbstractDriverMiddleware
         #[\SensitiveParameter]
         array $params
     ) {
-        $databasePlatform = $this->getDatabasePlatform();
         $spanBuilder = $this->tracer
-            ->spanBuilder('doctrine.dbal.middleware.driver')
+            ->spanBuilder('doctrine.dbal.driver')
             ->setAttribute(TraceAttributes::DB_SYSTEM, $this->getSemanticDbSystem())
             ->setAttribute(TraceAttributes::DB_CONNECTION_STRING, $params['url'])
             ->setAttribute(TraceAttributes::DB_NAME, $params['dbname'])
@@ -97,17 +66,12 @@ final class Driver extends AbstractDriverMiddleware
 
         $spanBuilder->setSpanKind(SpanKind::KIND_SERVER);
 
-        $parent = Context::getCurrent();
+        $context = Context::getCurrent();
 
-        $span = $spanBuilder->setParent($parent)->startSpan();
-        $scope = $span->storeInContext($parent)->activate();
+        $span = $spanBuilder->setParent($context)->startSpan();
+        $span->storeInContext($context)->activate();
 
-        return new Connection(
-            parent::connect($params),
-            $this->tracer,
-            $span,
-            $scope,
-        );
+        return new Connection(parent::connect($params));
     }
 
     private function getSemanticDbSystem(): string

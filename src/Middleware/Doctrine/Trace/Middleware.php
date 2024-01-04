@@ -14,6 +14,6 @@ final class Middleware implements MiddlewareInterface
 
     public function wrap(DriverInterface $driver): DriverInterface
     {
-        return new Driver($driver, $this->tracer);
+        return new Driver($this->tracer, $driver);
     }
 }
