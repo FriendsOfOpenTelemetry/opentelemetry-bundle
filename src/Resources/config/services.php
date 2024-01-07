@@ -1,5 +1,7 @@
 <?php
 
+use FriendsOfOpenTelemetry\OpenTelemetryBundle\Adapter\Cache\Trace\CacheTraceAdapter;
+use FriendsOfOpenTelemetry\OpenTelemetryBundle\Adapter\Cache\Trace\TagAwareCacheTraceAdapter;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\EventSubscriber\ConsoleMetricEventSubscriber;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\EventSubscriber\ConsoleTraceEventSubscriber;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\EventSubscriber\HttpKernelMetricEventSubscriber;
@@ -63,6 +65,11 @@ return static function (ContainerConfigurator $container): void {
         ->set('open_telemetry.instrumentation.doctrine.trace.middleware', DoctrineTraceMiddleware::class)
 
         ->set('open_telemetry.instrumentation.twig.trace.extension', TwigTraceExtension::class)
+
+        ->set('open_telemetry.instrumentation.cache.trace.adapter', CacheTraceAdapter::class)
+            ->abstract()
+        ->set('open_telemetry.instrumentation.cache.trace.tag_aware_adapter', TagAwareCacheTraceAdapter::class)
+            ->abstract()
 
         ->set('open_telemetry.traces.samplers.always_on', AlwaysOnSampler::class)->public()
         ->set('open_telemetry.traces.samplers.always_off', AlwaysOffSampler::class)->public()

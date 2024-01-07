@@ -2,7 +2,7 @@
 
 namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\Extension\Twig\Trace;
 
-use OpenTelemetry\API\Trace\Span;
+use OpenTelemetry\API\Trace\SpanInterface;
 use OpenTelemetry\API\Trace\SpanKind;
 use OpenTelemetry\API\Trace\TracerInterface;
 use OpenTelemetry\Context\Context;
@@ -13,7 +13,7 @@ use Twig\Profiler\Profile;
 class TwigTraceExtension extends AbstractExtension
 {
     /**
-     * @var \SplObjectStorage<Profile, Span>
+     * @var \SplObjectStorage<Profile, SpanInterface>
      */
     private \SplObjectStorage $spans;
 

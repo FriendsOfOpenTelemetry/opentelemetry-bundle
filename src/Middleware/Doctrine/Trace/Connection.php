@@ -13,7 +13,7 @@ class Connection extends AbstractConnectionMiddleware
 {
     public function __construct(
         ConnectionInterface $connection,
-        private Tracer $tracer,
+        private DoctrineTracer $tracer,
         private SpanInterface $driverSpan,
     ) {
         parent::__construct($connection);
@@ -29,7 +29,7 @@ class Connection extends AbstractConnectionMiddleware
 
     public function prepare(string $sql): DriverStatement
     {
-        return $this->tracer->traceFunction('doctrine.dbal.statement.prepare', function (SpanInterface $span) use ($sql) {
+        return $this->tracer->traceFunction('doctrine.dbal.statement.prepare', function (SpanInterface $span) use ($sql): DriverStatement {
             $span->setAttribute(TraceAttributes::DB_STATEMENT, $sql);
 
             return new Statement(parent::prepare($sql), $this->tracer);
@@ -38,7 +38,7 @@ class Connection extends AbstractConnectionMiddleware
 
     public function query(string $sql): Result
     {
-        return $this->tracer->traceFunction('doctrine.dbal.connection.query', function (SpanInterface $span) use ($sql) {
+        return $this->tracer->traceFunction('doctrine.dbal.connection.query', function (SpanInterface $span) use ($sql): Result {
             $span->setAttribute(TraceAttributes::DB_STATEMENT, $sql);
 
             return parent::query($sql);
@@ -47,7 +47,7 @@ class Connection extends AbstractConnectionMiddleware
 
     public function exec(string $sql): int
     {
-        return $this->tracer->traceFunction('doctrine.dbal.connection.exec', function (SpanInterface $span) use ($sql) {
+        return $this->tracer->traceFunction('doctrine.dbal.connection.exec', function (SpanInterface $span) use ($sql): int {
             $span->setAttribute(TraceAttributes::DB_STATEMENT, $sql);
 
             return parent::exec($sql);
@@ -56,21 +56,21 @@ class Connection extends AbstractConnectionMiddleware
 
     public function beginTransaction(): bool
     {
-        return $this->tracer->traceFunction('doctrine.dbal.transaction.begin', function (SpanInterface $span) {
+        return $this->tracer->traceFunction('doctrine.dbal.transaction.begin', function (SpanInterface $span): bool {
             return parent::beginTransaction();
         });
     }
 
     public function commit(): bool
     {
-        return $this->tracer->traceFunction('doctrine.dbal.transaction.commit', function (SpanInterface $span) {
+        return $this->tracer->traceFunction('doctrine.dbal.transaction.commit', function (SpanInterface $span): bool {
             return parent::commit();
         });
     }
 
     public function rollBack(): bool
     {
-        return $this->tracer->traceFunction('doctrine.dbal.transaction.rollback', function (SpanInterface $span) {
+        return $this->tracer->traceFunction('doctrine.dbal.transaction.rollback', function (SpanInterface $span): bool {
             return parent::rollBack();
         });
     }

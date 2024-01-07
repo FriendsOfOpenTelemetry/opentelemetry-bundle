@@ -2,6 +2,7 @@
 
 namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\DependencyInjection;
 
+use FriendsOfOpenTelemetry\OpenTelemetryBundle\DependencyInjection\ExtensionLoader\Instrumentation\CacheInstrumentationExtensionLoader;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\DependencyInjection\ExtensionLoader\Instrumentation\ConsoleInstrumentationExtensionLoader;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\DependencyInjection\ExtensionLoader\Instrumentation\DoctrineInstrumentationExtensionLoader;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\DependencyInjection\ExtensionLoader\Instrumentation\HttpKernelInstrumentationExtensionLoader;
@@ -38,6 +39,7 @@ final class OpenTelemetryExtension extends ConfigurableExtension
         (new ConsoleInstrumentationExtensionLoader())->load($mergedConfig, $container);
         (new DoctrineInstrumentationExtensionLoader())->load($mergedConfig, $container);
         (new TwigInstrumentationExtensionLoader())->load($mergedConfig, $container);
+        (new CacheInstrumentationExtensionLoader())->load($mergedConfig, $container);
     }
 
     /**

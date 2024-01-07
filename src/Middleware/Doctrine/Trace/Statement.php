@@ -11,14 +11,14 @@ final class Statement extends AbstractStatementMiddleware
 {
     public function __construct(
         StatementInterface $statement,
-        private Tracer $tracer,
+        private DoctrineTracer $tracer,
     ) {
         parent::__construct($statement);
     }
 
     public function execute($params = null): Result
     {
-        return $this->tracer->traceFunction('doctrine.dbal.statement.execute', function (SpanInterface $span) use ($params) {
+        return $this->tracer->traceFunction('doctrine.dbal.statement.execute', function (SpanInterface $span) use ($params): Result {
             $span->setAttribute('db.params', $params);
 
             return parent::execute($params);

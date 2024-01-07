@@ -10,7 +10,7 @@ use OpenTelemetry\API\Trace\TracerInterface;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\SemConv\TraceAttributes;
 
-final readonly class Tracer
+final readonly class DoctrineTracer
 {
     public function __construct(
         private TracerInterface $tracer
