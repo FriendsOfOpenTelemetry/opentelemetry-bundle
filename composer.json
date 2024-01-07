@@ -65,6 +65,8 @@
         "ext-opentelemetry": "*",
         "ext-xdebug": "*",
         "doctrine/dbal": "^3.7",
+        "doctrine/doctrine-bundle": "^2.11",
+        "doctrine/orm": "^2.17",
         "friendsofphp/php-cs-fixer": "^3.41",
         "guzzlehttp/promises": "^2.0",
         "maglnet/composer-require-checker": "^4.8",
@@ -87,7 +89,9 @@
         "symfony/http-kernel": "^6.4 || ^7.0",
         "symfony/monolog-bundle": "^3.10",
         "symfony/phpunit-bridge": "^6.4 || ^7.0",
-        "symfony/yaml": "^6.4 || ^7.0"
+        "symfony/twig-bundle": "^7.0",
+        "symfony/yaml": "^6.4 || ^7.0",
+        "twig/twig": "^3.8"
     },
     "config": {
         "allow-plugins": {
@@ -102,6 +106,8 @@
         "symfony/http-foundation": "Needed to enable Symfony HttpKernel instrumentation",
         "symfony/http-kernel": "Needed to enable Symfony HttpKernel instrumentation",
         "symfony/monolog-bundle": "Needed to register OpenTelemetry handler in Symfony Monolog service",
+        "doctrine/orm": "Needed to enable Doctrine ORM instrumentation",
+        "doctrine/dbal": "Needed to enable Doctrine DBAL instrumentation",
         "open-telemetry/exporter-otlp": "Needed to export OpenTelemetry data via OTPL",
         "open-telemetry/exporter-zipkin": "Needed to export OpenTelemetry data via Zipkin",
         "open-telemetry/transport-grpc": "Needed to export OpenTelemetry data via gRPC",

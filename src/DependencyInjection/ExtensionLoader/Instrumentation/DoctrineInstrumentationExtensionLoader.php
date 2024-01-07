@@ -2,7 +2,7 @@
 
 namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\DependencyInjection\ExtensionLoader\Instrumentation;
 
-use Doctrine\DBAL\Driver\Middleware;
+use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
 
 final class DoctrineInstrumentationExtensionLoader extends AbstractInstrumentationExtensionLoader
 {
@@ -13,9 +13,9 @@ final class DoctrineInstrumentationExtensionLoader extends AbstractInstrumentati
 
     protected function assertInstrumentationCanHappen(): void
     {
-        /*        if (!class_exists(Middleware::class)) {
-                    throw new \LogicException('To configure the Doctrine instrumentation, you must first install the doctrine/dbal package.');
-                }*/
+        if (!class_exists(DoctrineBundle::class)) {
+            throw new \LogicException('To configure the Doctrine instrumentation, you must first install the doctrine/doctrine-bundle package.');
+        }
     }
 
     protected function setTracingDefinitions(): void

@@ -4,6 +4,7 @@ use FriendsOfOpenTelemetry\OpenTelemetryBundle\EventSubscriber\ConsoleMetricEven
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\EventSubscriber\ConsoleTraceEventSubscriber;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\EventSubscriber\HttpKernelMetricEventSubscriber;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\EventSubscriber\HttpKernelTraceEventSubscriber;
+use FriendsOfOpenTelemetry\OpenTelemetryBundle\Extension\Twig\Trace\TwigTraceExtension;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\Middleware\Doctrine\Trace\Middleware as DoctrineTraceMiddleware;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Context\Propagator\HeadersPropagator;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Exporter\ExporterDsn;
@@ -60,6 +61,8 @@ return static function (ContainerConfigurator $container): void {
         ->set('open_telemetry.instrumentation.console.metric.event_subscriber', ConsoleMetricEventSubscriber::class)
 
         ->set('open_telemetry.instrumentation.doctrine.trace.middleware', DoctrineTraceMiddleware::class)
+
+        ->set('open_telemetry.instrumentation.twig.trace.extension', TwigTraceExtension::class)
 
         ->set('open_telemetry.traces.samplers.always_on', AlwaysOnSampler::class)->public()
         ->set('open_telemetry.traces.samplers.always_off', AlwaysOffSampler::class)->public()
