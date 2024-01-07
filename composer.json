@@ -72,6 +72,7 @@
         "maglnet/composer-require-checker": "^4.8",
         "matthiasnoback/symfony-config-test": "^5.1",
         "matthiasnoback/symfony-dependency-injection-test": "^5.0",
+        "nyholm/symfony-bundle-test": "^3.0",
         "open-telemetry/exporter-otlp": "^1.0",
         "open-telemetry/exporter-zipkin": "^1.0",
         "open-telemetry/transport-grpc": "^1.0",
@@ -88,6 +89,8 @@
         "symfony/cache": "^7.0",
         "symfony/framework-bundle": "^6.4 || ^7.0",
         "symfony/http-kernel": "^6.4 || ^7.0",
+        "symfony/mailer": "^7.0",
+        "symfony/messenger": "^7.0",
         "symfony/monolog-bundle": "^3.10",
         "symfony/phpunit-bridge": "^6.4 || ^7.0",
         "symfony/twig-bundle": "^7.0",
@@ -103,15 +106,18 @@
         "sort-packages": true
     },
     "suggest": {
-        "symfony/console": "Needed to enable Symfony Console instrumentation",
-        "symfony/http-foundation": "Needed to enable Symfony HttpKernel instrumentation",
-        "symfony/http-kernel": "Needed to enable Symfony HttpKernel instrumentation",
-        "symfony/monolog-bundle": "Needed to register OpenTelemetry handler in Symfony Monolog service",
-        "doctrine/orm": "Needed to enable Doctrine ORM instrumentation",
         "doctrine/dbal": "Needed to enable Doctrine DBAL instrumentation",
+        "doctrine/orm": "Needed to enable Doctrine ORM instrumentation",
         "open-telemetry/exporter-otlp": "Needed to export OpenTelemetry data via OTPL",
         "open-telemetry/exporter-zipkin": "Needed to export OpenTelemetry data via Zipkin",
+        "open-telemetry/opentelemetry-logger-monolog": "Need to export logs from Monolog via OpenTelemetry",
         "open-telemetry/transport-grpc": "Needed to export OpenTelemetry data via gRPC",
-        "open-telemetry/opentelemetry-logger-monolog": "Need to export logs from Monolog via OpenTelemetry"
+        "symfony/cache": "Needed to enable Symfony Cache instrumentation",
+        "symfony/console": "Needed to enable Symfony Console instrumentation",
+        "symfony/http-kernel": "Needed to enable Symfony HttpKernel instrumentation",
+        "symfony/http-client": "Needed to enable Symfony HttpClient instrumentation",
+        "symfony/mailer": "Needed to enable Symfony Mailer instrumentation",
+        "symfony/messenger": "Needed to enable Symfony Messenger instrumentation",
+        "symfony/monolog-bundle": "Needed to register OpenTelemetry handler in Symfony Monolog service"
     }
 }

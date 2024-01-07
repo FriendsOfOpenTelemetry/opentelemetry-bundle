@@ -5,7 +5,10 @@ namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\DependencyInjection;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\DependencyInjection\ExtensionLoader\Instrumentation\CacheInstrumentationExtensionLoader;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\DependencyInjection\ExtensionLoader\Instrumentation\ConsoleInstrumentationExtensionLoader;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\DependencyInjection\ExtensionLoader\Instrumentation\DoctrineInstrumentationExtensionLoader;
+use FriendsOfOpenTelemetry\OpenTelemetryBundle\DependencyInjection\ExtensionLoader\Instrumentation\HttpClientInstrumentationExtensionLoader;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\DependencyInjection\ExtensionLoader\Instrumentation\HttpKernelInstrumentationExtensionLoader;
+use FriendsOfOpenTelemetry\OpenTelemetryBundle\DependencyInjection\ExtensionLoader\Instrumentation\MailerInstrumentationExtensionLoader;
+use FriendsOfOpenTelemetry\OpenTelemetryBundle\DependencyInjection\ExtensionLoader\Instrumentation\MessengerInstrumentationExtensionLoader;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\DependencyInjection\ExtensionLoader\Instrumentation\TwigInstrumentationExtensionLoader;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\DependencyInjection\ExtensionLoader\LogsExtensionLoader;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\DependencyInjection\ExtensionLoader\MetricsExtensionLoader;
@@ -35,11 +38,14 @@ final class OpenTelemetryExtension extends ConfigurableExtension
 
         $this->loadMonologHandlers($mergedConfig['logs'], $container);
 
-        (new HttpKernelInstrumentationExtensionLoader())->load($mergedConfig, $container);
+        (new CacheInstrumentationExtensionLoader())->load($mergedConfig, $container);
         (new ConsoleInstrumentationExtensionLoader())->load($mergedConfig, $container);
         (new DoctrineInstrumentationExtensionLoader())->load($mergedConfig, $container);
+        (new HttpClientInstrumentationExtensionLoader())->load($mergedConfig, $container);
+        (new HttpKernelInstrumentationExtensionLoader())->load($mergedConfig, $container);
+        (new MailerInstrumentationExtensionLoader())->load($mergedConfig, $container);
+        (new MessengerInstrumentationExtensionLoader())->load($mergedConfig, $container);
         (new TwigInstrumentationExtensionLoader())->load($mergedConfig, $container);
-        (new CacheInstrumentationExtensionLoader())->load($mergedConfig, $container);
     }
 
     /**
