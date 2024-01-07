@@ -41,7 +41,7 @@ abstract class AbstractInstrumentationExtensionLoader implements ExtensionLoader
 
     private function isConfigInstrumentationSectionEnabled(): bool
     {
-        return $this->getConfigInstrumentationSection()['enabled'];
+        return true === $this->getConfigInstrumentationSection()['enabled'];
     }
 
     protected function getConfigInstrumentationSection(): array
@@ -51,7 +51,7 @@ abstract class AbstractInstrumentationExtensionLoader implements ExtensionLoader
 
     private function isTracingConfigInstrumentationSectionEnabled(): bool
     {
-        return $this->getTracingConfigInstrumentationSection()['enabled'];
+        return true === $this->getTracingConfigInstrumentationSection()['enabled'];
     }
 
     protected function getTracingConfigInstrumentationSection(): array
@@ -83,7 +83,7 @@ abstract class AbstractInstrumentationExtensionLoader implements ExtensionLoader
 
     private function isMeteringConfigInstrumentationSectionEnabled(): bool
     {
-        return $this->getMeteringConfigInstrumentationSection()['enabled'];
+        return true === $this->getMeteringConfigInstrumentationSection()['enabled'];
     }
 
     protected function getMeteringConfigInstrumentationSection(): array

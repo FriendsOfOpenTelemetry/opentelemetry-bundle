@@ -13,9 +13,9 @@ final class DoctrineInstrumentationExtensionLoader extends AbstractInstrumentati
 
     protected function assertInstrumentationCanHappen(): void
     {
-        if (!class_exists(Middleware::class)) {
-            throw new \LogicException('To configure the Doctrine instrumentation, you must first install the doctrine/dbal package.');
-        }
+        /*        if (!class_exists(Middleware::class)) {
+                    throw new \LogicException('To configure the Doctrine instrumentation, you must first install the doctrine/dbal package.');
+                }*/
     }
 
     protected function setTracingDefinitions(): void

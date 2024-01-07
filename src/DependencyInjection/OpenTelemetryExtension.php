@@ -3,6 +3,7 @@
 namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\DependencyInjection;
 
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\DependencyInjection\ExtensionLoader\Instrumentation\ConsoleInstrumentationExtensionLoader;
+use FriendsOfOpenTelemetry\OpenTelemetryBundle\DependencyInjection\ExtensionLoader\Instrumentation\DoctrineInstrumentationExtensionLoader;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\DependencyInjection\ExtensionLoader\Instrumentation\HttpKernelInstrumentationExtensionLoader;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\DependencyInjection\ExtensionLoader\LogsExtensionLoader;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\DependencyInjection\ExtensionLoader\MetricsExtensionLoader;
@@ -34,6 +35,7 @@ final class OpenTelemetryExtension extends ConfigurableExtension
 
         (new HttpKernelInstrumentationExtensionLoader())->load($mergedConfig, $container);
         (new ConsoleInstrumentationExtensionLoader())->load($mergedConfig, $container);
+        (new DoctrineInstrumentationExtensionLoader())->load($mergedConfig, $container);
     }
 
     /**

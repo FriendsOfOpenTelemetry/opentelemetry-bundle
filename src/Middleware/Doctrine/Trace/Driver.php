@@ -12,10 +12,7 @@ use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Doctrine\DBAL\Platforms\SqlitePlatform;
 use Doctrine\DBAL\Platforms\SQLServerPlatform;
 use OpenTelemetry\API\Trace\SpanInterface;
-use OpenTelemetry\API\Trace\SpanKind;
 use OpenTelemetry\API\Trace\TracerInterface;
-use OpenTelemetry\Context\Context;
-use OpenTelemetry\Context\ScopeInterface;
 use OpenTelemetry\SemConv\TraceAttributes;
 
 /**
@@ -24,29 +21,15 @@ use OpenTelemetry\SemConv\TraceAttributes;
  */
 final class Driver extends AbstractDriverMiddleware
 {
-    private ?ScopeInterface $scope = null;
-    private ?SpanInterface $span = null;
+    private Tracer $tracer;
 
     public function __construct(
-        private readonly TracerInterface $tracer,
+        TracerInterface $tracer,
         DriverInterface $driver,
     ) {
         parent::__construct($driver);
-    }
 
-    public function __destruct()
-    {
-        if (null === $this->scope) {
-            return;
-        }
-
-        $this->scope->detach();
-
-        if (null === $this->span) {
-            return;
-        }
-
-        $this->span->end();
+        $this->tracer = new Tracer($tracer);
     }
 
     /**
@@ -56,22 +39,16 @@ final class Driver extends AbstractDriverMiddleware
         #[\SensitiveParameter]
         array $params
     ) {
-        $spanBuilder = $this->tracer
-            ->spanBuilder('doctrine.dbal.driver')
-            ->setAttribute(TraceAttributes::DB_SYSTEM, $this->getSemanticDbSystem())
-            ->setAttribute(TraceAttributes::DB_CONNECTION_STRING, $params['url'])
-            ->setAttribute(TraceAttributes::DB_NAME, $params['dbname'])
-            ->setAttribute(TraceAttributes::DB_USER, $params['user'])
-        ;
+        return $this->tracer->traceFunction('doctrine.dbal.driver.connect', function (SpanInterface $span) use ($params) {
+            $span
+                ->setAttribute(TraceAttributes::DB_SYSTEM, $this->getSemanticDbSystem())
+                ->setAttribute(TraceAttributes::DB_CONNECTION_STRING, $params['url'] ?? $params['path'])
+                ->setAttribute(TraceAttributes::DB_NAME, $params['dbname'] ?? 'default')
+                ->setAttribute(TraceAttributes::DB_USER, $params['user'])
+            ;
 
-        $spanBuilder->setSpanKind(SpanKind::KIND_SERVER);
-
-        $context = Context::getCurrent();
-
-        $span = $spanBuilder->setParent($context)->startSpan();
-        $span->storeInContext($context)->activate();
-
-        return new Connection(parent::connect($params));
+            return new Connection(parent::connect($params), $this->tracer, $span);
+        });
     }
 
     private function getSemanticDbSystem(): string
