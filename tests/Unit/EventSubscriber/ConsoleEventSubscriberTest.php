@@ -2,7 +2,7 @@
 
 namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\Tests\Unit\EventSubscriber;
 
-use FriendsOfOpenTelemetry\OpenTelemetryBundle\EventSubscriber\ConsoleTraceEventSubscriber;
+use FriendsOfOpenTelemetry\OpenTelemetryBundle\Instrumentation\Symfony\EventSubscriber\Console\TraceableConsoleEventSubscriber;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\Tests\Application\Command\DummyCommand;
 use OpenTelemetry\API\Trace\Span;
 use OpenTelemetry\API\Trace\TracerInterface;
@@ -17,7 +17,7 @@ use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\NullOutput;
 
 /**
- * @coversDefaultClass \FriendsOfOpenTelemetry\OpenTelemetryBundle\EventSubscriber\ConsoleTraceEventSubscriber
+ * @coversDefaultClass \FriendsOfOpenTelemetry\OpenTelemetryBundle\Instrumentation\Symfony\EventSubscriber\Console\TraceableConsoleEventSubscriber
  */
 final class ConsoleEventSubscriberTest extends TestCase
 {
@@ -55,7 +55,7 @@ final class ConsoleEventSubscriberTest extends TestCase
      */
     public function testHandleCommandEvent(ConsoleCommandEvent $event): void
     {
-        $subscriber = new ConsoleTraceEventSubscriber($this->tracer);
+        $subscriber = new TraceableConsoleEventSubscriber($this->tracer);
 
         $subscriber->startSpan($event);
 

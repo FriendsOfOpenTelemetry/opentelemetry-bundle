@@ -54,6 +54,41 @@ final class ConfigurationTest extends TestCase
                     'enabled' => false,
                     'tracing' => [
                         'enabled' => false,
+                        'request_headers' => [],
+                        'response_headers' => [],
+                    ],
+                    'metering' => [
+                        'enabled' => false,
+                    ],
+                ],
+                'messenger' => [
+                    'enabled' => false,
+                    'tracing' => [
+                        'enabled' => false,
+                        'request_headers' => [],
+                        'response_headers' => [],
+                    ],
+                    'metering' => [
+                        'enabled' => false,
+                    ],
+                ],
+                'mailer' => [
+                    'enabled' => false,
+                    'tracing' => [
+                        'enabled' => false,
+                        'request_headers' => [],
+                        'response_headers' => [],
+                    ],
+                    'metering' => [
+                        'enabled' => false,
+                    ],
+                ],
+                'doctrine' => [
+                    'enabled' => false,
+                    'tracing' => [
+                        'enabled' => false,
+                        'request_headers' => [],
+                        'response_headers' => [],
                     ],
                     'metering' => [
                         'enabled' => false,
@@ -104,26 +139,70 @@ final class ConfigurationTest extends TestCase
                         enabled:              false
 
                         # The tracer to use, defaults to `traces.default_tracer` or first tracer in `traces.tracers`
-                        tracer:               ~ # Required
+                        tracer:               ~
                         request_headers:      []
                         response_headers:     []
                     metering:
                         enabled:              false
 
                         # The meter to use, defaults to `metrics.default_meter` or first meter in `metrics.meters`
-                        meter:                ~ # Required
+                        meter:                ~
                 console:
                     enabled:              false
                     tracing:
                         enabled:              false
 
                         # The tracer to use, defaults to `traces.default_tracer` or first tracer in `traces.tracers`
-                        tracer:               ~ # Required
+                        tracer:               ~
+                        request_headers:      []
+                        response_headers:     []
                     metering:
                         enabled:              false
 
                         # The meter to use, defaults to `metrics.default_meter` or first meter in `metrics.meters`
-                        meter:                ~ # Required
+                        meter:                ~
+                messenger:
+                    enabled:              false
+                    tracing:
+                        enabled:              false
+
+                        # The tracer to use, defaults to `traces.default_tracer` or first tracer in `traces.tracers`
+                        tracer:               ~
+                        request_headers:      []
+                        response_headers:     []
+                    metering:
+                        enabled:              false
+
+                        # The meter to use, defaults to `metrics.default_meter` or first meter in `metrics.meters`
+                        meter:                ~
+                mailer:
+                    enabled:              false
+                    tracing:
+                        enabled:              false
+
+                        # The tracer to use, defaults to `traces.default_tracer` or first tracer in `traces.tracers`
+                        tracer:               ~
+                        request_headers:      []
+                        response_headers:     []
+                    metering:
+                        enabled:              false
+
+                        # The meter to use, defaults to `metrics.default_meter` or first meter in `metrics.meters`
+                        meter:                ~
+                doctrine:
+                    enabled:              false
+                    tracing:
+                        enabled:              false
+
+                        # The tracer to use, defaults to `traces.default_tracer` or first tracer in `traces.tracers`
+                        tracer:               ~
+                        request_headers:      []
+                        response_headers:     []
+                    metering:
+                        enabled:              false
+
+                        # The meter to use, defaults to `metrics.default_meter` or first meter in `metrics.meters`
+                        meter:                ~
             traces:
 
                 # The default tracer to use among the `tracers`

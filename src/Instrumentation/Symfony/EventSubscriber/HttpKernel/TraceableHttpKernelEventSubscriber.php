@@ -1,6 +1,6 @@
 <?php
 
-namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\EventSubscriber;
+namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\Instrumentation\Symfony\EventSubscriber\HttpKernel;
 
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Context\Attribute\HttpKernelTraceAttributeEnum;
 use OpenTelemetry\API\Trace\SpanInterface;
@@ -25,7 +25,7 @@ use Symfony\Component\HttpKernel\Event\TerminateEvent;
 use Symfony\Component\HttpKernel\Event\ViewEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
-final class HttpKernelTraceEventSubscriber implements EventSubscriberInterface
+final class TraceableHttpKernelEventSubscriber implements EventSubscriberInterface
 {
     private const REQUEST_ATTRIBUTE_SPAN = '__opentelemetry_symfony_internal_span';
     private const REQUEST_ATTRIBUTE_SCOPE = '__opentelemetry_symfony_internal_scope';
