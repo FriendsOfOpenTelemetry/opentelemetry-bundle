@@ -5,6 +5,7 @@
 [![Coveralls: Coverage][coveralls-badge]][coveralls-page]
 [![Project stage: Research][project-stage-badge]][project-stage-page]
 [![Built with Nix][build-with-nix-badge]][build-with-nix-page]
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FFriendsOfOpenTelemetry%2Fopentelemetry-bundle.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2FFriendsOfOpenTelemetry%2Fopentelemetry-bundle?ref=badge_shield)
 
 > [WIP] Symfony Bundle for OpenTelemetry PHP
 
@@ -18,3 +19,7 @@
 [build-with-nix-page]: https://builtwithnix.org/
 [project-stage-badge]: https://img.shields.io/badge/Project_Stage-Research-orange.svg
 [project-stage-page]: https://blog.pother.ca/project-stages/
+
+
+## License
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FFriendsOfOpenTelemetry%2Fopentelemetry-bundle.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2FFriendsOfOpenTelemetry%2Fopentelemetry-bundle?ref=badge_large)
