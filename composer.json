@@ -67,6 +67,7 @@
         "phpstan/phpstan-symfony": "^1.3",
         "phpunit/phpunit": "^9.6",
         "pyrech/composer-changelogs": "^2.1",
+        "roave/backward-compatibility-check": "^8.6",
         "roave/security-advisories": "dev-master",
         "symfony/cache": "^6.4 || ^7.0",
         "symfony/framework-bundle": "^6.4 || ^7.0",
@@ -117,6 +118,7 @@
     },
     "scripts": {
         "check-reqs": "@php vendor/bin/composer-require-checker check",
+        "check-bcs": "@php vendor/bin/roave-backward-compatibility-check --format=github-actions",
         "format": [
             "@php-cs-fixer:fix",
             "@composer normalize"
