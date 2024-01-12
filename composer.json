@@ -15,6 +15,7 @@
         "php-cs-fixer:lint": "@php-cs-fixer:fix --dry-run --diff",
         "phpstan": "@php vendor/bin/phpstan analyse",
         "phpunit": "@php vendor/bin/phpunit",
+        "check-reqs": "@php vendor/bin/composer-require-checker check",
         "lint": [
             "@php-cs-fixer:lint",
             "@phpstan"
@@ -40,14 +41,21 @@
     "prefer-stable": true,
     "require": {
         "php": "~8.2 || ~8.3",
+        "monolog/monolog": "^3.5",
         "nyholm/psr7": "^1.8",
         "open-telemetry/api": "^1.0",
+        "open-telemetry/context": "^1.0",
+        "open-telemetry/opentelemetry-logger-monolog": "^1.0",
         "open-telemetry/sdk": "^1.0",
         "open-telemetry/sem-conv": "^1.23",
+        "php-http/discovery": "^1.19",
+        "psr/http-factory": "^1.0",
         "symfony/config": "^6.4 || ^7.0",
         "symfony/dependency-injection": "^6.4 || ^7.0",
+        "symfony/event-dispatcher": "^7.0",
         "symfony/http-client": "^6.4 || ^7.0",
-        "zenstruck/dsn": "^0.2"
+        "zenstruck/dsn": "^0.2",
+        "zenstruck/uri": "^2.3"
     },
     "require-dev": {
         "ext-ffi": "*",
@@ -57,11 +65,11 @@
         "ext-xdebug": "*",
         "friendsofphp/php-cs-fixer": "^3.41",
         "guzzlehttp/promises": "^2.0",
+        "maglnet/composer-require-checker": "^4.8",
         "matthiasnoback/symfony-config-test": "^5.1",
         "matthiasnoback/symfony-dependency-injection-test": "^5.0",
         "open-telemetry/exporter-otlp": "^1.0",
         "open-telemetry/exporter-zipkin": "^1.0",
-        "open-telemetry/opentelemetry-logger-monolog": "^1.0",
         "open-telemetry/transport-grpc": "^1.0",
         "php-http/httplug": "^2.4",
         "phpstan/extension-installer": "^1.3",
@@ -88,8 +96,9 @@
         "sort-packages": true
     },
     "suggest": {
-        "symfony/console": "Needed to enable Symfony HttpKernel instrumentation",
-        "symfony/http-kernel": "Needed to enable Symfony Console instrumentation",
+        "symfony/console": "Needed to enable Symfony Console instrumentation",
+        "symfony/http-foundation": "Needed to enable Symfony HttpKernel instrumentation",
+        "symfony/http-kernel": "Needed to enable Symfony HttpKernel instrumentation",
         "symfony/monolog-bundle": "Needed to register OpenTelemetry handler in Symfony Monolog service",
         "open-telemetry/exporter-otlp": "Needed to export OpenTelemetry data via OTPL",
         "open-telemetry/exporter-zipkin": "Needed to export OpenTelemetry data via Zipkin",
