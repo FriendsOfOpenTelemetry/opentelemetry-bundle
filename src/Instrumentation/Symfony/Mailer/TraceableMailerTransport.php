@@ -7,6 +7,7 @@ use OpenTelemetry\API\Trace\StatusCode;
 use OpenTelemetry\API\Trace\TracerInterface;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\SemConv\TraceAttributes;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Exception\TransportException;
 use Symfony\Component\Mailer\SentMessage;
@@ -18,6 +19,7 @@ final readonly class TraceableMailerTransport implements TransportInterface
     public function __construct(
         private TransportInterface $transport,
         private TracerInterface $tracer,
+        private LoggerInterface $logger,
     ) {
     }
 
@@ -30,6 +32,8 @@ final readonly class TraceableMailerTransport implements TransportInterface
     {
         $scope = Context::storage()->scope();
         if (null === $scope) {
+            $this->logger->debug('No scope is available to register new spans.');
+
             return $this->transport->send($message, $envelope);
         }
 
@@ -38,12 +42,17 @@ final readonly class TraceableMailerTransport implements TransportInterface
         try {
             $spanBuilder = $this->tracer
                 ->spanBuilder('mailer.transport.send')
-                ->setSpanKind(SpanKind::KIND_INTERNAL)
+                ->setSpanKind(SpanKind::KIND_CLIENT)
             ;
 
             $span = $spanBuilder->setParent(Context::getCurrent())->startSpan();
 
-            return $this->transport->send($message, $envelope);
+            $headers = $message->getHeaders()->addTextHeader('X-Trace', $span->getContext()->getTraceId());
+
+            return $this->transport->send(
+                $message->setHeaders($headers),
+                $envelope,
+            );
         } catch (TransportException $exception) {
             if (null !== $span) {
                 $span->recordException($exception, [TraceAttributes::EXCEPTION_ESCAPED => true]);

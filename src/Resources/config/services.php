@@ -45,6 +45,7 @@ return static function (ContainerConfigurator $container): void {
     $container->parameters()
         ->set('open_telemetry.bundle.name', OpenTelemetryBundle::name())
         ->set('open_telemetry.bundle.version', OpenTelemetryBundle::version())
+        ->set('monolog.additional_channels', ['open_telemetry'])
     ;
 
     $container->services()
@@ -68,12 +69,16 @@ return static function (ContainerConfigurator $container): void {
             ->arg('$propagationGetter', service('open_telemetry.propagation_getters.headers'))
             ->arg('$requestHeaders', param('open_telemetry.instrumentation.http_kernel.request_headers'))
             ->arg('$responseHeaders', param('open_telemetry.instrumentation.http_kernel.response_headers'))
+            ->tag('monolog.logger', ['channel' => 'open_telemetry'])
         ->set('open_telemetry.instrumentation.http_kernel.metric.event_subscriber', ObservableHttpKernelEventSubscriber::class)
 
         ->set('open_telemetry.instrumentation.console.trace.event_subscriber', TraceableConsoleEventSubscriber::class)
+            ->tag('monolog.logger', ['channel' => 'open_telemetry'])
+
         ->set('open_telemetry.instrumentation.console.metric.event_subscriber', ObservableConsoleEventSubscriber::class)
 
         ->set('open_telemetry.instrumentation.doctrine.trace.middleware', TraceableDoctrineMiddleware::class)
+            ->tag('monolog.logger', ['channel' => 'open_telemetry'])
 
         ->set('open_telemetry.instrumentation.twig.trace.extension', TraceableTwigExtension::class)
 
@@ -85,15 +90,32 @@ return static function (ContainerConfigurator $container): void {
         ->set('open_telemetry.instrumentation.http_client.trace.client', TraceableHttpClient::class)
 
         ->set('open_telemetry.instrumentation.mailer.trace.event_subscriber', TraceableMailerEventSubscriber::class)
+        ->tag('monolog.logger', ['channel' => 'open_telemetry'])
+
         ->set('open_telemetry.instrumentation.mailer.metric.event_subscriber', ObservableMailerEventSubscriber::class)
-        ->set('open_telemetry.instrumentation.mailer.trace.transport', TraceableMailerTransport::class)
+
+        ->set('open_telemetry.instrumentation.mailer.trace.transports', TraceableMailerTransport::class)
+            ->decorate('mailer.transports')
+            ->arg('$transport', service('.inner'))
+            ->tag('monolog.logger', ['channel' => 'open_telemetry'])
+
+        ->set('open_telemetry.instrumentation.mailer.trace.default_transport', TraceableMailerTransport::class)
+            ->decorate('mailer.default_transport')
+            ->arg('$transport', service('.inner'))
+            ->tag('monolog.logger', ['channel' => 'open_telemetry'])
+
         ->set('open_telemetry.instrumentation.mailer.trace.mailer', TraceableMailer::class)
+            ->decorate('mailer.mailer')
+            ->arg('$mailer', service('.inner'))
+            ->tag('monolog.logger', ['channel' => 'open_telemetry'])
 
         ->set('open_telemetry.instrumentation.messenger.trace.event_subscriber', TraceableMessengerEventSubscriber::class)
         ->set('open_telemetry.instrumentation.messenger.metric.event_subscriber', ObservableMessengerEventSubscriber::class)
         ->set('open_telemetry.instrumentation.messenger.trace.transport', TraceableMessengerTransport::class)
         ->set('open_telemetry.instrumentation.messenger.trace.transport_factory', TraceableMessengerTransportFactory::class)
         ->set('open_telemetry.instrumentation.messenger.trace.middleware', TraceableMessengerMiddleware::class)
+
+        ->alias('messenger.middleware.open_telemetry_tracer', 'open_telemetry.instrumentation.messenger.trace.middleware')
 
         ->set('open_telemetry.traces.samplers.always_on', AlwaysOnSampler::class)->public()
         ->set('open_telemetry.traces.samplers.always_off', AlwaysOffSampler::class)->public()

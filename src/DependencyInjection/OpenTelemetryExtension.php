@@ -94,6 +94,11 @@ final class OpenTelemetryExtension extends ConfigurableExtension
                     '$level' => Level::fromName(ucfirst($handler['level'])),
                     '$bubble' => $handler['bubble'],
                 ]);
+
+            //            $container->setParameter('monolog.handlers.open_telemetry', [
+            //                'type' => 'service',
+            //                'id' => $handlerId,
+            //            ]);
         }
     }
 }

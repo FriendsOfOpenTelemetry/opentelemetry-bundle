@@ -12,6 +12,7 @@ use OpenTelemetry\Context\Propagation\PropagationGetterInterface;
 use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
 use OpenTelemetry\Context\ScopeInterface;
 use OpenTelemetry\SemConv\TraceAttributes;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\HeaderBag;
 use Symfony\Component\HttpFoundation\Request;
@@ -49,8 +50,9 @@ final class TraceableHttpKernelEventSubscriber implements EventSubscriberInterfa
         private readonly TracerInterface $tracer,
         private readonly TextMapPropagatorInterface $propagator,
         private readonly PropagationGetterInterface $propagationGetter,
+        private readonly LoggerInterface $logger,
         iterable $requestHeaders = [],
-        iterable $responseHeaders = []
+        iterable $responseHeaders = [],
     ) {
         $this->requestHeaderAttributes = $this->createHeaderAttributeMapping('request', $requestHeaders);
         $this->responseHeaderAttributes = $this->createHeaderAttributeMapping('response', $responseHeaders);
@@ -116,6 +118,7 @@ final class TraceableHttpKernelEventSubscriber implements EventSubscriberInterfa
 
         $span = $spanBuilder->setParent($parent)->startSpan();
         $scope = $span->storeInContext($parent)->activate();
+
         $request->attributes->set(self::REQUEST_ATTRIBUTE_SPAN, $span);
         $request->attributes->set(self::REQUEST_ATTRIBUTE_SCOPE, $scope);
     }
@@ -203,7 +206,6 @@ final class TraceableHttpKernelEventSubscriber implements EventSubscriberInterfa
         if (null === $scope) {
             return;
         }
-
         $scope->detach();
     }
 
