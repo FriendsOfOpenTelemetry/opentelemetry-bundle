@@ -30,6 +30,7 @@ class TagAwareTraceableCacheAdapter implements TagAwareAdapterInterface, TagAwar
                 if (!$this->adapter instanceof CacheInterface) {
                     throw new \BadMethodCallException(sprintf('The %s::get() method is not supported because the decorated adapter does not implement the "%s" interface.', self::class, CacheInterface::class));
                 }
+                $span?->setAttribute('cache.get', $key);
 
                 return $this->adapter->get($key, $callback, $beta, $metadata);
             });
@@ -41,6 +42,7 @@ class TagAwareTraceableCacheAdapter implements TagAwareAdapterInterface, TagAwar
             if (!$this->adapter instanceof TagAwareAdapterInterface) {
                 throw new \BadMethodCallException(sprintf('The %s::invalidateTags() method is not supported because the decorated adapter does not implement the "%s" interface.', self::class, TagAwareAdapterInterface::class));
             }
+            $span?->setAttribute('cache.invalidate_tags', $tags);
 
             return $this->adapter->invalidateTags($tags);
         });

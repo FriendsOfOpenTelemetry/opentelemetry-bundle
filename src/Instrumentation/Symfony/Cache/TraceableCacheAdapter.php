@@ -29,6 +29,7 @@ class TraceableCacheAdapter implements AdapterInterface, CacheInterface, Pruneab
                 if (!$this->adapter instanceof CacheInterface) {
                     throw new \BadMethodCallException(sprintf('The %s::get() method is not supported because the decorated adapter does not implement the "%s" interface.', self::class, CacheInterface::class));
                 }
+                $span?->setAttribute('cache.get', $key);
 
                 return $this->adapter->get($key, $callback, $beta, $metadata);
             }
