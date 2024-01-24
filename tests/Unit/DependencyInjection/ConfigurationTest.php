@@ -39,7 +39,7 @@ final class ConfigurationTest extends TestCase
         self::assertSame([
             'service' => [],
             'instrumentation' => [
-                'http_kernel' => [
+                'cache' => [
                     'enabled' => false,
                     'tracing' => [
                         'enabled' => false,
@@ -54,6 +54,74 @@ final class ConfigurationTest extends TestCase
                     'enabled' => false,
                     'tracing' => [
                         'enabled' => false,
+                        'request_headers' => [],
+                        'response_headers' => [],
+                    ],
+                    'metering' => [
+                        'enabled' => false,
+                    ],
+                ],
+                'doctrine' => [
+                    'enabled' => false,
+                    'tracing' => [
+                        'enabled' => false,
+                        'request_headers' => [],
+                        'response_headers' => [],
+                    ],
+                    'metering' => [
+                        'enabled' => false,
+                    ],
+                ],
+                'http_client' => [
+                    'enabled' => false,
+                    'tracing' => [
+                        'enabled' => false,
+                        'request_headers' => [],
+                        'response_headers' => [],
+                    ],
+                    'metering' => [
+                        'enabled' => false,
+                    ],
+                ],
+                'http_kernel' => [
+                    'enabled' => false,
+                    'tracing' => [
+                        'enabled' => false,
+                        'request_headers' => [],
+                        'response_headers' => [],
+                    ],
+                    'metering' => [
+                        'enabled' => false,
+                    ],
+                ],
+                'mailer' => [
+                    'enabled' => false,
+                    'tracing' => [
+                        'enabled' => false,
+                        'request_headers' => [],
+                        'response_headers' => [],
+                    ],
+                    'metering' => [
+                        'enabled' => false,
+                    ],
+                ],
+                'messenger' => [
+                    'enabled' => false,
+                    'tracing' => [
+                        'enabled' => false,
+                        'request_headers' => [],
+                        'response_headers' => [],
+                    ],
+                    'metering' => [
+                        'enabled' => false,
+                    ],
+                ],
+                'twig' => [
+                    'enabled' => false,
+                    'tracing' => [
+                        'enabled' => false,
+                        'request_headers' => [],
+                        'response_headers' => [],
                     ],
                     'metering' => [
                         'enabled' => false,
@@ -98,36 +166,119 @@ final class ConfigurationTest extends TestCase
                 version:              ~ # Required, Example: 1.0.0
                 environment:          ~ # Required, Example: '%kernel.environment%'
             instrumentation:
-                http_kernel:
+                cache:
                     enabled:              false
                     tracing:
                         enabled:              false
 
                         # The tracer to use, defaults to `traces.default_tracer` or first tracer in `traces.tracers`
-                        tracer:               ~ # Required
+                        tracer:               ~
                         request_headers:      []
                         response_headers:     []
                     metering:
                         enabled:              false
 
                         # The meter to use, defaults to `metrics.default_meter` or first meter in `metrics.meters`
-                        meter:                ~ # Required
+                        meter:                ~
                 console:
                     enabled:              false
                     tracing:
                         enabled:              false
 
                         # The tracer to use, defaults to `traces.default_tracer` or first tracer in `traces.tracers`
-                        tracer:               ~ # Required
+                        tracer:               ~
+                        request_headers:      []
+                        response_headers:     []
                     metering:
                         enabled:              false
 
                         # The meter to use, defaults to `metrics.default_meter` or first meter in `metrics.meters`
-                        meter:                ~ # Required
-            traces:
+                        meter:                ~
+                doctrine:
+                    enabled:              false
+                    tracing:
+                        enabled:              false
 
-                # The default tracer to use among the `tracers`
-                default_tracer:       ~
+                        # The tracer to use, defaults to `traces.default_tracer` or first tracer in `traces.tracers`
+                        tracer:               ~
+                        request_headers:      []
+                        response_headers:     []
+                    metering:
+                        enabled:              false
+
+                        # The meter to use, defaults to `metrics.default_meter` or first meter in `metrics.meters`
+                        meter:                ~
+                http_client:
+                    enabled:              false
+                    tracing:
+                        enabled:              false
+
+                        # The tracer to use, defaults to `traces.default_tracer` or first tracer in `traces.tracers`
+                        tracer:               ~
+                        request_headers:      []
+                        response_headers:     []
+                    metering:
+                        enabled:              false
+
+                        # The meter to use, defaults to `metrics.default_meter` or first meter in `metrics.meters`
+                        meter:                ~
+                http_kernel:
+                    enabled:              false
+                    tracing:
+                        enabled:              false
+
+                        # The tracer to use, defaults to `traces.default_tracer` or first tracer in `traces.tracers`
+                        tracer:               ~
+                        request_headers:      []
+                        response_headers:     []
+                    metering:
+                        enabled:              false
+
+                        # The meter to use, defaults to `metrics.default_meter` or first meter in `metrics.meters`
+                        meter:                ~
+                mailer:
+                    enabled:              false
+                    tracing:
+                        enabled:              false
+
+                        # The tracer to use, defaults to `traces.default_tracer` or first tracer in `traces.tracers`
+                        tracer:               ~
+                        request_headers:      []
+                        response_headers:     []
+                    metering:
+                        enabled:              false
+
+                        # The meter to use, defaults to `metrics.default_meter` or first meter in `metrics.meters`
+                        meter:                ~
+                messenger:
+                    enabled:              false
+                    tracing:
+                        enabled:              false
+
+                        # The tracer to use, defaults to `traces.default_tracer` or first tracer in `traces.tracers`
+                        tracer:               ~
+                        request_headers:      []
+                        response_headers:     []
+                    metering:
+                        enabled:              false
+
+                        # The meter to use, defaults to `metrics.default_meter` or first meter in `metrics.meters`
+                        meter:                ~
+                twig:
+                    enabled:              false
+                    tracing:
+                        enabled:              false
+
+                        # The tracer to use, defaults to `traces.default_tracer` or first tracer in `traces.tracers`
+                        tracer:               ~
+                        request_headers:      []
+                        response_headers:     []
+                    metering:
+                        enabled:              false
+
+                        # The meter to use, defaults to `metrics.default_meter` or first meter in `metrics.meters`
+                        meter:                ~
+            traces:
                 tracers:
 
                     # Prototype
@@ -177,9 +328,6 @@ final class ConfigurationTest extends TestCase
                             cert:                 ~
                             key:                  ~
             metrics:
-
-                # The default meter to use among the `meters`
-                default_meter:        ~
                 meters:
 
                     # Prototype
@@ -215,9 +363,6 @@ final class ConfigurationTest extends TestCase
                             cert:                 ~
                             key:                  ~
             logs:
-
-                # The default logger to use among the `loggers`
-                default_logger:       ~
                 monolog:
                     enabled:              false
                     handlers:

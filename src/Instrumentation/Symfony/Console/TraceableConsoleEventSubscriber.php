@@ -1,13 +1,12 @@
 <?php
 
-namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\EventSubscriber;
+namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\Instrumentation\Symfony\Console;
 
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Context\Attribute\ConsoleTraceAttributeEnum;
 use OpenTelemetry\API\Trace\Span;
 use OpenTelemetry\API\Trace\StatusCode;
 use OpenTelemetry\API\Trace\TracerInterface;
 use OpenTelemetry\Context\Context;
-use OpenTelemetry\Context\ContextStorageScopeInterface;
 use OpenTelemetry\SemConv\TraceAttributes;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\ConsoleEvents;
@@ -17,7 +16,7 @@ use Symfony\Component\Console\Event\ConsoleSignalEvent;
 use Symfony\Component\Console\Event\ConsoleTerminateEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-final class ConsoleTraceEventSubscriber implements EventSubscriberInterface
+final class TraceableConsoleEventSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private readonly TracerInterface $tracer,
@@ -51,15 +50,18 @@ final class ConsoleTraceEventSubscriber implements EventSubscriberInterface
         $name = $command->getName();
         $class = get_class($command);
 
-        $span = $this->tracer
+        $spanBuilder = $this->tracer
             ->spanBuilder($name)
             ->setAttributes([
                 TraceAttributes::CODE_FUNCTION => 'execute',
                 TraceAttributes::CODE_NAMESPACE => $class,
-            ])
-            ->startSpan();
+            ]);
 
-        Context::storage()->attach($span->storeInContext(Context::getCurrent()));
+        $parent = Context::getCurrent();
+
+        $span = $spanBuilder->setParent($parent)->startSpan();
+
+        Context::storage()->attach($span->storeInContext($parent));
     }
 
     public function handleError(ConsoleErrorEvent $event): void
@@ -74,7 +76,7 @@ final class ConsoleTraceEventSubscriber implements EventSubscriberInterface
     public function endSpan(ConsoleTerminateEvent $event): void
     {
         $scope = Context::storage()->scope();
-        if (!$scope instanceof ContextStorageScopeInterface) {
+        if (null === $scope) {
             return;
         }
         $scope->detach();

@@ -1,9 +1,5 @@
 <?php
 
-use FriendsOfOpenTelemetry\OpenTelemetryBundle\EventSubscriber\ConsoleMetricEventSubscriber;
-use FriendsOfOpenTelemetry\OpenTelemetryBundle\EventSubscriber\ConsoleTraceEventSubscriber;
-use FriendsOfOpenTelemetry\OpenTelemetryBundle\EventSubscriber\HttpKernelMetricEventSubscriber;
-use FriendsOfOpenTelemetry\OpenTelemetryBundle\EventSubscriber\HttpKernelTraceEventSubscriber;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Context\Propagator\HeadersPropagator;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Exporter\ExporterDsn;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Exporter\ExporterOptionsInterface;
@@ -24,13 +20,11 @@ use OpenTelemetry\SDK\Trace\Sampler\TraceIdRatioBasedSampler;
 use OpenTelemetry\SDK\Trace\Tracer;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 
-use function Symfony\Component\DependencyInjection\Loader\Configurator\param;
-use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
-
 return static function (ContainerConfigurator $container): void {
     $container->parameters()
         ->set('open_telemetry.bundle.name', OpenTelemetryBundle::name())
         ->set('open_telemetry.bundle.version', OpenTelemetryBundle::version())
+        ->set('monolog.additional_channels', ['open_telemetry'])
     ;
 
     $container->services()
@@ -38,6 +32,7 @@ return static function (ContainerConfigurator $container): void {
         ->private()
 
         ->set('open_telemetry.exporter_dsn', ExporterDsn::class)
+            ->abstract()
             ->factory([ExporterDsn::class, 'fromString'])
 
         ->set('open_telemetry.exporter_options', ExporterOptionsInterface::class)
@@ -47,17 +42,6 @@ return static function (ContainerConfigurator $container): void {
 
         ->set('open_telemetry.text_map_propagators.noop', NoopTextMapPropagator::class)
         ->set('open_telemetry.propagation_getters.headers', HeadersPropagator::class)
-
-        ->set('open_telemetry.instrumentation.http_kernel.trace.event_subscriber', HttpKernelTraceEventSubscriber::class)
-            ->arg('$propagator', service('open_telemetry.text_map_propagators.noop'))
-            ->arg('$propagationGetter', service('open_telemetry.propagation_getters.headers'))
-            ->arg('$requestHeaders', param('open_telemetry.instrumentation.http_kernel.request_headers'))
-            ->arg('$responseHeaders', param('open_telemetry.instrumentation.http_kernel.response_headers'))
-
-        ->set('open_telemetry.instrumentation.console.trace.event_subscriber', ConsoleTraceEventSubscriber::class)
-
-        ->set('open_telemetry.instrumentation.http_kernel.metric.event_subscriber', HttpKernelMetricEventSubscriber::class)
-        ->set('open_telemetry.instrumentation.console.metric.event_subscriber', ConsoleMetricEventSubscriber::class)
 
         ->set('open_telemetry.traces.samplers.always_on', AlwaysOnSampler::class)->public()
         ->set('open_telemetry.traces.samplers.always_off', AlwaysOffSampler::class)->public()

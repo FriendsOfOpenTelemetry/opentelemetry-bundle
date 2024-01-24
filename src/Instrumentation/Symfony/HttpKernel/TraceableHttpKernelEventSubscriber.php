@@ -1,6 +1,6 @@
 <?php
 
-namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\EventSubscriber;
+namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\Instrumentation\Symfony\HttpKernel;
 
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Context\Attribute\HttpKernelTraceAttributeEnum;
 use OpenTelemetry\API\Trace\SpanInterface;
@@ -12,6 +12,7 @@ use OpenTelemetry\Context\Propagation\PropagationGetterInterface;
 use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
 use OpenTelemetry\Context\ScopeInterface;
 use OpenTelemetry\SemConv\TraceAttributes;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\HeaderBag;
 use Symfony\Component\HttpFoundation\Request;
@@ -25,7 +26,7 @@ use Symfony\Component\HttpKernel\Event\TerminateEvent;
 use Symfony\Component\HttpKernel\Event\ViewEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
-final class HttpKernelTraceEventSubscriber implements EventSubscriberInterface
+final class TraceableHttpKernelEventSubscriber implements EventSubscriberInterface
 {
     private const REQUEST_ATTRIBUTE_SPAN = '__opentelemetry_symfony_internal_span';
     private const REQUEST_ATTRIBUTE_SCOPE = '__opentelemetry_symfony_internal_scope';
@@ -49,8 +50,10 @@ final class HttpKernelTraceEventSubscriber implements EventSubscriberInterface
         private readonly TracerInterface $tracer,
         private readonly TextMapPropagatorInterface $propagator,
         private readonly PropagationGetterInterface $propagationGetter,
+        /** @phpstan-ignore-next-line  */
+        private readonly LoggerInterface $logger,
         iterable $requestHeaders = [],
-        iterable $responseHeaders = []
+        iterable $responseHeaders = [],
     ) {
         $this->requestHeaderAttributes = $this->createHeaderAttributeMapping('request', $requestHeaders);
         $this->responseHeaderAttributes = $this->createHeaderAttributeMapping('response', $responseHeaders);
@@ -204,7 +207,6 @@ final class HttpKernelTraceEventSubscriber implements EventSubscriberInterface
         if (null === $scope) {
             return;
         }
-
         $scope->detach();
     }
 
