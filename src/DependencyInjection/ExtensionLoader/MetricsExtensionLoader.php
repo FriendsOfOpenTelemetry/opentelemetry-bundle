@@ -19,6 +19,9 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 final class MetricsExtensionLoader implements ExtensionLoaderInterface
 {
+    /**
+     * @var array<string, mixed>
+     */
     private array $config;
 
     private ContainerBuilder $container;
@@ -29,7 +32,7 @@ final class MetricsExtensionLoader implements ExtensionLoaderInterface
      *     meters: array<string, mixed>,
      *     exporters: array<string, mixed>,
      *     providers: array<string, mixed>
-     * } $config
+     * }|array<string, mixed> $config
      */
     public function load(array $config, ContainerBuilder $container): void
     {
@@ -48,13 +51,13 @@ final class MetricsExtensionLoader implements ExtensionLoaderInterface
             $this->loadMetricMeter($name, $meter);
         }
 
-        $defaultMeter = $this->config['default_meter'] ?? null;
+        $defaultMeter = null;
         if (0 < count($this->config['meters'])) {
             $defaultMeter = array_key_first($this->config['meters']);
         }
 
         if (null !== $defaultMeter) {
-            $this->container->set('open_telemetry.metrics.default_meter', new Reference(sprintf('open_telemetry.metrics.meters.%s', $defaultMeter)));
+            $this->container->setAlias('open_telemetry.metrics.default_meter', new Reference(sprintf('open_telemetry.metrics.meters.%s', $defaultMeter)));
         }
     }
 

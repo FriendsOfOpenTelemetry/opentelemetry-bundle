@@ -25,6 +25,9 @@ final class TraceableHttpClient implements HttpClientInterface, LoggerAwareInter
     ) {
     }
 
+    /**
+     * @param array<mixed> $options
+     */
     public function request(string $method, string $url, array $options = []): ResponseInterface
     {
         $scope = Context::storage()->scope();
@@ -74,6 +77,9 @@ final class TraceableHttpClient implements HttpClientInterface, LoggerAwareInter
         return new ResponseStream(TraceableResponse::stream($this->client, $responses, $timeout));
     }
 
+    /**
+     * @param array<mixed> $options
+     */
     public function withOptions(array $options): static
     {
         $clone = clone $this;

@@ -50,7 +50,7 @@
         "open-telemetry/sem-conv": "^1.23",
         "php-http/discovery": "^1.19",
         "psr/http-factory": "^1.0",
-        "open-telemetry/symfony-sdk-bundle": "^0.0.23",
+        "open-telemetry/symfony-sdk-bundle": "^0.0.24",
         "symfony/config": "^6.4 || ^7.0",
         "symfony/dependency-injection": "^6.4 || ^7.0",
         "symfony/event-dispatcher": "^7.0",

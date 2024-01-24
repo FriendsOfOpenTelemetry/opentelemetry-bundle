@@ -20,6 +20,9 @@ class TraceableMessengerTransportFactory implements TransportFactoryInterface
     ) {
     }
 
+    /**
+     * @param array<mixed> $options
+     */
     public function createTransport(#[\SensitiveParameter] string $dsn, array $options, SerializerInterface $serializer): TransportInterface
     {
         $transport = $this->transportFactory->createTransport(Dsn::parse($dsn)->inner(), $options, $serializer);
@@ -27,6 +30,9 @@ class TraceableMessengerTransportFactory implements TransportFactoryInterface
         return new TraceableMessengerTransport($transport, $this->tracer);
     }
 
+    /**
+     * @param array<mixed> $options
+     */
     public function supports(#[\SensitiveParameter] string $dsn, array $options): bool
     {
         return Dsn::parse($dsn)->scheme()->equals('trace');

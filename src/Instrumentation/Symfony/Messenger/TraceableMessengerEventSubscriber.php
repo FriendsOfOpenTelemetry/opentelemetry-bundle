@@ -17,6 +17,7 @@ use Symfony\Component\Messenger\Event\WorkerStoppedEvent;
 final readonly class TraceableMessengerEventSubscriber implements EventSubscriberInterface
 {
     public function __construct(
+        /** @phpstan-ignore-next-line */
         private TracerInterface $tracer,
     ) {
     }

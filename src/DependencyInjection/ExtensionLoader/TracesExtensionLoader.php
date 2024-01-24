@@ -23,6 +23,9 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 final class TracesExtensionLoader implements ExtensionLoaderInterface
 {
+    /**
+     * @var array<string, mixed>
+     */
     private array $config;
     private ContainerBuilder $container;
 
@@ -33,7 +36,7 @@ final class TracesExtensionLoader implements ExtensionLoaderInterface
      *     exporters: array<string, mixed>,
      *     processors: array<string, mixed>,
      *     providers: array<string, mixed>
-     * } $config
+     * }|array<string, mixed> $config
      */
     public function load(array $config, ContainerBuilder $container): void
     {
@@ -56,13 +59,13 @@ final class TracesExtensionLoader implements ExtensionLoaderInterface
             $this->loadTraceTracer($name, $tracer);
         }
 
-        $defaultTracer = $this->config['default_tracer'] ?? null;
+        $defaultTracer = null;
         if (0 < count($this->config['tracers'])) {
             $defaultTracer = array_key_first($this->config['tracers']);
         }
 
         if (null !== $defaultTracer) {
-            $this->container->set('open_telemetry.traces.default_tracer', new Reference(sprintf('open_telemetry.traces.tracers.%s', $defaultTracer)));
+            $this->container->setAlias('open_telemetry.traces.default_tracer', new Reference(sprintf('open_telemetry.traces.tracers.%s', $defaultTracer)));
         }
     }
 

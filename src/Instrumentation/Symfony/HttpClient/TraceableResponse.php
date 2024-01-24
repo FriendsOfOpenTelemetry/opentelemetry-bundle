@@ -60,6 +60,9 @@ final class TraceableResponse implements ResponseInterface, StreamableInterface
         }
     }
 
+    /**
+     * @return array<mixed>
+     */
     public function toArray(bool $throw = true): array
     {
         try {

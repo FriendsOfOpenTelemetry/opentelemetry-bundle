@@ -12,6 +12,7 @@ use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Exception\TransportException;
 use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\Transport\TransportInterface;
+use Symfony\Component\Mime\Email;
 use Symfony\Component\Mime\RawMessage;
 
 final readonly class TraceableMailerTransport implements TransportInterface
@@ -47,10 +48,13 @@ final readonly class TraceableMailerTransport implements TransportInterface
 
             $span = $spanBuilder->setParent(Context::getCurrent())->startSpan();
 
-            $headers = $message->getHeaders()->addTextHeader('X-Trace', $span->getContext()->getTraceId());
+            if ($message instanceof Email) {
+                $headers = $message->getHeaders()->addTextHeader('X-Trace', $span->getContext()->getTraceId());
+                $message = $message->setHeaders($headers);
+            }
 
             return $this->transport->send(
-                $message->setHeaders($headers),
+                $message,
                 $envelope,
             );
         } catch (TransportException $exception) {

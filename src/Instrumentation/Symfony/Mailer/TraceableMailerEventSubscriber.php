@@ -11,6 +11,7 @@ use Symfony\Component\Mailer\Event\SentMessageEvent;
 final readonly class TraceableMailerEventSubscriber implements EventSubscriberInterface
 {
     public function __construct(
+        /** @phpstan-ignore-next-line */
         private TracerInterface $tracer,
     ) {
     }

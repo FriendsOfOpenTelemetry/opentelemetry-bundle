@@ -20,6 +20,7 @@ use OpenTelemetry\API\Trace\TracerInterface;
 final class TraceableEntityEventSubscriber implements EventSubscriber
 {
     public function __construct(
+        /** @phpstan-ignore-next-line */
         private readonly TracerInterface $tracer,
     ) {
     }

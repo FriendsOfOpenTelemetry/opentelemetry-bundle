@@ -21,17 +21,19 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 final class LogsExtensionLoader implements ExtensionLoaderInterface
 {
+    /**
+     * @var array<string, mixed>
+     */
     private array $config;
     private ContainerBuilder $container;
 
     /**
      * @param array{
-     *     default_logger?: string,
      *     loggers: array<string, mixed>,
      *     exporters: array<string, mixed>,
      *     processors: array<string, mixed>,
      *     providers: array<string, mixed>
-     * } $config
+     * }|array<string, mixed> $config
      */
     public function load(array $config, ContainerBuilder $container): void
     {
@@ -54,13 +56,13 @@ final class LogsExtensionLoader implements ExtensionLoaderInterface
             $this->loadLogLogger($name, $logger);
         }
 
-        $defaultLogger = $this->config['default_logger'] ?? null;
+        $defaultLogger = null;
         if (0 < count($this->config['loggers'])) {
             $defaultLogger = array_key_first($this->config['loggers']);
         }
 
         if (null !== $defaultLogger) {
-            $this->container->set('open_telemetry.logs.default_logger', new Reference(sprintf('open_telemetry.logs.loggers.%s', $defaultLogger)));
+            $this->container->setAlias('open_telemetry.logs.default_logger', new Reference(sprintf('open_telemetry.logs.loggers.%s', $defaultLogger)));
         }
     }
 

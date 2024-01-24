@@ -15,9 +15,10 @@ class TraceableCacheAdapter implements AdapterInterface, CacheInterface, Pruneab
 
     public function __construct(
         TracerInterface $tracer,
-        private readonly AdapterInterface $adapter,
+        AdapterInterface $adapter,
     ) {
         $this->tracer = new Tracer($tracer);
+        $this->adapter = $adapter;
     }
 
     public function get(string $key, callable $callback, float $beta = null, array &$metadata = null): mixed

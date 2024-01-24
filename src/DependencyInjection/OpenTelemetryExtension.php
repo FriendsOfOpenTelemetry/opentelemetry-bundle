@@ -2,14 +2,6 @@
 
 namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\DependencyInjection;
 
-use FriendsOfOpenTelemetry\OpenTelemetryBundle\DependencyInjection\ExtensionLoader\Instrumentation\CacheInstrumentationExtensionLoader;
-use FriendsOfOpenTelemetry\OpenTelemetryBundle\DependencyInjection\ExtensionLoader\Instrumentation\ConsoleInstrumentationExtensionLoader;
-use FriendsOfOpenTelemetry\OpenTelemetryBundle\DependencyInjection\ExtensionLoader\Instrumentation\DoctrineInstrumentationExtensionLoader;
-use FriendsOfOpenTelemetry\OpenTelemetryBundle\DependencyInjection\ExtensionLoader\Instrumentation\HttpClientInstrumentationExtensionLoader;
-use FriendsOfOpenTelemetry\OpenTelemetryBundle\DependencyInjection\ExtensionLoader\Instrumentation\HttpKernelInstrumentationExtensionLoader;
-use FriendsOfOpenTelemetry\OpenTelemetryBundle\DependencyInjection\ExtensionLoader\Instrumentation\MailerInstrumentationExtensionLoader;
-use FriendsOfOpenTelemetry\OpenTelemetryBundle\DependencyInjection\ExtensionLoader\Instrumentation\MessengerInstrumentationExtensionLoader;
-use FriendsOfOpenTelemetry\OpenTelemetryBundle\DependencyInjection\ExtensionLoader\Instrumentation\TwigInstrumentationExtensionLoader;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\DependencyInjection\ExtensionLoader\LogsExtensionLoader;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\DependencyInjection\ExtensionLoader\MetricsExtensionLoader;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\DependencyInjection\ExtensionLoader\TracesExtensionLoader;
@@ -22,6 +14,23 @@ use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\DependencyInjection\ConfigurableExtension;
 
+/**
+ * @phpstan-type InstrumentationConfig array{
+ *     enabled: bool,
+ *     tracing: TracingInstrumentationConfig,
+ *     metering: MeteringInstrumentationConfig,
+ * }
+ * @phpstan-type TracingInstrumentationConfig array{
+ *     enabled: bool,
+ *     tracer: string,
+ *     request_headers: array<string, mixed>,
+ *     response_headers: array<string, mixed>,
+ * }
+ * @phpstan-type MeteringInstrumentationConfig array{
+ *     enabled: bool,
+ *     meter: string,
+ * }
+ */
 final class OpenTelemetryExtension extends ConfigurableExtension
 {
     /** @phpstan-ignore-next-line */
@@ -29,23 +38,16 @@ final class OpenTelemetryExtension extends ConfigurableExtension
     {
         $loader = new PhpFileLoader($container, new FileLocator(dirname(__DIR__).'/Resources/config'));
         $loader->load('services.php');
+        $loader->load('services_tracing_instrumentation.php');
 
         $this->loadService($mergedConfig['service'], $container);
+        $this->loadInstrumentationParams($mergedConfig['instrumentation'], $container);
 
         (new TracesExtensionLoader())->load($mergedConfig['traces'], $container);
         (new MetricsExtensionLoader())->load($mergedConfig['metrics'], $container);
         (new LogsExtensionLoader())->load($mergedConfig['logs'], $container);
 
         $this->loadMonologHandlers($mergedConfig['logs'], $container);
-
-        (new CacheInstrumentationExtensionLoader())->load($mergedConfig, $container);
-        (new ConsoleInstrumentationExtensionLoader())->load($mergedConfig, $container);
-        (new DoctrineInstrumentationExtensionLoader())->load($mergedConfig, $container);
-        (new HttpClientInstrumentationExtensionLoader())->load($mergedConfig, $container);
-        (new HttpKernelInstrumentationExtensionLoader())->load($mergedConfig, $container);
-        (new MailerInstrumentationExtensionLoader())->load($mergedConfig, $container);
-        (new MessengerInstrumentationExtensionLoader())->load($mergedConfig, $container);
-        (new TwigInstrumentationExtensionLoader())->load($mergedConfig, $container);
     }
 
     /**
@@ -62,6 +64,44 @@ final class OpenTelemetryExtension extends ConfigurableExtension
         $container->setParameter('open_telemetry.service.name', $config['name']);
         $container->setParameter('open_telemetry.service.version', $config['version']);
         $container->setParameter('open_telemetry.service.environment', $config['environment']);
+    }
+
+    /**
+     * @param array{
+     *     cache: InstrumentationConfig,
+     *     console: InstrumentationConfig,
+     *     doctrine: InstrumentationConfig,
+     *     http_client: InstrumentationConfig,
+     *     http_kernel: InstrumentationConfig,
+     *     mailer: InstrumentationConfig,
+     *     messenger: InstrumentationConfig,
+     *     twig: InstrumentationConfig,
+     * } $config
+     */
+    private function loadInstrumentationParams(array $config, ContainerBuilder $container): void
+    {
+        foreach ($config as $name => $instrumentation) {
+            $container->setParameter(
+                sprintf('open_telemetry.instrumentation.%s.enabled', $name),
+                $instrumentation['enabled'],
+            );
+            $container->setParameter(
+                sprintf('open_telemetry.instrumentation.%s.tracing.enabled', $name),
+                $instrumentation['tracing']['enabled'],
+            );
+            $container->setParameter(
+                sprintf('open_telemetry.instrumentation.%s.tracing.request_headers', $name),
+                $instrumentation['tracing']['request_headers'],
+            );
+            $container->setParameter(
+                sprintf('open_telemetry.instrumentation.%s.tracing.response_headers', $name),
+                $instrumentation['tracing']['response_headers'],
+            );
+            $container->setParameter(
+                sprintf('open_telemetry.instrumentation.%s.metering.enabled', $name),
+                $instrumentation['metering']['enabled'],
+            );
+        }
     }
 
     /**

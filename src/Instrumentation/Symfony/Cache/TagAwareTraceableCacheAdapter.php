@@ -16,9 +16,10 @@ class TagAwareTraceableCacheAdapter implements TagAwareAdapterInterface, TagAwar
 
     public function __construct(
         TracerInterface $tracer,
-        private readonly TagAwareAdapterInterface $adapter,
+        TagAwareAdapterInterface $adapter,
     ) {
         $this->tracer = new Tracer($tracer);
+        $this->adapter = $adapter;
     }
 
     public function get(string $key, callable $callback, float $beta = null, array &$metadata = null): mixed
@@ -37,6 +38,10 @@ class TagAwareTraceableCacheAdapter implements TagAwareAdapterInterface, TagAwar
     public function invalidateTags(array $tags): bool
     {
         return $this->tracer->traceFunction('cache.invalidate_tags', function (?SpanInterface $span) use ($tags): bool {
+            if (!$this->adapter instanceof TagAwareAdapterInterface) {
+                throw new \BadMethodCallException(sprintf('The %s::invalidateTags() method is not supported because the decorated adapter does not implement the "%s" interface.', self::class, TagAwareAdapterInterface::class));
+            }
+
             return $this->adapter->invalidateTags($tags);
         });
     }
