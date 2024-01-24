@@ -2,9 +2,6 @@
 
 namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\DependencyInjection;
 
-use FriendsOfOpenTelemetry\OpenTelemetryBundle\DependencyInjection\ExtensionLoader\LogsExtensionLoader;
-use FriendsOfOpenTelemetry\OpenTelemetryBundle\DependencyInjection\ExtensionLoader\MetricsExtensionLoader;
-use FriendsOfOpenTelemetry\OpenTelemetryBundle\DependencyInjection\ExtensionLoader\TracesExtensionLoader;
 use Monolog\Level;
 use OpenTelemetry\Contrib\Logs\Monolog\Handler;
 use Symfony\Component\Config\FileLocator;
@@ -43,9 +40,9 @@ final class OpenTelemetryExtension extends ConfigurableExtension
         $this->loadService($mergedConfig['service'], $container);
         $this->loadInstrumentationParams($mergedConfig['instrumentation'], $container);
 
-        (new TracesExtensionLoader())->load($mergedConfig['traces'], $container);
-        (new MetricsExtensionLoader())->load($mergedConfig['metrics'], $container);
-        (new LogsExtensionLoader())->load($mergedConfig['logs'], $container);
+        (new OpenTelemetryTracesExtension())($mergedConfig['traces'], $container);
+        (new OpenTelemetryMetricsExtension())($mergedConfig['metrics'], $container);
+        (new OpenTelemetryLogsExtension())($mergedConfig['logs'], $container);
 
         $this->loadMonologHandlers($mergedConfig['logs'], $container);
     }

@@ -1,8 +1,7 @@
 <?php
 
-namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\DependencyInjection\ExtensionLoader;
+namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\DependencyInjection;
 
-use FriendsOfOpenTelemetry\OpenTelemetryBundle\DependencyInjection\ExporterDefinitionsFactory;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Exporter\ExporterDsn;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Exporter\ExporterOptionsInterface;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Log\LogExporter\LogExporterEnum;
@@ -19,7 +18,7 @@ use Symfony\Component\DependencyInjection\Reference;
 /**
  * @phpstan-import-type ExporterOptions from ExporterOptionsInterface
  */
-final class LogsExtensionLoader implements ExtensionLoaderInterface
+final class OpenTelemetryLogsExtension
 {
     /**
      * @var array<string, mixed>
@@ -35,7 +34,7 @@ final class LogsExtensionLoader implements ExtensionLoaderInterface
      *     providers: array<string, mixed>
      * }|array<string, mixed> $config
      */
-    public function load(array $config, ContainerBuilder $container): void
+    public function __invoke(array $config, ContainerBuilder $container): void
     {
         $this->config = $config;
         $this->container = $container;

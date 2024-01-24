@@ -80,7 +80,7 @@ class TransportParamsTest extends TestCase
             new OtlpExporterOptions(),
             [
                 'contentType' => 'application/json',
-                'headers' => ['User-Agent' => 'OTel OTLP Exporter PHP/1.0.4, Symfony OTEL Bundle'],
+                'headers' => ['User-Agent' => 'OTel OTLP Exporter PHP/1.0.7, Symfony OTEL Bundle'],
                 'compression' => 'none',
                 'timeout' => .10,
                 'retryDelay' => 100,
@@ -107,7 +107,7 @@ class TransportParamsTest extends TestCase
                 'contentType' => 'application/x-ndjson',
                 'headers' => [
                     'X-Foo' => 'Bar',
-                    'User-Agent' => 'OTel OTLP Exporter PHP/1.0.4, Symfony OTEL Bundle',
+                    'User-Agent' => 'OTel OTLP Exporter PHP/1.0.7, Symfony OTEL Bundle',
                 ],
                 'compression' => 'gzip',
                 'timeout' => 1.0,
