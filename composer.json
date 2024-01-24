@@ -1,46 +1,27 @@
 {
     "name": "friendsofopentelemetry/opentelemetry-bundle",
     "description": "Symfony Bundle for OpenTelemetry PHP",
-    "keywords": ["symfony", "bundle", "opentelemetry", "otel", "metrics", "tracing", "logging", "apm", "otlp"],
-    "type": "symfony-bundle",
     "license": "MIT",
+    "type": "symfony-bundle",
+    "keywords": [
+        "apm",
+        "bundle",
+        "logging",
+        "symfony",
+        "metrics",
+        "opentelemetry",
+        "otel",
+        "otlp",
+        "tracing"
+    ],
     "authors": [
         {
             "name": "Gaël Reyrol",
             "email": "me@gaelreyrol.dev"
         }
     ],
-    "scripts": {
-        "php-cs-fixer:fix": "@php ./vendor/bin/php-cs-fixer fix",
-        "php-cs-fixer:lint": "@php-cs-fixer:fix --dry-run --diff",
-        "phpstan": "@php vendor/bin/phpstan analyse",
-        "phpunit": "@php vendor/bin/phpunit",
-        "check-reqs": "@php vendor/bin/composer-require-checker check",
-        "lint": [
-            "@php-cs-fixer:lint",
-            "@phpstan"
-        ],
-        "format": [
-            "@php-cs-fixer:fix"
-        ],
-        "test": [
-            "@phpunit"
-        ]
-    },
-    "autoload": {
-        "psr-4": {
-            "FriendsOfOpenTelemetry\\OpenTelemetryBundle\\": "src/"
-        }
-    },
-    "autoload-dev": {
-        "psr-4": {
-            "FriendsOfOpenTelemetry\\OpenTelemetryBundle\\Tests\\": "tests/"
-        }
-    },
-    "minimum-stability": "stable",
-    "prefer-stable": true,
     "require": {
-        "php": "~8.2 || ~8.3",
+        "php": "^8.2",
         "monolog/monolog": "^3.5",
         "nyholm/psr7": "^1.8",
         "open-telemetry/api": "^1.0",
@@ -48,9 +29,9 @@
         "open-telemetry/opentelemetry-logger-monolog": "^1.0",
         "open-telemetry/sdk": "^1.0",
         "open-telemetry/sem-conv": "^1.23",
+        "open-telemetry/symfony-sdk-bundle": "^0.0.24",
         "php-http/discovery": "^1.19",
         "psr/http-factory": "^1.0",
-        "open-telemetry/symfony-sdk-bundle": "^0.0.24",
         "symfony/config": "^6.4 || ^7.0",
         "symfony/dependency-injection": "^6.4 || ^7.0",
         "symfony/event-dispatcher": "^7.0",
@@ -67,6 +48,7 @@
         "doctrine/dbal": "^3.7",
         "doctrine/doctrine-bundle": "^2.11",
         "doctrine/orm": "^2.17",
+        "ergebnis/composer-normalize": "^2.41",
         "friendsofphp/php-cs-fixer": "^3.41",
         "guzzlehttp/promises": "^2.0",
         "maglnet/composer-require-checker": "^4.8",
@@ -97,14 +79,6 @@
         "symfony/yaml": "^6.4 || ^7.0",
         "twig/twig": "^3.8"
     },
-    "config": {
-        "allow-plugins": {
-            "phpstan/extension-installer": true,
-            "php-http/discovery": true,
-            "pyrech/composer-changelogs": true
-        },
-        "sort-packages": true
-    },
     "suggest": {
         "doctrine/dbal": "Needed to enable Doctrine DBAL instrumentation",
         "doctrine/orm": "Needed to enable Doctrine ORM instrumentation",
@@ -114,10 +88,50 @@
         "open-telemetry/transport-grpc": "Needed to export OpenTelemetry data via gRPC",
         "symfony/cache": "Needed to enable Symfony Cache instrumentation",
         "symfony/console": "Needed to enable Symfony Console instrumentation",
-        "symfony/http-kernel": "Needed to enable Symfony HttpKernel instrumentation",
         "symfony/http-client": "Needed to enable Symfony HttpClient instrumentation",
+        "symfony/http-kernel": "Needed to enable Symfony HttpKernel instrumentation",
         "symfony/mailer": "Needed to enable Symfony Mailer instrumentation",
         "symfony/messenger": "Needed to enable Symfony Messenger instrumentation",
         "symfony/monolog-bundle": "Needed to register OpenTelemetry handler in Symfony Monolog service"
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true,
+    "autoload": {
+        "psr-4": {
+            "FriendsOfOpenTelemetry\\OpenTelemetryBundle\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "FriendsOfOpenTelemetry\\OpenTelemetryBundle\\Tests\\": "tests/"
+        }
+    },
+    "config": {
+        "allow-plugins": {
+            "ergebnis/composer-normalize": true,
+            "php-http/discovery": true,
+            "phpstan/extension-installer": true,
+            "pyrech/composer-changelogs": true
+        },
+        "sort-packages": true
+    },
+    "scripts": {
+        "check-reqs": "@php vendor/bin/composer-require-checker check",
+        "format": [
+            "@php-cs-fixer:fix",
+            "@composer normalize"
+        ],
+        "lint": [
+            "@php-cs-fixer:lint",
+            "@phpstan",
+            "@composer normalize --dry-run"
+        ],
+        "php-cs-fixer:fix": "@php ./vendor/bin/php-cs-fixer fix",
+        "php-cs-fixer:lint": "@php-cs-fixer:fix --dry-run --diff",
+        "phpstan": "@php vendor/bin/phpstan analyse",
+        "phpunit": "@php vendor/bin/phpunit",
+        "test": [
+            "@phpunit"
+        ]
     }
 }
