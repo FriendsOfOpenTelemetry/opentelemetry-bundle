@@ -1,0 +1,60 @@
+open_telemetry:
+  service:
+    namespace: 'FriendsOfOpenTelemetry/OpenTelemetry'
+    name: 'Test'
+    version: '0.0.0'
+    environment: test
+  instrumentation:
+    cache:
+      enabled: false
+      tracing:
+        enabled: false
+    console:
+      enabled: false
+      tracing:
+        enabled: false
+    doctrine:
+      enabled: false
+      tracing:
+        enabled: false
+    http_client:
+      enabled: false
+      tracing:
+        enabled: false
+    http_kernel:
+      enabled: false
+      tracing:
+        enabled: false
+    mailer:
+      enabled: false
+      tracing:
+        enabled: false
+    messenger:
+      enabled: false
+      tracing:
+        enabled: false
+    twig:
+      enabled: false
+      tracing:
+        enabled: false
+  traces:
+    tracers:
+      main:
+        provider: noop
+    providers:
+      noop:
+        type: noop
+  metrics:
+    meters:
+      main:
+        provider: noop
+    providers:
+      noop:
+        type: noop
+  logs:
+    loggers:
+      main:
+        provider: noop
+    providers:
+      noop:
+        type: noop

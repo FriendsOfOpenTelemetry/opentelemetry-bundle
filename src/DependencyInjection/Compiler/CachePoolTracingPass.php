@@ -11,12 +11,8 @@ use Symfony\Component\DependencyInjection\Reference;
 
 class CachePoolTracingPass implements CompilerPassInterface
 {
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
-        if (false === $container->getParameter('open_telemetry.instrumentation.cache.enabled')) {
-            return;
-        }
-
         if (true === $container->getParameter('open_telemetry.instrumentation.cache.tracing.enabled')) {
             foreach ($container->findTaggedServiceIds('cache.pool') as $serviceId => $tags) {
                 $cachePoolDefinition = $container->getDefinition($serviceId);
@@ -43,6 +39,9 @@ class CachePoolTracingPass implements CompilerPassInterface
 
                 $container->setDefinition($serviceId.'.tracer', $traceableCachePoolDefinition);
             }
+        } else {
+            $container->removeDefinition('open_telemetry.instrumentation.cache.trace.tag_aware_adapter');
+            $container->removeDefinition('open_telemetry.instrumentation.cache.trace.adapter');
         }
     }
 
