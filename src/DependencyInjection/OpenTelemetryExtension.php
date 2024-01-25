@@ -79,10 +79,6 @@ final class OpenTelemetryExtension extends ConfigurableExtension
     {
         foreach ($config as $name => $instrumentation) {
             $container->setParameter(
-                sprintf('open_telemetry.instrumentation.%s.enabled', $name),
-                $instrumentation['enabled'],
-            );
-            $container->setParameter(
                 sprintf('open_telemetry.instrumentation.%s.tracing.enabled', $name),
                 $instrumentation['tracing']['enabled'],
             );

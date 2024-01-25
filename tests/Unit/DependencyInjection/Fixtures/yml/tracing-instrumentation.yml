@@ -6,35 +6,27 @@ open_telemetry:
     environment: test
   instrumentation:
     cache:
-      enabled: true
       tracing:
         enabled: true
     console:
-      enabled: true
       tracing:
         enabled: true
     doctrine:
-      enabled: true
       tracing:
         enabled: true
     http_client:
-      enabled: true
       tracing:
         enabled: true
     http_kernel:
-      enabled: true
       tracing:
         enabled: true
     mailer:
-      enabled: true
       tracing:
         enabled: true
     messenger:
-      enabled: true
       tracing:
         enabled: true
     twig:
-      enabled: true
       tracing:
         enabled: true
   traces:

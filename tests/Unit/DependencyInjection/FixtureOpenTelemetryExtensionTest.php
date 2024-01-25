@@ -81,41 +81,34 @@ abstract class FixtureOpenTelemetryExtensionTest extends DependencyInjectionTest
     {
         $container = $this->getContainer('no-tracing-instrumentation');
 
-        self::assertFalse($container->getParameter('open_telemetry.instrumentation.cache.enabled'));
         self::assertFalse($container->getParameter('open_telemetry.instrumentation.cache.tracing.enabled'));
 
         self::assertFalse($container->hasDefinition('open_telemetry.instrumentation.cache.trace.adapter'));
         self::assertFalse($container->hasDefinition('open_telemetry.instrumentation.cache.trace.tag_aware_adapter'));
 
-        self::assertFalse($container->getParameter('open_telemetry.instrumentation.console.enabled'));
         self::assertFalse($container->getParameter('open_telemetry.instrumentation.console.tracing.enabled'));
 
         self::assertFalse($container->hasDefinition('open_telemetry.instrumentation.console.trace.event_subscriber'));
 
-        self::assertFalse($container->getParameter('open_telemetry.instrumentation.doctrine.enabled'));
         self::assertFalse($container->getParameter('open_telemetry.instrumentation.doctrine.tracing.enabled'));
 
         self::assertFalse($container->hasDefinition('open_telemetry.instrumentation.doctrine.trace.event_subscriber'));
         self::assertFalse($container->hasDefinition('open_telemetry.instrumentation.doctrine.trace.middleware'));
 
-        self::assertFalse($container->getParameter('open_telemetry.instrumentation.http_client.enabled'));
         self::assertFalse($container->getParameter('open_telemetry.instrumentation.http_client.tracing.enabled'));
 
         self::assertFalse($container->hasDefinition('open_telemetry.instrumentation.http_client.trace.client'));
 
-        self::assertFalse($container->getParameter('open_telemetry.instrumentation.http_kernel.enabled'));
         self::assertFalse($container->getParameter('open_telemetry.instrumentation.http_kernel.tracing.enabled'));
 
         self::assertFalse($container->hasDefinition('open_telemetry.instrumentation.http_kernel.trace.event_subscriber'));
 
-        self::assertFalse($container->getParameter('open_telemetry.instrumentation.mailer.enabled'));
         self::assertFalse($container->getParameter('open_telemetry.instrumentation.mailer.tracing.enabled'));
 
         self::assertFalse($container->hasDefinition('open_telemetry.instrumentation.mailer.trace.event_subscriber'));
         self::assertFalse($container->hasDefinition('open_telemetry.instrumentation.mailer.trace.default_transport'));
         self::assertFalse($container->hasDefinition('open_telemetry.instrumentation.mailer.trace.mailer'));
 
-        self::assertFalse($container->getParameter('open_telemetry.instrumentation.messenger.enabled'));
         self::assertFalse($container->getParameter('open_telemetry.instrumentation.messenger.tracing.enabled'));
 
         self::assertFalse($container->hasDefinition('open_telemetry.instrumentation.messenger.trace.event_subscriber'));
@@ -125,7 +118,6 @@ abstract class FixtureOpenTelemetryExtensionTest extends DependencyInjectionTest
         self::assertFalse($container->hasDefinition('open_telemetry.instrumentation.messenger.trace.middleware'));
         self::assertFalse($container->hasAlias('messenger.middleware.open_telemetry_tracer'));
 
-        self::assertFalse($container->getParameter('open_telemetry.instrumentation.twig.enabled'));
         self::assertFalse($container->getParameter('open_telemetry.instrumentation.twig.tracing.enabled'));
 
         self::assertFalse($container->hasDefinition('open_telemetry.instrumentation.twig.trace.extension'));
@@ -203,42 +195,35 @@ abstract class FixtureOpenTelemetryExtensionTest extends DependencyInjectionTest
     {
         $container = $this->getContainer('tracing-instrumentation');
 
-        self::assertTrue($container->getParameter('open_telemetry.instrumentation.cache.enabled'));
         self::assertTrue($container->getParameter('open_telemetry.instrumentation.cache.tracing.enabled'));
 
         self::assertTrue($container->hasDefinition('open_telemetry.instrumentation.cache.trace.adapter'));
         self::assertTrue($container->hasDefinition('open_telemetry.instrumentation.cache.trace.tag_aware_adapter'));
 
-        self::assertTrue($container->getParameter('open_telemetry.instrumentation.console.enabled'));
         self::assertTrue($container->getParameter('open_telemetry.instrumentation.console.tracing.enabled'));
 
         self::assertTrue($container->hasDefinition('open_telemetry.instrumentation.console.trace.event_subscriber'));
 
-        self::assertTrue($container->getParameter('open_telemetry.instrumentation.doctrine.enabled'));
         self::assertTrue($container->getParameter('open_telemetry.instrumentation.doctrine.tracing.enabled'));
 
         self::assertTrue($container->hasDefinition('open_telemetry.instrumentation.doctrine.trace.event_subscriber'));
         self::assertTrue($container->hasDefinition('open_telemetry.instrumentation.doctrine.trace.middleware'));
 
-        self::assertTrue($container->getParameter('open_telemetry.instrumentation.http_client.enabled'));
         self::assertTrue($container->getParameter('open_telemetry.instrumentation.http_client.tracing.enabled'));
 
         // ToDo: Add http_client service definition
         // self::assertTrue($container->hasDefinition('open_telemetry.instrumentation.http_client.trace.client'));
 
-        self::assertTrue($container->getParameter('open_telemetry.instrumentation.http_kernel.enabled'));
         self::assertTrue($container->getParameter('open_telemetry.instrumentation.http_kernel.tracing.enabled'));
 
         self::assertTrue($container->hasDefinition('open_telemetry.instrumentation.http_kernel.trace.event_subscriber'));
 
-        self::assertTrue($container->getParameter('open_telemetry.instrumentation.mailer.enabled'));
         self::assertTrue($container->getParameter('open_telemetry.instrumentation.mailer.tracing.enabled'));
 
         self::assertTrue($container->hasDefinition('open_telemetry.instrumentation.mailer.trace.event_subscriber'));
         self::assertTrue($container->hasDefinition('open_telemetry.instrumentation.mailer.trace.default_transport'));
         self::assertTrue($container->hasDefinition('open_telemetry.instrumentation.mailer.trace.mailer'));
 
-        self::assertTrue($container->getParameter('open_telemetry.instrumentation.messenger.enabled'));
         self::assertTrue($container->getParameter('open_telemetry.instrumentation.messenger.tracing.enabled'));
 
         self::assertTrue($container->hasDefinition('open_telemetry.instrumentation.messenger.trace.event_subscriber'));
@@ -248,7 +233,6 @@ abstract class FixtureOpenTelemetryExtensionTest extends DependencyInjectionTest
         self::assertTrue($container->hasDefinition('open_telemetry.instrumentation.messenger.trace.middleware'));
         self::assertTrue($container->hasAlias('messenger.middleware.open_telemetry_tracer'));
 
-        self::assertTrue($container->getParameter('open_telemetry.instrumentation.twig.enabled'));
         self::assertTrue($container->getParameter('open_telemetry.instrumentation.twig.tracing.enabled'));
 
         self::assertTrue($container->hasDefinition('open_telemetry.instrumentation.twig.trace.extension'));

@@ -40,7 +40,6 @@ final class ConfigurationTest extends TestCase
             'service' => [],
             'instrumentation' => [
                 'cache' => [
-                    'enabled' => false,
                     'tracing' => [
                         'enabled' => false,
                         'request_headers' => [],
@@ -51,7 +50,6 @@ final class ConfigurationTest extends TestCase
                     ],
                 ],
                 'console' => [
-                    'enabled' => false,
                     'tracing' => [
                         'enabled' => false,
                         'request_headers' => [],
@@ -62,7 +60,6 @@ final class ConfigurationTest extends TestCase
                     ],
                 ],
                 'doctrine' => [
-                    'enabled' => false,
                     'tracing' => [
                         'enabled' => false,
                         'request_headers' => [],
@@ -73,7 +70,6 @@ final class ConfigurationTest extends TestCase
                     ],
                 ],
                 'http_client' => [
-                    'enabled' => false,
                     'tracing' => [
                         'enabled' => false,
                         'request_headers' => [],
@@ -84,7 +80,6 @@ final class ConfigurationTest extends TestCase
                     ],
                 ],
                 'http_kernel' => [
-                    'enabled' => false,
                     'tracing' => [
                         'enabled' => false,
                         'request_headers' => [],
@@ -95,7 +90,6 @@ final class ConfigurationTest extends TestCase
                     ],
                 ],
                 'mailer' => [
-                    'enabled' => false,
                     'tracing' => [
                         'enabled' => false,
                         'request_headers' => [],
@@ -106,7 +100,6 @@ final class ConfigurationTest extends TestCase
                     ],
                 ],
                 'messenger' => [
-                    'enabled' => false,
                     'tracing' => [
                         'enabled' => false,
                         'request_headers' => [],
@@ -117,7 +110,6 @@ final class ConfigurationTest extends TestCase
                     ],
                 ],
                 'twig' => [
-                    'enabled' => false,
                     'tracing' => [
                         'enabled' => false,
                         'request_headers' => [],
@@ -167,7 +159,6 @@ final class ConfigurationTest extends TestCase
                 environment:          ~ # Required, Example: '%kernel.environment%'
             instrumentation:
                 cache:
-                    enabled:              false
                     tracing:
                         enabled:              false
 
@@ -181,7 +172,6 @@ final class ConfigurationTest extends TestCase
                         # The meter to use, defaults to `metrics.default_meter` or first meter in `metrics.meters`
                         meter:                ~
                 console:
-                    enabled:              false
                     tracing:
                         enabled:              false
 
@@ -195,7 +185,6 @@ final class ConfigurationTest extends TestCase
                         # The meter to use, defaults to `metrics.default_meter` or first meter in `metrics.meters`
                         meter:                ~
                 doctrine:
-                    enabled:              false
                     tracing:
                         enabled:              false
 
@@ -209,7 +198,6 @@ final class ConfigurationTest extends TestCase
                         # The meter to use, defaults to `metrics.default_meter` or first meter in `metrics.meters`
                         meter:                ~
                 http_client:
-                    enabled:              false
                     tracing:
                         enabled:              false
 
@@ -223,7 +211,6 @@ final class ConfigurationTest extends TestCase
                         # The meter to use, defaults to `metrics.default_meter` or first meter in `metrics.meters`
                         meter:                ~
                 http_kernel:
-                    enabled:              false
                     tracing:
                         enabled:              false
 
@@ -237,7 +224,6 @@ final class ConfigurationTest extends TestCase
                         # The meter to use, defaults to `metrics.default_meter` or first meter in `metrics.meters`
                         meter:                ~
                 mailer:
-                    enabled:              false
                     tracing:
                         enabled:              false
 
@@ -251,7 +237,6 @@ final class ConfigurationTest extends TestCase
                         # The meter to use, defaults to `metrics.default_meter` or first meter in `metrics.meters`
                         meter:                ~
                 messenger:
-                    enabled:              false
                     tracing:
                         enabled:              false
 
@@ -265,7 +250,6 @@ final class ConfigurationTest extends TestCase
                         # The meter to use, defaults to `metrics.default_meter` or first meter in `metrics.meters`
                         meter:                ~
                 twig:
-                    enabled:              false
                     tracing:
                         enabled:              false
 
