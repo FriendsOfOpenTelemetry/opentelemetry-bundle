@@ -29,7 +29,7 @@ final readonly class TraceableMailerTransport implements TransportInterface
         return (string) $this->transport;
     }
 
-    public function send(RawMessage $message, Envelope $envelope = null): ?SentMessage
+    public function send(RawMessage $message, ?Envelope $envelope = null): ?SentMessage
     {
         $scope = Context::storage()->scope();
         if (null === $scope) {

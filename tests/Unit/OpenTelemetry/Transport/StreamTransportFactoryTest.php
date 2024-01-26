@@ -13,88 +13,83 @@ use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Metric\MetricExport
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Trace\TraceExporterEndpoint;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Trace\ZipkinExporterEndpoint;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Transport\StreamTransportFactory;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @coversDefaultClass \FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Transport\StreamTransportFactory
- */
+#[CoversClass(StreamTransportFactory::class)]
 class StreamTransportFactoryTest extends TestCase
 {
-    /**
-     * @dataProvider exporterProvider
-     */
+    #[DataProvider('exporterProvider')]
     public function testCreateTransportFromExporter(
         ExporterEndpointInterface $endpoint,
         ExporterOptionsInterface $options,
-        ?\Exception $exception,
+        bool $shouldSupport,
     ): void {
-        if (null !== $exception) {
-            self::expectExceptionObject($exception);
-        } else {
-            $this->expectNotToPerformAssertions();
+        $factory = new StreamTransportFactory();
+
+        self::assertSame($shouldSupport, $factory->supports($endpoint, $options));
+
+        if ($shouldSupport) {
+            $factory->createTransport($endpoint, $options);
         }
-
-        $factory = StreamTransportFactory::fromExporter($endpoint, $options);
-
-        $factory->createTransport();
     }
 
     /**
      * @return \Generator<array{
      *     0: ExporterEndpointInterface,
      *     1: ExporterOptionsInterface,
-     *     2: ?\Exception
+     *     2: bool,
      * }>
      */
-    public function exporterProvider(): \Generator
+    public static function exporterProvider(): \Generator
     {
         yield [
             TraceExporterEndpoint::fromDsn(ExporterDsn::fromString('stream+console://default')),
             new EmptyExporterOptions(),
-            null,
+            true,
         ];
 
         yield [
-            // This DSN is valid but given the context of the transport, the failure is expected.
-            TraceExporterEndpoint::fromDsn(ExporterDsn::fromString('stream+console://default/var/log/symfony.log')),
+            TraceExporterEndpoint::fromDsn(ExporterDsn::fromString('stream+console://default/tmp/symfony.log')),
             new EmptyExporterOptions(),
-            new \ErrorException('fopen(/var/log/symfony.log): Failed to open stream: Permission denied'),
+            true,
         ];
 
         yield [
             TraceExporterEndpoint::fromDsn(ExporterDsn::fromString('in-memory://default')),
             new EmptyExporterOptions(),
-            new \InvalidArgumentException('Unsupported exporter endpoint or options for this transport.'),
+            false,
         ];
 
         yield [
             TraceExporterEndpoint::fromDsn(ExporterDsn::fromString('http+otlp://localhost')),
             new OtlpExporterOptions(),
-            new \InvalidArgumentException('Unsupported exporter endpoint or options for this transport.'),
+            false,
         ];
 
         yield [
             MetricExporterEndpoint::fromDsn(ExporterDsn::fromString('http+otlp://localhost')),
             new MetricExporterOptions(),
-            new \InvalidArgumentException('Unsupported exporter endpoint or options for this transport.'),
+            false,
         ];
 
         yield [
             LogExporterEndpoint::fromDsn(ExporterDsn::fromString('http+otlp://localhost')),
             new OtlpExporterOptions(),
-            new \InvalidArgumentException('Unsupported exporter endpoint or options for this transport.'),
+            false,
         ];
 
         yield [
             ZipkinExporterEndpoint::fromDsn(ExporterDsn::fromString('http+zipkin://localhost')),
             new EmptyExporterOptions(),
-            new \InvalidArgumentException('Unsupported exporter endpoint or options for this transport.'),
+            false,
         ];
 
         yield [
             TraceExporterEndpoint::fromDsn(ExporterDsn::fromString('grpc+otlp://localhost')),
             new OtlpExporterOptions(),
-            new \InvalidArgumentException('Unsupported exporter endpoint or options for this transport.'),
+            false,
         ];
     }
 }

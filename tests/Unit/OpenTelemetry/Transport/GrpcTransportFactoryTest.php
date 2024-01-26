@@ -12,75 +12,71 @@ use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Metric\MetricExport
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Metric\MetricExporterOptions;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Trace\TraceExporterEndpoint;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Transport\GrpcTransportFactory;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @coversDefaultClass \FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Transport\GrpcTransportFactory
- */
+#[CoversClass(GrpcTransportFactory::class)]
 class GrpcTransportFactoryTest extends TestCase
 {
-    /**
-     * @dataProvider exporterProvider
-     */
+    #[DataProvider('exporterProvider')]
     public function testCreateTransportFromExporter(
         ExporterEndpointInterface $endpoint,
         ExporterOptionsInterface $options,
-        ?\Exception $exception,
+        bool $shouldSupport,
     ): void {
-        if (null !== $exception) {
-            self::expectExceptionObject($exception);
-        } else {
-            $this->expectNotToPerformAssertions();
+        $factory = new GrpcTransportFactory();
+
+        self::assertSame($shouldSupport, $factory->supports($endpoint, $options));
+
+        if ($shouldSupport) {
+            $factory->createTransport($endpoint, $options);
         }
-
-        $factory = GrpcTransportFactory::fromExporter($endpoint, $options);
-
-        $factory->createTransport();
     }
 
     /**
      * @return \Generator<array{
      *     0: ExporterEndpointInterface,
      *     1: ExporterOptionsInterface,
-     *     2: ?\Exception
+     *     2: bool
      * }>
      */
-    public function exporterProvider(): \Generator
+    public static function exporterProvider(): \Generator
     {
         yield [
             TraceExporterEndpoint::fromDsn(ExporterDsn::fromString('grpc+otlp://localhost')),
             new OtlpExporterOptions(),
-            null,
+            true,
         ];
 
         yield [
             MetricExporterEndpoint::fromDsn(ExporterDsn::fromString('grpc+otlp://localhost')),
             new MetricExporterOptions(),
-            null,
+            true,
         ];
 
         yield [
             LogExporterEndpoint::fromDsn(ExporterDsn::fromString('grpc+otlp://localhost')),
             new OtlpExporterOptions(),
-            null,
+            true,
         ];
 
         yield [
             TraceExporterEndpoint::fromDsn(ExporterDsn::fromString('http+otlp://localhost')),
             new OtlpExporterOptions(),
-            new \InvalidArgumentException('Unsupported exporter endpoint or options for this transport.'),
+            false,
         ];
 
         yield [
             TraceExporterEndpoint::fromDsn(ExporterDsn::fromString('stream+console://default')),
             new EmptyExporterOptions(),
-            new \InvalidArgumentException('Unsupported exporter endpoint or options for this transport.'),
+            false,
         ];
 
         yield [
             TraceExporterEndpoint::fromDsn(ExporterDsn::fromString('in-memory://default')),
             new EmptyExporterOptions(),
-            new \InvalidArgumentException('Unsupported exporter endpoint or options for this transport.'),
+            false,
         ];
     }
 }

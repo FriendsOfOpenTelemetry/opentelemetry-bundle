@@ -5,16 +5,14 @@ namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\Tests\Unit\OpenTelemetry\Ex
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Exporter\ExporterDsn;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Exporter\OtlpExporterEndpoint;
 use OpenTelemetry\API\Signals;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @coversDefaultClass \FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Exporter\OtlpExporterEndpoint
- */
+#[CoversClass(OtlpExporterEndpoint::class)]
 class OtlpExporterEndpointTest extends TestCase
 {
-    /**
-     * @dataProvider dsnProvider
-     */
+    #[DataProvider('dsnProvider')]
     public function testFromDsn(string $dsn, string $endpoint, string $signal): void
     {
         self::assertSame($endpoint, (string) OtlpExporterEndpoint::fromDsn(ExporterDsn::fromString($dsn))->withSignal($signal));
@@ -23,7 +21,7 @@ class OtlpExporterEndpointTest extends TestCase
     /**
      * @return \Generator<int, array{0: string, 1: string, 2: string}>
      */
-    public function dsnProvider(): \Generator
+    public static function dsnProvider(): \Generator
     {
         yield [
             'http+otlp://localhost',

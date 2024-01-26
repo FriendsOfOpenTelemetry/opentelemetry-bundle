@@ -7,9 +7,14 @@ use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Exporter\ExporterOp
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Metric\MetricExporterOptions;
 use OpenTelemetry\SDK\Metrics\MetricExporter\InMemoryExporter;
 
-final class InMemoryMetricExporterFactory implements MetricExporterFactoryInterface
+final class InMemoryMetricExporterFactory extends AbstractMetricExporterFactory
 {
-    public static function createExporter(ExporterDsn $dsn, ExporterOptionsInterface $options): InMemoryExporter
+    public function supports(#[\SensitiveParameter] ExporterDsn $dsn, ExporterOptionsInterface $options): bool
+    {
+        return MetricExporterEnum::InMemory === MetricExporterEnum::tryFrom($dsn->getExporter());
+    }
+
+    public function createExporter(#[\SensitiveParameter] ExporterDsn $dsn, ExporterOptionsInterface $options): InMemoryExporter
     {
         assert($options instanceof MetricExporterOptions);
 

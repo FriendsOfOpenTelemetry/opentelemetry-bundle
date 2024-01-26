@@ -6,11 +6,11 @@ use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Exporter\OtlpExport
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Exporter\OtlpExporterFormatEnum;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Exporter\OtlpExporterOptions;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Transport\TransportParams;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @coversDefaultClass \FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Transport\TransportParams
- */
+#[CoversClass(TransportParams::class)]
 class TransportParamsTest extends TestCase
 {
     public function testCreateDefault(): void
@@ -29,8 +29,6 @@ class TransportParamsTest extends TestCase
     }
 
     /**
-     * @dataProvider otlpExporterOptionProvider
-     *
      * @param array{
      *     contentType: string,
      *     headers: array<string, mixed>,
@@ -43,6 +41,7 @@ class TransportParamsTest extends TestCase
      *     key: ?string,
      * } $expected
      */
+    #[DataProvider('otlpExporterOptionProvider')]
     public function testFromOtlpExporterOptions(OtlpExporterOptions $options, array $expected): void
     {
         $params = $options->toTransportParams();
@@ -74,7 +73,7 @@ class TransportParamsTest extends TestCase
      *     }
      * }>
      */
-    public function otlpExporterOptionProvider(): \Generator
+    public static function otlpExporterOptionProvider(): \Generator
     {
         yield [
             new OtlpExporterOptions(),

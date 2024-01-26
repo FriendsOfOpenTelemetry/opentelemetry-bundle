@@ -55,8 +55,8 @@ return static function (ContainerConfigurator $container): void {
 
         ->set('open_telemetry.instrumentation.http_kernel.trace.event_subscriber', TraceableHttpKernelEventSubscriber::class)
             ->arg('$tracer', service('open_telemetry.traces.default_tracer'))
-            ->arg('$propagator', service('open_telemetry.text_map_propagators.noop'))
-            ->arg('$propagationGetter', service('open_telemetry.propagation_getters.headers'))
+            ->arg('$propagator', service('open_telemetry.propagator_text_map.noop'))
+            ->arg('$propagationGetter', service('open_telemetry.propagation_getter.headers'))
             ->arg('$requestHeaders', param('open_telemetry.instrumentation.http_kernel.tracing.request_headers'))
             ->arg('$responseHeaders', param('open_telemetry.instrumentation.http_kernel.tracing.response_headers'))
             ->tag('kernel.event_subscriber')

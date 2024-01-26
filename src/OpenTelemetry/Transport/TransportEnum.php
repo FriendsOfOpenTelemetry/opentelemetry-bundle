@@ -12,18 +12,6 @@ enum TransportEnum: string
     case Https = 'https';
     case Stream = 'stream';
 
-    /**
-     * @return class-string<TransportFactoryInterface>
-     */
-    public function getFactoryClass(): string
-    {
-        return match ($this) {
-            self::Grpc, self::Grpcs => GrpcTransportFactory::class,
-            self::Http, self::Https => OtlpHttpTransportFactory::class,
-            self::Stream => StreamTransportFactory::class,
-        };
-    }
-
     public function getScheme(): ?string
     {
         return match ($this) {

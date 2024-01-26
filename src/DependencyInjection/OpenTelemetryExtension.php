@@ -35,9 +35,13 @@ final class OpenTelemetryExtension extends ConfigurableExtension
     {
         $loader = new PhpFileLoader($container, new FileLocator(dirname(__DIR__).'/Resources/config'));
         $loader->load('services.php');
+        $loader->load('services_transports.php');
+        $loader->load('services_logs.php');
+        $loader->load('services_metrics.php');
+        $loader->load('services_traces.php');
         $loader->load('services_tracing_instrumentation.php');
 
-        $this->loadService($mergedConfig['service'], $container);
+        $this->loadServiceParams($mergedConfig['service'], $container);
         $this->loadInstrumentationParams($mergedConfig['instrumentation'], $container);
 
         (new OpenTelemetryTracesExtension())($mergedConfig['traces'], $container);
@@ -55,7 +59,7 @@ final class OpenTelemetryExtension extends ConfigurableExtension
      *     environment: string
      * } $config
      */
-    private function loadService(array $config, ContainerBuilder $container): void
+    private function loadServiceParams(array $config, ContainerBuilder $container): void
     {
         $container->setParameter('open_telemetry.service.namespace', $config['namespace']);
         $container->setParameter('open_telemetry.service.name', $config['name']);
@@ -123,7 +127,7 @@ final class OpenTelemetryExtension extends ConfigurableExtension
                 ->setDefinition($handlerId, new ChildDefinition('open_telemetry.logs.monolog.handler'))
                 ->setPublic(true)
                 ->setArguments([
-                    '$loggerProvider' => new Reference(sprintf('open_telemetry.logs.providers.%s', $handler['provider'])),
+                    '$loggerProvider' => new Reference($handler['provider']),
                     '$level' => Level::fromName(ucfirst($handler['level'])),
                     '$bubble' => $handler['bubble'],
                 ]);

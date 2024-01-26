@@ -6,21 +6,23 @@ use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Exporter\ExporterDs
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Exporter\ExporterOptionsInterface;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Exporter\OtlpExporterOptions;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Log\LogExporter\OtlpLogExporterFactory;
+use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Transport\GrpcTransportFactory;
+use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Transport\PsrHttpTransportFactory;
+use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Transport\TransportFactory;
 use OpenTelemetry\Contrib\Grpc\GrpcTransport;
 use OpenTelemetry\SDK\Common\Export\Http\PsrTransport;
 use OpenTelemetry\SDK\Common\Export\TransportInterface;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @coversDefaultClass \FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Log\LogExporter\OtlpLogExporterFactory
- */
+#[CoversClass(OtlpLogExporterFactory::class)]
 class OtlpLogExporterFactoryTest extends TestCase
 {
     /**
-     * @dataProvider exporterProvider
-     *
      * @param ?class-string<TransportInterface<string>> $transportClass
      */
+    #[DataProvider('exporterProvider')]
     public function testCreateExporter(
         string $dsn,
         ExporterOptionsInterface $options,
@@ -31,7 +33,11 @@ class OtlpLogExporterFactoryTest extends TestCase
             self::expectExceptionObject($exception);
         }
 
-        $exporter = OtlpLogExporterFactory::createExporter(ExporterDsn::fromString($dsn), $options);
+        $exporter = (new OtlpLogExporterFactory(new TransportFactory([
+            new GrpcTransportFactory(),
+            new PsrHttpTransportFactory(),
+        ])))
+            ->createExporter(ExporterDsn::fromString($dsn), $options);
 
         $reflection = new \ReflectionObject($exporter);
         $transport = $reflection->getProperty('transport');
@@ -47,7 +53,7 @@ class OtlpLogExporterFactoryTest extends TestCase
      *     3: ?\Exception,
      * }>
      */
-    public function exporterProvider(): \Generator
+    public static function exporterProvider(): \Generator
     {
         yield [
             'http+otlp://default',

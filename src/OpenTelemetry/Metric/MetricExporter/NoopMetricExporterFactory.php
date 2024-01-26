@@ -6,9 +6,14 @@ use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Exporter\ExporterDs
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Exporter\ExporterOptionsInterface;
 use OpenTelemetry\SDK\Metrics\MetricExporter\NoopMetricExporter;
 
-final class NoopMetricExporterFactory implements MetricExporterFactoryInterface
+final class NoopMetricExporterFactory extends AbstractMetricExporterFactory
 {
-    public static function createExporter(ExporterDsn $dsn = null, ExporterOptionsInterface $options = null): NoopMetricExporter
+    public function supports(#[\SensitiveParameter] ExporterDsn $dsn, ExporterOptionsInterface $options): bool
+    {
+        return MetricExporterEnum::Noop === MetricExporterEnum::tryFrom($dsn->getExporter());
+    }
+
+    public function createExporter(#[\SensitiveParameter] ExporterDsn $dsn, ExporterOptionsInterface $options): NoopMetricExporter
     {
         return new NoopMetricExporter();
     }

@@ -4,16 +4,14 @@ namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\Tests\Unit\OpenTelemetry\Tr
 
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Exporter\ExporterDsn;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Trace\TraceExporterEndpoint;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @coversDefaultClass \FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Trace\TraceExporterEndpoint
- */
+#[CoversClass(TraceExporterEndpoint::class)]
 class TraceExporterEndpointTest extends TestCase
 {
-    /**
-     * @dataProvider dsnProvider
-     */
+    #[DataProvider('dsnProvider')]
     public function testFromDsn(string $dsn, ?string $endpoint, ?\Exception $exception): void
     {
         if (null !== $exception) {
@@ -30,7 +28,7 @@ class TraceExporterEndpointTest extends TestCase
      *     2: ?\Exception
      * }>
      */
-    public function dsnProvider(): \Generator
+    public static function dsnProvider(): \Generator
     {
         yield [
             'http+otlp://localhost',

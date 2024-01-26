@@ -7,24 +7,23 @@ use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Exporter\ExporterOp
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Metric\MetricExporter\ConsoleMetricExporterFactory;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Metric\MetricExporter\MetricTemporalityEnum;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Metric\MetricExporterOptions;
+use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Transport\TransportFactory;
 use OpenTelemetry\SDK\Metrics\Data\Temporality;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @coversDefaultClass \FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Metric\MetricExporter\ConsoleMetricExporterFactory
- */
+#[CoversClass(ConsoleMetricExporterFactory::class)]
 class ConsoleMetricExporterFactoryTest extends TestCase
 {
-    /**
-     * @dataProvider exporterProvider
-     */
+    #[DataProvider('exporterProvider')]
     public function testCreateExporter(string $dsn, ExporterOptionsInterface $options, ?string $temporality, ?\Exception $exception): void
     {
         if (null !== $exception) {
             self::expectExceptionObject($exception);
         }
 
-        $exporter = ConsoleMetricExporterFactory::createExporter(ExporterDsn::fromString($dsn), $options);
+        $exporter = (new ConsoleMetricExporterFactory(new TransportFactory([])))->createExporter(ExporterDsn::fromString($dsn), $options);
 
         $reflection = new \ReflectionObject($exporter);
         $reflectedTemporality = $reflection->getProperty('temporality');
@@ -40,7 +39,7 @@ class ConsoleMetricExporterFactoryTest extends TestCase
      *     3: ?\Exception,
      * }>
      */
-    public function exporterProvider(): \Generator
+    public static function exporterProvider(): \Generator
     {
         yield [
             'stream+console://default',

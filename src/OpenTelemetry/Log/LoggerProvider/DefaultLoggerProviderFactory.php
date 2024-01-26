@@ -2,15 +2,15 @@
 
 namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Log\LoggerProvider;
 
-use OpenTelemetry\API\Logs\LoggerProviderInterface;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeFactory;
 use OpenTelemetry\SDK\Logs\LoggerProvider;
+use OpenTelemetry\SDK\Logs\LoggerProviderInterface;
 use OpenTelemetry\SDK\Logs\LogRecordLimitsBuilder;
 use OpenTelemetry\SDK\Logs\LogRecordProcessorInterface;
 
-final class LoggerProviderFactory implements LoggerProviderFactoryInterface
+final class DefaultLoggerProviderFactory extends AbstractLoggerProviderFactory
 {
-    public static function createProvider(LogRecordProcessorInterface $processor): LoggerProviderInterface
+    public function createProvider(LogRecordProcessorInterface $processor): LoggerProviderInterface
     {
         $instrumentationScopeFactory = new InstrumentationScopeFactory((new LogRecordLimitsBuilder())->build()->getAttributeFactory());
 

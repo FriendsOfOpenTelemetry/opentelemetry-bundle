@@ -5,15 +5,17 @@ namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Trace\SpanExp
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Exporter\ExporterDsn;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Exporter\ExporterOptionsInterface;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Trace\TraceExporterEndpoint;
-use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Transport\StreamTransportFactory;
 use OpenTelemetry\SDK\Trace\SpanExporter\ConsoleSpanExporter;
 
-final readonly class ConsoleSpanExporterFactory implements SpanExporterFactoryInterface
+final readonly class ConsoleSpanExporterFactory extends AbstractSpanExporterFactory
 {
-    public static function createExporter(ExporterDsn $dsn, ExporterOptionsInterface $options): ConsoleSpanExporter
+    public function supports(#[\SensitiveParameter] ExporterDsn $dsn, ExporterOptionsInterface $options): bool
     {
-        $transport = StreamTransportFactory::fromExporter(TraceExporterEndpoint::fromDsn($dsn), $options)->createTransport();
+        return TraceExporterEnum::Console === TraceExporterEnum::tryFrom($dsn->getExporter());
+    }
 
-        return new ConsoleSpanExporter($transport);
+    public function createExporter(#[\SensitiveParameter] ExporterDsn $dsn, ExporterOptionsInterface $options): ConsoleSpanExporter
+    {
+        return new ConsoleSpanExporter($this->transportFactory->createTransport(TraceExporterEndpoint::fromDsn($dsn), $options));
     }
 }

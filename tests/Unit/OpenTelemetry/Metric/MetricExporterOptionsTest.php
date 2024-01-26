@@ -7,13 +7,14 @@ use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Exporter\OtlpExport
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Exporter\OtlpExporterFormatEnum;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Metric\MetricExporter\MetricTemporalityEnum;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Metric\MetricExporterOptions;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @coversDefaultClass \FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Metric\MetricExporterOptions
- *
  * @phpstan-import-type ExporterOptions from ExporterOptionsInterface
  */
+#[CoversClass(MetricExporterOptions::class)]
 class MetricExporterOptionsTest extends TestCase
 {
     public function testDefault(): void
@@ -37,11 +38,10 @@ class MetricExporterOptionsTest extends TestCase
     }
 
     /**
-     * @dataProvider configurationProvider
-     *
      * @param array&ExporterOptions                 $configuration
      * @param callable(MetricExporterOptions): void $assertion
      */
+    #[DataProvider('configurationProvider')]
     public function testFromConfiguration(array $configuration, callable $assertion): void
     {
         $options = MetricExporterOptions::fromConfiguration($configuration);
@@ -55,7 +55,7 @@ class MetricExporterOptionsTest extends TestCase
      *     1: callable(MetricExporterOptions): void
      * }>
      */
-    public function configurationProvider(): \Generator
+    public static function configurationProvider(): \Generator
     {
         yield [
             ['temporality' => 'cumulative'],

@@ -6,9 +6,14 @@ use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Exporter\ExporterDs
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Exporter\ExporterOptionsInterface;
 use OpenTelemetry\SDK\Logs\Exporter\InMemoryExporter;
 
-final class InMemoryLogExporterFactory implements LogExporterFactoryInterface
+final class InMemoryLogExporterFactory extends AbstractLogExporterFactory
 {
-    public static function createExporter(ExporterDsn $dsn = null, ExporterOptionsInterface $options = null): InMemoryExporter
+    public function supports(#[\SensitiveParameter] ExporterDsn $dsn, ExporterOptionsInterface $options): bool
+    {
+        return LogExporterEnum::InMemory === LogExporterEnum::tryFrom($dsn->getExporter());
+    }
+
+    public function createExporter(#[\SensitiveParameter] ExporterDsn $dsn, ExporterOptionsInterface $options): InMemoryExporter
     {
         return new InMemoryExporter();
     }

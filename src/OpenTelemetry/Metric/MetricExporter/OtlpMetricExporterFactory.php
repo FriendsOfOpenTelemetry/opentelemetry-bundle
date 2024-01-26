@@ -6,33 +6,22 @@ use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Exporter\ExporterDs
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Exporter\ExporterOptionsInterface;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Metric\MetricExporterEndpoint;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Metric\MetricExporterOptions;
-use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Transport\TransportEnum;
-use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Transport\TransportFactoryInterface;
 use OpenTelemetry\Contrib\Otlp\MetricExporter;
 
-final class OtlpMetricExporterFactory implements MetricExporterFactoryInterface
+final class OtlpMetricExporterFactory extends AbstractMetricExporterFactory
 {
-    public static function createExporter(ExporterDsn $dsn, ExporterOptionsInterface $options): MetricExporter
+    public function supports(#[\SensitiveParameter] ExporterDsn $dsn, ExporterOptionsInterface $options): bool
+    {
+        return MetricExporterEnum::Otlp === MetricExporterEnum::tryFrom($dsn->getExporter());
+    }
+
+    public function createExporter(#[\SensitiveParameter] ExporterDsn $dsn, ExporterOptionsInterface $options): MetricExporter
     {
         assert($options instanceof MetricExporterOptions);
 
-        $exporter = MetricExporterEnum::fromDsn($dsn);
-        if (MetricExporterEnum::Otlp !== $exporter) {
-            throw new \InvalidArgumentException('DSN exporter must be of type Otlp.');
-        }
-
-        $transport = TransportEnum::fromDsn($dsn);
-        if (null === $transport) {
-            throw new \InvalidArgumentException('Could not find a transport from DSN for this exporter factory.');
-        }
-
-        /** @var TransportFactoryInterface $transportFactory */
-        $transportFactory = call_user_func(
-            [$transport->getFactoryClass(), 'fromExporter'],
+        return new MetricExporter($this->transportFactory->createTransport(
             MetricExporterEndpoint::fromDsn($dsn),
             $options->getOtlpOptions(),
-        );
-
-        return new MetricExporter($transportFactory->createTransport(), $options->getTemporality()->toData());
+        ), $options->getTemporality()->toData());
     }
 }

@@ -55,7 +55,7 @@ final class ExporterDsn
         return $this->uri->path()->isEmpty() ? null : $this->uri->path()->toString();
     }
 
-    public function getPort(int $default = null): ?int
+    public function getPort(?int $default = null): ?int
     {
         return $this->uri->port() ?? $default;
     }

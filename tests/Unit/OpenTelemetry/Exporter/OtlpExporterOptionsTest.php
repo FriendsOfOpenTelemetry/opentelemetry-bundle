@@ -6,6 +6,8 @@ use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Exporter\ExporterOp
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Exporter\OtlpExporterCompressionEnum;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Exporter\OtlpExporterFormatEnum;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Exporter\OtlpExporterOptions;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -13,6 +15,7 @@ use PHPUnit\Framework\TestCase;
  *
  * @phpstan-import-type ExporterOptions from ExporterOptionsInterface
  */
+#[CoversClass(OtlpExporterOptions::class)]
 class OtlpExporterOptionsTest extends TestCase
 {
     public function testDefault(): void
@@ -33,11 +36,10 @@ class OtlpExporterOptionsTest extends TestCase
     }
 
     /**
-     * @dataProvider configurationProvider
-     *
      * @param array&ExporterOptions               $configuration
      * @param callable(OtlpExporterOptions): void $assertion
      */
+    #[DataProvider('configurationProvider')]
     public function testFromConfiguration(array $configuration, callable $assertion): void
     {
         $options = OtlpExporterOptions::fromConfiguration($configuration);
@@ -51,7 +53,7 @@ class OtlpExporterOptionsTest extends TestCase
      *     1: callable(OtlpExporterOptions): void
      * }>
      */
-    public function configurationProvider(): \Generator
+    public static function configurationProvider(): \Generator
     {
         yield [
             ['format' => 'ndjson'],

@@ -4,16 +4,14 @@ namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\Tests\Unit\OpenTelemetry\Tr
 
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Exporter\ExporterDsn;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Trace\ZipkinExporterEndpoint;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @coversDefaultClass \FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Trace\TraceExporterEndpoint
- */
+#[CoversClass(ZipkinExporterEndpoint::class)]
 class ZipkinExporterEndpointTest extends TestCase
 {
-    /**
-     * @dataProvider dsnProvider
-     */
+    #[DataProvider('dsnProvider')]
     public function testFromDsn(string $dsn, ?string $endpoint, ?\Exception $exception): void
     {
         if (null !== $exception) {
@@ -30,7 +28,7 @@ class ZipkinExporterEndpointTest extends TestCase
      *     2: ?\Exception
      * }>
      */
-    public function dsnProvider(): \Generator
+    public static function dsnProvider(): \Generator
     {
         yield [
             'http+zipkin://localhost',

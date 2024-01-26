@@ -6,16 +6,15 @@ use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Exporter\ExporterDs
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Exporter\ExporterOptionsInterface;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Metric\MetricExporter\NoopMetricExporterFactory;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Metric\MetricExporterOptions;
+use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Transport\TransportFactory;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @coversDefaultClass \FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Metric\MetricExporter\NoopMetricExporterFactory
- */
+#[CoversClass(NoopMetricExporterFactory::class)]
 class NoopMetricExporterFactoryTest extends TestCase
 {
-    /**
-     * @dataProvider exporterProvider
-     */
+    #[DataProvider('exporterProvider')]
     public function testCreateExporter(string $dsn, ExporterOptionsInterface $options, ?\Exception $exception): void
     {
         if (null !== $exception) {
@@ -24,7 +23,7 @@ class NoopMetricExporterFactoryTest extends TestCase
             self::expectNotToPerformAssertions();
         }
 
-        NoopMetricExporterFactory::createExporter(ExporterDsn::fromString($dsn), $options);
+        (new NoopMetricExporterFactory(new TransportFactory([])))->createExporter(ExporterDsn::fromString($dsn), $options);
     }
 
     /**
@@ -34,7 +33,7 @@ class NoopMetricExporterFactoryTest extends TestCase
      *     2: ?\Exception,
      * }>
      */
-    public function exporterProvider(): \Generator
+    public static function exporterProvider(): \Generator
     {
         yield [
             'stream+console://default',

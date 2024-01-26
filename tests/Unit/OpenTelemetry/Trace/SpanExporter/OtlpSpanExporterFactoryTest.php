@@ -6,21 +6,23 @@ use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Exporter\ExporterDs
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Exporter\ExporterOptionsInterface;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Exporter\OtlpExporterOptions;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Trace\SpanExporter\OtlpSpanExporterFactory;
+use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Transport\GrpcTransportFactory;
+use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Transport\OtlpHttpTransportFactory;
+use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Transport\TransportFactory;
 use OpenTelemetry\Contrib\Grpc\GrpcTransport;
 use OpenTelemetry\SDK\Common\Export\Http\PsrTransport;
 use OpenTelemetry\SDK\Common\Export\TransportInterface;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @coversDefaultClass \FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Trace\SpanExporter\OtlpSpanExporterFactory
- */
+#[CoversClass(OtlpSpanExporterFactory::class)]
 class OtlpSpanExporterFactoryTest extends TestCase
 {
     /**
-     * @dataProvider exporterProvider
-     *
      * @param ?class-string<TransportInterface<string>> $transportClass
      */
+    #[DataProvider('exporterProvider')]
     public function testCreateExporter(
         string $dsn,
         ExporterOptionsInterface $options,
@@ -31,7 +33,10 @@ class OtlpSpanExporterFactoryTest extends TestCase
             self::expectExceptionObject($exception);
         }
 
-        $exporter = OtlpSpanExporterFactory::createExporter(ExporterDsn::fromString($dsn), $options);
+        $exporter = (new OtlpSpanExporterFactory(new TransportFactory([
+            new GrpcTransportFactory(),
+            new OtlpHttpTransportFactory(),
+        ])))->createExporter(ExporterDsn::fromString($dsn), $options);
 
         $reflection = new \ReflectionObject($exporter);
         $transport = $reflection->getProperty('transport');
@@ -47,7 +52,7 @@ class OtlpSpanExporterFactoryTest extends TestCase
      *     3: ?\Exception,
      * }>
      */
-    public function exporterProvider(): \Generator
+    public static function exporterProvider(): \Generator
     {
         yield [
             'http+otlp://default',
@@ -67,21 +72,21 @@ class OtlpSpanExporterFactoryTest extends TestCase
             'stream+console://default',
             new OtlpExporterOptions(),
             null,
-            new \InvalidArgumentException('DSN exporter must be of type Otlp.'),
+            new \InvalidArgumentException('No transport supports the given endpoint.'),
         ];
 
         yield [
             'http+zipkin://default',
             new OtlpExporterOptions(),
             null,
-            new \InvalidArgumentException('DSN exporter must be of type Otlp.'),
+            new \InvalidArgumentException('No transport supports the given endpoint.'),
         ];
 
         yield [
             'in-memory://default',
             new OtlpExporterOptions(),
             null,
-            new \InvalidArgumentException('DSN exporter must be of type Otlp.'),
+            new \InvalidArgumentException('No transport supports the given endpoint.'),
         ];
 
         yield [

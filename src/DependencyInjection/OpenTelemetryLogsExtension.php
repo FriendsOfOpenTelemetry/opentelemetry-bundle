@@ -2,17 +2,10 @@
 
 namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\DependencyInjection;
 
-use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Exporter\ExporterDsn;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Exporter\ExporterOptionsInterface;
-use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Log\LogExporter\LogExporterEnum;
-use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Log\LoggerProvider\LoggerProviderEnum;
-use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Log\LoggerProvider\LoggerProviderFactoryInterface;
-use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Log\LogProcessor\LogProcessorEnum;
-use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Log\LogProcessor\LogProcessorFactoryInterface;
-use OpenTelemetry\SDK\Logs\LoggerProviderInterface;
-use OpenTelemetry\SDK\Logs\LogRecordProcessorInterface;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
@@ -73,20 +66,15 @@ final class OpenTelemetryLogsExtension
      */
     private function loadLogExporter(string $name, array $options): void
     {
-        $exporterId = sprintf('open_telemetry.logs.exporters.%s', $name);
-        $dsn = ExporterDsn::fromString($options['dsn']);
-        $exporter = LogExporterEnum::from($dsn->getExporter());
-
-        $exporterDefinitionsFactory = new ExporterDefinitionsFactory($this->container);
+        $dsn = $this->container->getDefinition('open_telemetry.exporter_dsn')->setArguments([$options['dsn']]);
+        $exporterOptions = $this->container->getDefinition('open_telemetry.otlp_exporter_options')->setArguments([$options['options'] ?? []]);
 
         $this->container
-            ->setDefinition($exporterId, new ChildDefinition('open_telemetry.logs.exporter'))
-            ->setClass($exporter->getClass())
-            ->setFactory([$exporter->getFactoryClass(), 'createExporter'])
-            ->setArguments([
-                '$dsn' => $exporterDefinitionsFactory->createExporterDsnDefinition($options['dsn']),
-                '$options' => $exporterDefinitionsFactory->createExporterOptionsDefinition($options['options'] ?? []),
-            ]);
+            ->setDefinition(
+                sprintf('open_telemetry.logs.exporters.%s', $name),
+                new ChildDefinition('open_telemetry.logs.exporter_interface'),
+            )
+            ->setArguments([$dsn, $exporterOptions]);
     }
 
     /**
@@ -98,71 +86,16 @@ final class OpenTelemetryLogsExtension
      */
     private function loadLogProcessor(string $name, array $processor): void
     {
-        $processorId = sprintf('open_telemetry.logs.processors.%s', $name);
-        $options = $this->getLogProcessorOptions($processor);
-
         $this->container
-            ->setDefinition($processorId, new ChildDefinition('open_telemetry.logs.processor'))
-            ->setClass($options['class'])
-            ->setFactory([$options['factory'], 'createProcessor'])
+            ->setDefinition(
+                sprintf('open_telemetry.logs.processors.%s', $name),
+                new ChildDefinition('open_telemetry.logs.processor_interface')
+            )
+            ->setFactory([new Reference(sprintf('open_telemetry.logs.processor_factory.%s', $processor['type'])), 'createProcessor'])
             ->setArguments([
-                '$processors' => $options['processors'],
-                '$exporter' => $options['exporter'],
+                array_map(fn (string $processor) => new Reference($processor), $processor['processors'] ?? []),
+                new Reference($processor['exporter'], ContainerInterface::NULL_ON_INVALID_REFERENCE),
             ]);
-    }
-
-    /**
-     * @param array{
-     *     type: string,
-     *     processors?: string[],
-     *     exporter?: string
-     * } $processor
-     *
-     * @return array{
-     *     factory: class-string<LogProcessorFactoryInterface>,
-     *     class: class-string<LogRecordProcessorInterface>,
-     *     processors: ?Reference[],
-     *     exporter: ?Reference,
-     * }
-     */
-    private function getLogProcessorOptions(array $processor): array
-    {
-        $processorEnum = LogProcessorEnum::from($processor['type']);
-        $options = [
-            'factory' => $processorEnum->getFactoryClass(),
-            'class' => $processorEnum->getClass(),
-            'processors' => [],
-            'exporter' => null,
-        ];
-
-        // if (LogProcessorEnum::Batch === $processorEnum) {
-        //     // TODO: Check batch options
-        //     clock: OpenTelemetry\SDK\Common\Time\SystemClock
-        //     max_queue_size: 2048
-        //     schedule_delay: 5000
-        //     export_timeout: 30000
-        //     max_export_batch_size: 512
-        //     auto_flush: true
-        // }
-
-        if (LogProcessorEnum::Multi === $processorEnum) {
-            if (!isset($processor['processors']) || 0 === count($processor['processors'])) {
-                throw new \InvalidArgumentException('Processors are not set or empty');
-            }
-            $options['processors'] = array_map(
-                fn (string $processor) => new Reference(sprintf('open_telemetry.logs.processors.%s', $processor)),
-                $processor['processors'],
-            );
-        }
-
-        if (LogProcessorEnum::Simple === $processorEnum) {
-            if (!isset($processor['exporter'])) {
-                throw new \InvalidArgumentException('Exporter is not set');
-            }
-            $options['exporter'] = new Reference(sprintf('open_telemetry.logs.exporters.%s', $processor['exporter']));
-        }
-
-        return $options;
     }
 
     /**
@@ -173,47 +106,15 @@ final class OpenTelemetryLogsExtension
      */
     private function loadLogProvider(string $name, array $provider): void
     {
-        $providerId = sprintf('open_telemetry.logs.providers.%s', $name);
-        $options = $this->getLoggerProviderOptions($provider);
-
         $this->container
-            ->setDefinition($providerId, new ChildDefinition('open_telemetry.logs.provider'))
-            ->setClass($options['class'])
-            ->setFactory([$options['factory'], 'createProvider'])
+            ->setDefinition(
+                sprintf('open_telemetry.logs.providers.%s', $name),
+                new ChildDefinition('open_telemetry.logs.provider_interface')
+            )
+            ->setFactory([new Reference(sprintf('open_telemetry.logs.provider_factory.%s', $provider['type'])), 'createProvider'])
             ->setArguments([
-                '$processor' => $options['processor'],
+                new Reference($provider['processor'] ?? ''),
             ]);
-    }
-
-    /**
-     * @param array{
-     *     type: string,
-     *     processor?: string,
-     * } $provider
-     *
-     * @return array{
-     *     factory: class-string<LoggerProviderFactoryInterface>,
-     *     class: class-string<LoggerProviderInterface>,
-     *     processor: ?Reference,
-     * }
-     */
-    private function getLoggerProviderOptions(array $provider): array
-    {
-        $providerEnum = LoggerProviderEnum::from($provider['type']);
-        $options = [
-            'factory' => $providerEnum->getFactoryClass(),
-            'class' => $providerEnum->getClass(),
-            'processor' => null,
-        ];
-
-        if (LoggerProviderEnum::Default === $providerEnum) {
-            if (!isset($provider['processor'])) {
-                throw new \InvalidArgumentException('Processor is not set');
-            }
-            $options['processor'] = new Reference(sprintf('open_telemetry.logs.processors.%s', $provider['processor']));
-        }
-
-        return $options;
     }
 
     /**
@@ -225,15 +126,13 @@ final class OpenTelemetryLogsExtension
      */
     private function loadLogLogger(string $name, array $logger): void
     {
-        $loggerId = sprintf('open_telemetry.logs.loggers.%s', $name);
-
         $this->container
-            ->setDefinition($loggerId, new ChildDefinition('open_telemetry.logs.logger'))
+            ->setDefinition(
+                sprintf('open_telemetry.logs.loggers.%s', $name),
+                new ChildDefinition('open_telemetry.logs.logger'),
+            )
             ->setPublic(true)
-            ->setFactory([
-                new Reference(sprintf('open_telemetry.logs.providers.%s', $logger['provider'])),
-                'getLogger',
-            ])
+            ->setFactory([new Reference($logger['provider']), 'getLogger'])
             ->setArguments([
                 $logger['name'] ?? $this->container->getParameter('open_telemetry.bundle.name'),
                 $logger['version'] ?? $this->container->getParameter('open_telemetry.bundle.version'),

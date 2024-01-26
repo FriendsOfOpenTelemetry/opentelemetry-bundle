@@ -10,24 +10,9 @@ use OpenTelemetry\SDK\Common\Export\TransportInterface;
 
 final readonly class OtlpHttpTransportFactory implements TransportFactoryInterface
 {
-    private function __construct(
-        private string $endpoint,
-        private TransportParams $params,
-    ) {
-    }
-
-    public static function fromExporter(ExporterEndpointInterface $endpoint, ExporterOptionsInterface $options): self
+    public function supports(#[\SensitiveParameter] ExporterEndpointInterface $endpoint, ExporterOptionsInterface $options): bool
     {
-        if (false === self::supportExporter($endpoint, $options)) {
-            throw new \InvalidArgumentException('Unsupported exporter endpoint or options for this transport.');
-        }
-
-        return new self((string) $endpoint, $options->toTransportParams());
-    }
-
-    public static function supportExporter(ExporterEndpointInterface $endpoint, ExporterOptionsInterface $options): bool
-    {
-        if (false === str_contains($endpoint->getTransport() ?? '', 'http')) {
+        if (null === $endpoint->getTransport()) {
             return false;
         }
 
@@ -35,25 +20,26 @@ final readonly class OtlpHttpTransportFactory implements TransportFactoryInterfa
             return false;
         }
 
-        return true;
+        return in_array(TransportEnum::tryFrom($endpoint->getTransport()), [TransportEnum::Http, TransportEnum::Https], true);
     }
 
-    public function createTransport(): TransportInterface
+    public function createTransport(#[\SensitiveParameter] ExporterEndpointInterface $endpoint, ExporterOptionsInterface $options): TransportInterface
     {
-        $format = OtlpExporterFormatEnum::tryFrom($this->params->contentType) ?? OtlpExporterFormatEnum::Json;
-        $compression = OtlpExporterCompressionEnum::tryFrom($this->params->contentType) ?? OtlpExporterCompressionEnum::None;
+        $params = $options->toTransportParams();
+        $format = OtlpExporterFormatEnum::tryFrom($params->contentType) ?? OtlpExporterFormatEnum::Json;
+        $compression = OtlpExporterCompressionEnum::tryFrom($params->contentType) ?? OtlpExporterCompressionEnum::None;
 
         return (new \OpenTelemetry\Contrib\Otlp\OtlpHttpTransportFactory())->create(
-            $this->endpoint,
+            (string) $endpoint,
             $format->toContentType(),
-            $this->params->headers,
+            $params->headers,
             $compression->toKnownValue(),
-            $this->params->timeout,
-            $this->params->retryDelay,
-            $this->params->maxRetries,
-            $this->params->caCert,
-            $this->params->cert,
-            $this->params->key,
+            $params->timeout,
+            $params->retryDelay,
+            $params->maxRetries,
+            $params->caCert,
+            $params->cert,
+            $params->key,
         );
     }
 }

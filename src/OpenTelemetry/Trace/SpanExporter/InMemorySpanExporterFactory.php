@@ -6,9 +6,14 @@ use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Exporter\ExporterDs
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Exporter\ExporterOptionsInterface;
 use OpenTelemetry\SDK\Trace\SpanExporter\InMemoryExporter;
 
-final readonly class InMemorySpanExporterFactory implements SpanExporterFactoryInterface
+final readonly class InMemorySpanExporterFactory extends AbstractSpanExporterFactory
 {
-    public static function createExporter(ExporterDsn $dsn = null, ExporterOptionsInterface $options = null): InMemoryExporter
+    public function supports(#[\SensitiveParameter] ExporterDsn $dsn, ExporterOptionsInterface $options): bool
+    {
+        return TraceExporterEnum::InMemory === TraceExporterEnum::tryFrom($dsn->getExporter());
+    }
+
+    public function createExporter(#[\SensitiveParameter] ExporterDsn $dsn, ExporterOptionsInterface $options): InMemoryExporter
     {
         return new InMemoryExporter();
     }

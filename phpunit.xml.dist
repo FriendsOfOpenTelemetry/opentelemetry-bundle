@@ -1,15 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.6/phpunit.xsd"
-         bootstrap="vendor/autoload.php"
-         cacheResultFile=".phpunit.cache/test-results"
-         executionOrder="depends,defects"
-         beStrictAboutOutputDuringTests="true"
-         beStrictAboutTodoAnnotatedTests="true"
-         convertDeprecationsToExceptions="true"
-         failOnRisky="true"
-         failOnWarning="false"
-         verbose="true">
+    xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/10.5/phpunit.xsd"
+    bootstrap="vendor/autoload.php"
+    executionOrder="depends,defects"
+    beStrictAboutOutputDuringTests="true"
+    failOnRisky="true"
+    failOnWarning="false"
+    cacheDirectory=".phpunit.cache"
+>
 
     <php>
         <ini name="error_reporting" value="-1"/>
@@ -24,14 +22,9 @@
         </testsuite>
     </testsuites>
 
-    <coverage cacheDirectory=".phpunit.cache/code-coverage"
-              processUncoveredFiles="true">
+    <source>
         <include>
             <directory suffix=".php">src</directory>
         </include>
-    </coverage>
-
-    <listeners>
-        <listener class="Symfony\Bridge\PhpUnit\SymfonyTestsListener"/>
-    </listeners>
+    </source>
 </phpunit>

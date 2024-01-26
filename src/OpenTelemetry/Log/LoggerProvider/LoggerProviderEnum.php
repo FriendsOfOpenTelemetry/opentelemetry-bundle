@@ -17,7 +17,7 @@ enum LoggerProviderEnum: string
     public function getFactoryClass(): string
     {
         return match ($this) {
-            self::Default => LoggerProviderFactory::class,
+            self::Default => DefaultLoggerProviderFactory::class,
             self::Noop => NoopLoggerProviderFactory::class,
         };
     }

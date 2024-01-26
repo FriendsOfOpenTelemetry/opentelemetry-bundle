@@ -17,7 +17,7 @@ enum MeterProviderEnum: string
     public function getFactoryClass(): string
     {
         return match ($this) {
-            self::Default => MeterProviderFactory::class,
+            self::Default => DefaultMeterProviderFactory::class,
             self::Noop => NoopMeterProviderFactory::class,
         };
     }

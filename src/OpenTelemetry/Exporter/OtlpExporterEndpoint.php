@@ -17,7 +17,7 @@ final class OtlpExporterEndpoint implements ExporterEndpointInterface
 
     private function __construct(
         private readonly ExporterDsn $dsn,
-        UriFactoryInterface $uriFactory = null,
+        ?UriFactoryInterface $uriFactory = null,
     ) {
         if ('otlp' !== $this->dsn->getExporter()) {
             throw new \RuntimeException('Provided DSN exporter is not compatible with this endpoint.');
