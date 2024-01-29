@@ -127,7 +127,7 @@
             "@composer normalize --dry-run"
         ],
         "php-cs-fixer:fix": "@php ./vendor/bin/php-cs-fixer fix",
-        "php-cs-fixer:lint": "@php-cs-fixer:fix --dry-run --diff",
+        "php-cs-fixer:lint": "@php ./vendor/bin/php-cs-fixer check",
         "phpstan": "@php vendor/bin/phpstan analyse",
         "phpunit": "@php vendor/bin/phpunit",
         "test": [
