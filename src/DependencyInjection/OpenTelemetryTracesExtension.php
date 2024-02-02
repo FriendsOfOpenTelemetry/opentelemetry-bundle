@@ -2,19 +2,11 @@
 
 namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\DependencyInjection;
 
-use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Exporter\ExporterDsn;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Exporter\ExporterOptionsInterface;
-use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Trace\SpanExporter\TraceExporterEnum;
-use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Trace\SpanProcessor\SpanProcessorEnum;
-use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Trace\SpanProcessor\SpanProcessorFactoryInterface;
-use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Trace\TracerProvider\TraceProviderEnum;
-use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Trace\TracerProvider\TracerProviderFactoryInterface;
-use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Trace\TracerProvider\TraceSamplerEnum;
-use OpenTelemetry\SDK\Trace\SpanProcessorInterface;
-use OpenTelemetry\SDK\Trace\TracerProviderInterface;
+use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Trace\TraceSamplerEnum;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
@@ -76,20 +68,15 @@ final class OpenTelemetryTracesExtension
      */
     private function loadTraceExporter(string $name, array $options): void
     {
-        $exporterId = sprintf('open_telemetry.traces.exporters.%s', $name);
-        $dsn = ExporterDsn::fromString($options['dsn']);
-        $exporter = TraceExporterEnum::from($dsn->getExporter());
-
-        $exporterDefinitionsFactory = new ExporterDefinitionsFactory($this->container);
+        $dsn = $this->container->getDefinition('open_telemetry.exporter_dsn')->setArguments([$options['dsn']]);
+        $exporterOptions = $this->container->getDefinition('open_telemetry.otlp_exporter_options')->setArguments([$options['options'] ?? []]);
 
         $this->container
-            ->setDefinition($exporterId, new ChildDefinition('open_telemetry.traces.exporter'))
-            ->setClass($exporter->getClass())
-            ->setFactory([$exporter->getFactoryClass(), 'createExporter'])
-            ->setArguments([
-                '$dsn' => $exporterDefinitionsFactory->createExporterDsnDefinition($options['dsn']),
-                '$options' => $exporterDefinitionsFactory->createExporterOptionsDefinition($options['options'] ?? []),
-            ]);
+            ->setDefinition(
+                sprintf('open_telemetry.traces.exporters.%s', $name),
+                new ChildDefinition('open_telemetry.traces.exporter_interface')
+            )
+            ->setArguments([$dsn, $exporterOptions]);
     }
 
     /**
@@ -101,164 +88,42 @@ final class OpenTelemetryTracesExtension
      */
     private function loadTraceProcessor(string $name, array $processor): void
     {
-        $processorId = sprintf('open_telemetry.traces.processors.%s', $name);
-        $options = $this->getTraceProcessorOptions($processor);
-
         $this->container
-            ->setDefinition($processorId, new ChildDefinition('open_telemetry.traces.processor'))
-            ->setClass($options['class'])
-            ->setFactory([$options['factory'], 'createProcessor'])
+            ->setDefinition(
+                sprintf('open_telemetry.traces.processors.%s', $name),
+                new ChildDefinition('open_telemetry.traces.processor_interface'),
+            )
+            ->setFactory([new Reference(sprintf('open_telemetry.traces.processor_factory.%s', $processor['type'])), 'createProcessor'])
             ->setArguments([
-                '$processors' => $options['processors'],
-                '$exporter' => $options['exporter'],
+                array_map(fn (string $processor) => new Reference($processor), $processor['processors'] ?? []),
+                new Reference($processor['exporter'], ContainerInterface::NULL_ON_INVALID_REFERENCE),
             ]);
     }
 
     /**
      * @param array{
      *     type: string,
-     *     processors?: string[],
-     *     exporter?: string
-     * } $processor
-     *
-     * @return array{
-     *     factory: class-string<SpanProcessorFactoryInterface>,
-     *     class: class-string<SpanProcessorInterface>,
-     *     processors: ?Reference[],
-     *     exporter: ?Reference,
-     * }
-     */
-    private function getTraceProcessorOptions(array $processor): array
-    {
-        $processorEnum = SpanProcessorEnum::from($processor['type']);
-        $options = [
-            'factory' => $processorEnum->getFactoryClass(),
-            'class' => $processorEnum->getClass(),
-            'processors' => [],
-            'exporter' => null,
-        ];
-
-        // if (SpanProcessorEnum::Batch === $options['type']) {
-        //     // TODO: Check batch options
-        //     clock: OpenTelemetry\SDK\Common\Time\SystemClock
-        //     max_queue_size: 2048
-        //     schedule_delay: 5000
-        //     export_timeout: 30000
-        //     max_export_batch_size: 512
-        //     auto_flush: true
-        // }
-
-        if (SpanProcessorEnum::Multi === $processorEnum) {
-            if (!isset($processor['processors']) || 0 === count($processor['processors'])) {
-                throw new \InvalidArgumentException('Processors are not set or empty');
-            }
-            $options['processors'] = array_map(
-                fn (string $processor) => new Reference(sprintf('open_telemetry.traces.processors.%s', $processor)),
-                $processor['processors'],
-            );
-        }
-
-        if (SpanProcessorEnum::Simple === $processorEnum) {
-            if (!isset($processor['exporter'])) {
-                throw new \InvalidArgumentException('Exporter is not set');
-            }
-            $options['exporter'] = new Reference(sprintf('open_telemetry.traces.exporters.%s', $processor['exporter']));
-        }
-
-        return $options;
-    }
-
-    /**
-     * @param array{
-     *     type: string,
-     *     sampler?: array{type: string, ratio?: float, parent?: string},
+     *     sampler?: array{type: string, probability?: float},
      *     processors?: string[]
      * } $provider
      */
     private function loadTraceProvider(string $name, array $provider): void
     {
-        $providerId = sprintf('open_telemetry.traces.providers.%s', $name);
-        $options = $this->getTraceProviderOptions($provider);
-
-        $sampler = isset($provider['sampler']) ? $this->getTraceSamplerDefinition($provider['sampler']) : $this->container->getDefinition('open_telemetry.traces.samplers.always_on');
+        $sampler = $this->container->getDefinition('open_telemetry.traces.sampler_factory')->setArguments([
+            $provider['sampler']['type'] ?? TraceSamplerEnum::AlwaysOn->value,
+            $provider['sampler']['probability'] ?? null,
+        ]);
 
         $this->container
-            ->setDefinition($providerId, new ChildDefinition('open_telemetry.traces.provider'))
-            ->setClass($options['class'])
-            ->setFactory([$options['factory'], 'createProvider'])
+            ->setDefinition(
+                sprintf('open_telemetry.traces.providers.%s', $name),
+                new ChildDefinition('open_telemetry.traces.provider_interface'),
+            )
+            ->setFactory([new Reference(sprintf('open_telemetry.traces.provider_factory.%s', $provider['type'])), 'createProvider'])
             ->setArguments([
-                '$sampler' => $sampler,
-                '$processors' => $options['processors'],
+                $sampler,
+                array_map(fn (string $processor) => new Reference($processor), $provider['processors'] ?? []),
             ]);
-    }
-
-    /**
-     * @param array{type: string, ratio?: float, parent?: string} $sampler
-     */
-    private function getTraceSamplerDefinition(array $sampler): Definition
-    {
-        $type = TraceSamplerEnum::from($sampler['type']);
-
-        if (TraceSamplerEnum::TraceIdRatio === $type && !isset($sampler['ratio'])) {
-            throw new \InvalidArgumentException(sprintf("Sampler of type '%s' requires a ratio parameter.", $type->value));
-        }
-
-        if (TraceSamplerEnum::ParentBased === $type) {
-            if (!isset($sampler['parent'])) {
-                throw new \InvalidArgumentException(sprintf("Sampler of type '%s' requires a parent parameter.", $type->value));
-            }
-            $parentSampler = TraceSamplerEnum::tryFrom($sampler['parent']);
-            if (!in_array($parentSampler, [TraceSamplerEnum::AlwaysOn, TraceSamplerEnum::AlwaysOff], true)) {
-                throw new \InvalidArgumentException(sprintf("Unsupported '%s' parent sampler", $parentSampler->value));
-            }
-        }
-
-        return match ($type) {
-            TraceSamplerEnum::AlwaysOn => $this->container->getDefinition('open_telemetry.traces.samplers.always_on'),
-            TraceSamplerEnum::AlwaysOff => $this->container->getDefinition('open_telemetry.traces.samplers.always_off'),
-            TraceSamplerEnum::TraceIdRatio => $this->container
-                ->getDefinition('open_telemetry.traces.samplers.trace_id_ratio_based')
-                ->setArgument('$probability', $sampler['ratio']),
-            TraceSamplerEnum::ParentBased => $this->container
-                ->getDefinition('open_telemetry.traces.samplers.parent_based')
-                ->setArgument('$root', $this->getTraceSamplerDefinition([
-                    'type' => $sampler['parent'],
-                ])),
-        };
-    }
-
-    /**
-     * @param array{
-     *     type: string,
-     *     processors?: string[]
-     * } $provider
-     *
-     * @return array{
-     *     factory: class-string<TracerProviderFactoryInterface>,
-     *     class: class-string<TracerProviderInterface>,
-     *     processors: ?Reference[],
-     * }
-     */
-    private function getTraceProviderOptions(array $provider): array
-    {
-        $providerEnum = TraceProviderEnum::from($provider['type']);
-        $options = [
-            'factory' => $providerEnum->getFactoryClass(),
-            'class' => $providerEnum->getClass(),
-            'processors' => [],
-        ];
-
-        if (TraceProviderEnum::Default === $providerEnum) {
-            if (!isset($provider['processors']) || 0 === count($provider['processors'])) {
-                throw new \InvalidArgumentException('Processors are not set or empty');
-            }
-            $options['processors'] = array_map(
-                fn (string $processor) => new Reference(sprintf('open_telemetry.traces.processors.%s', $processor)),
-                $provider['processors']
-            );
-        }
-
-        return $options;
     }
 
     /**
@@ -270,15 +135,13 @@ final class OpenTelemetryTracesExtension
      */
     private function loadTraceTracer(string $name, array $tracer): void
     {
-        $tracerId = sprintf('open_telemetry.traces.tracers.%s', $name);
-
         $this->container
-            ->setDefinition($tracerId, new ChildDefinition('open_telemetry.traces.tracer'))
+            ->setDefinition(
+                sprintf('open_telemetry.traces.tracers.%s', $name),
+                new ChildDefinition('open_telemetry.traces.tracer'),
+            )
             ->setPublic(true)
-            ->setFactory([
-                new Reference(sprintf('open_telemetry.traces.providers.%s', $tracer['provider'])),
-                'getTracer',
-            ])
+            ->setFactory([new Reference($tracer['provider']), 'getTracer'])
             ->setArguments([
                 $tracer['name'] ?? $this->container->getParameter('open_telemetry.bundle.name'),
                 $tracer['version'] ?? $this->container->getParameter('open_telemetry.bundle.version'),

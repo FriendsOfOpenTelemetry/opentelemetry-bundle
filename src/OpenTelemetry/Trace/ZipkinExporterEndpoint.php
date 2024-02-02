@@ -16,7 +16,7 @@ final class ZipkinExporterEndpoint implements ExporterEndpointInterface
 
     private function __construct(
         private readonly ExporterDsn $dsn,
-        UriFactoryInterface $uriFactory = null,
+        ?UriFactoryInterface $uriFactory = null,
     ) {
         if (TraceExporterEnum::Zipkin !== TraceExporterEnum::fromDsn($this->dsn)) {
             throw new \InvalidArgumentException('Unsupported DSN exporter for this endpoint.');

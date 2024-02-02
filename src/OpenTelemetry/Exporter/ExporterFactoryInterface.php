@@ -7,8 +7,10 @@ namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Exporter;
  */
 interface ExporterFactoryInterface
 {
+    public function supports(#[\SensitiveParameter] ExporterDsn $dsn, ExporterOptionsInterface $options): bool;
+
     /**
      * @return T
      */
-    public static function createExporter(ExporterDsn $dsn, ExporterOptionsInterface $options);
+    public function createExporter(#[\SensitiveParameter] ExporterDsn $dsn, ExporterOptionsInterface $options);
 }

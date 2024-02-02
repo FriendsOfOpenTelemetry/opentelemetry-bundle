@@ -7,9 +7,18 @@ use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Exporter\ExporterOp
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Metric\MetricExporterOptions;
 use OpenTelemetry\SDK\Metrics\MetricExporter\ConsoleMetricExporter;
 
-final class ConsoleMetricExporterFactory implements MetricExporterFactoryInterface
+final class ConsoleMetricExporterFactory extends AbstractMetricExporterFactory
 {
-    public static function createExporter(ExporterDsn $dsn, ExporterOptionsInterface $options): ConsoleMetricExporter
+    public function supports(#[\SensitiveParameter] ExporterDsn $dsn, ExporterOptionsInterface $options): bool
+    {
+        if (!$options instanceof MetricExporterOptions) {
+            return false;
+        }
+
+        return MetricExporterEnum::Console === MetricExporterEnum::tryFrom($dsn->getExporter());
+    }
+
+    public function createExporter(#[\SensitiveParameter] ExporterDsn $dsn, ExporterOptionsInterface $options): ConsoleMetricExporter
     {
         assert($options instanceof MetricExporterOptions);
 

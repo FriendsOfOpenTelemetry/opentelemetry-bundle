@@ -9,7 +9,7 @@ use OpenTelemetry\SDK\Metrics\MetricExporterInterface;
 use OpenTelemetry\SDK\Metrics\MetricReader\ExportingReader;
 use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
 
-final class MeterProviderFactory implements MeterProviderFactoryInterface
+final class DefaultMeterProviderFactory extends AbstractMeterProviderFactory
 {
     public static function createProvider(MetricExporterInterface $exporter, ExemplarFilterInterface $filter): MeterProviderInterface
     {

@@ -4,16 +4,14 @@ namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\Tests\Unit\OpenTelemetry\Ex
 
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Exporter\ConsoleExporterEndpoint;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Exporter\ExporterDsn;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @coversDefaultClass \FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Exporter\ConsoleExporterEndpoint
- */
+#[CoversClass(ConsoleExporterEndpoint::class)]
 class ConsoleExporterEndpointTest extends TestCase
 {
-    /**
-     * @dataProvider dsnProvider
-     */
+    #[DataProvider('dsnProvider')]
     public function testFromDsn(string $dsn, string $endpoint): void
     {
         self::assertSame($endpoint, (string) ConsoleExporterEndpoint::fromDsn(ExporterDsn::fromString($dsn)));
@@ -22,7 +20,7 @@ class ConsoleExporterEndpointTest extends TestCase
     /**
      * @return \Generator<int, array{0: string, 1: string}>
      */
-    public function dsnProvider(): \Generator
+    public static function dsnProvider(): \Generator
     {
         yield [
            'stream+console://default',

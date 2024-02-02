@@ -3,13 +3,13 @@
 namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\Tests\Unit\Command;
 
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\Tests\Application\Command\DummyCommand;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Tester\CommandTester;
 
-/**
- * @coversDefaultClass \FriendsOfOpenTelemetry\OpenTelemetryBundle\Tests\Application\Command\DummyCommand
- */
+#[CoversClass(DummyCommand::class)]
 final class DummyCommandTest extends TestCase
 {
     public function testSuccessful(): void
@@ -49,7 +49,7 @@ final class DummyCommandTest extends TestCase
     /**
      * @return array<int, array{0: int, 1: array<string, mixed>}>
      */
-    public function exitCodeProvider(): array
+    public static function exitCodeProvider(): array
     {
         return [
             [42, ['--exit-code' => 42]],
@@ -58,10 +58,9 @@ final class DummyCommandTest extends TestCase
     }
 
     /**
-     * @dataProvider exitCodeProvider
-     *
      * @param array<string, mixed> $args
      */
+    #[DataProvider('exitCodeProvider')]
     public function testExitCode(int $exitCode, array $args): void
     {
         $commandTester = new CommandTester(new DummyCommand());

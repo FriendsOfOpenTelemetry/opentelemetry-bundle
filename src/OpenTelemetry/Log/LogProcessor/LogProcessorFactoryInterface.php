@@ -12,6 +12,6 @@ interface LogProcessorFactoryInterface
      */
     public static function createProcessor(
         array $processors = [],
-        LogRecordExporterInterface $exporter = null,
+        ?LogRecordExporterInterface $exporter = null,
     ): LogRecordProcessorInterface;
 }

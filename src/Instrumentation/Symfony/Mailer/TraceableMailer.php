@@ -22,7 +22,7 @@ final readonly class TraceableMailer implements MailerInterface
     ) {
     }
 
-    public function send(RawMessage $message, Envelope $envelope = null): void
+    public function send(RawMessage $message, ?Envelope $envelope = null): void
     {
         $scope = Context::storage()->scope();
         if (null === $scope) {

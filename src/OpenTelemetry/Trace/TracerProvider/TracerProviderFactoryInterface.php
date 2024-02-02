@@ -11,5 +11,5 @@ interface TracerProviderFactoryInterface
     /**
      * @param SpanProcessorInterface[] $processors
      */
-    public static function createProvider(SamplerInterface $sampler = null, array $processors = []): TracerProviderInterface;
+    public static function createProvider(?SamplerInterface $sampler = null, array $processors = []): TracerProviderInterface;
 }

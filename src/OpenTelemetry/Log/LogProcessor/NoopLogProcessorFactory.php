@@ -6,11 +6,11 @@ use OpenTelemetry\SDK\Logs\LogRecordExporterInterface;
 use OpenTelemetry\SDK\Logs\LogRecordProcessorInterface;
 use OpenTelemetry\SDK\Logs\Processor\NoopLogRecordProcessor;
 
-final class NoopLogProcessorFactory implements LogProcessorFactoryInterface
+final class NoopLogProcessorFactory extends AbstractLogProcessorFactory
 {
     public static function createProcessor(
         array $processors = [],
-        LogRecordExporterInterface $exporter = null,
+        ?LogRecordExporterInterface $exporter = null,
     ): LogRecordProcessorInterface {
         return new NoopLogRecordProcessor();
     }

@@ -5,15 +5,17 @@ namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Log\LogExport
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Exporter\ExporterDsn;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Exporter\ExporterOptionsInterface;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Log\LogExporterEndpoint;
-use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Transport\StreamTransportFactory;
 use OpenTelemetry\SDK\Logs\Exporter\ConsoleExporter;
 
-final class ConsoleLogExporterFactory implements LogExporterFactoryInterface
+final class ConsoleLogExporterFactory extends AbstractLogExporterFactory
 {
-    public static function createExporter(ExporterDsn $dsn, ExporterOptionsInterface $options): ConsoleExporter
+    public function supports(#[\SensitiveParameter] ExporterDsn $dsn, ExporterOptionsInterface $options): bool
     {
-        $transportFactory = StreamTransportFactory::fromExporter(LogExporterEndpoint::fromDsn($dsn), $options);
+        return LogExporterEnum::Console === LogExporterEnum::tryFrom($dsn->getExporter());
+    }
 
-        return new ConsoleExporter($transportFactory->createTransport());
+    public function createExporter(#[\SensitiveParameter] ExporterDsn $dsn, ExporterOptionsInterface $options): ConsoleExporter
+    {
+        return new ConsoleExporter($this->transportFactory->createTransport(LogExporterEndpoint::fromDsn($dsn), $options));
     }
 }

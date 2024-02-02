@@ -7,9 +7,9 @@ use OpenTelemetry\SDK\Metrics\MeterProviderInterface;
 use OpenTelemetry\SDK\Metrics\MetricExporterInterface;
 use OpenTelemetry\SDK\Metrics\NoopMeterProvider;
 
-final class NoopMeterProviderFactory implements MeterProviderFactoryInterface
+final class NoopMeterProviderFactory extends AbstractMeterProviderFactory
 {
-    public static function createProvider(MetricExporterInterface $exporter = null, ExemplarFilterInterface $filter = null): MeterProviderInterface
+    public static function createProvider(?MetricExporterInterface $exporter = null, ?ExemplarFilterInterface $filter = null): MeterProviderInterface
     {
         return new NoopMeterProvider();
     }

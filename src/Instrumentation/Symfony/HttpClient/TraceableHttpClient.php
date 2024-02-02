@@ -61,7 +61,7 @@ final class TraceableHttpClient implements HttpClientInterface, LoggerAwareInter
         }
     }
 
-    public function stream(iterable|ResponseInterface $responses, float $timeout = null): ResponseStreamInterface
+    public function stream(iterable|ResponseInterface $responses, ?float $timeout = null): ResponseStreamInterface
     {
         $scope = Context::storage()->scope();
         if (null === $scope) {

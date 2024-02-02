@@ -10,42 +10,29 @@ use OpenTelemetry\SDK\Common\Export\TransportInterface;
 
 final readonly class StreamTransportFactory implements TransportFactoryInterface
 {
-    private function __construct(
-        private string $endpoint,
-        private TransportParams $params,
-    ) {
+    public function supports(#[\SensitiveParameter] ExporterEndpointInterface $endpoint, ExporterOptionsInterface $options): bool
+    {
+        return null !== $endpoint->getTransport()
+            && TransportEnum::Stream === TransportEnum::tryFrom($endpoint->getTransport());
     }
 
-    public static function fromExporter(ExporterEndpointInterface $endpoint, ExporterOptionsInterface $options): self
+    public function createTransport(#[\SensitiveParameter] ExporterEndpointInterface $endpoint, ExporterOptionsInterface $options): TransportInterface
     {
-        if (false === self::supportExporter($endpoint, $options)) {
-            throw new \InvalidArgumentException('Unsupported exporter endpoint or options for this transport.');
-        }
-
-        return new self((string) $endpoint, $options->toTransportParams());
-    }
-
-    public static function supportExporter(ExporterEndpointInterface $endpoint, ExporterOptionsInterface $options): bool
-    {
-        return 'stream' === $endpoint->getTransport();
-    }
-
-    public function createTransport(): TransportInterface
-    {
-        $format = OtlpExporterFormatEnum::tryFrom($this->params->contentType) ?? OtlpExporterFormatEnum::Json;
-        $compression = OtlpExporterCompressionEnum::tryFrom($this->params->compression) ?? OtlpExporterCompressionEnum::None;
+        $params = $options->toTransportParams();
+        $format = OtlpExporterFormatEnum::tryFrom($params->contentType) ?? OtlpExporterFormatEnum::Json;
+        $compression = OtlpExporterCompressionEnum::tryFrom($params->compression) ?? OtlpExporterCompressionEnum::None;
 
         return (new \OpenTelemetry\SDK\Common\Export\Stream\StreamTransportFactory())->create(
-            $this->endpoint,
+            (string) $endpoint,
             $format->toContentType(),
-            $this->params->headers,
+            $params->headers,
             $compression->toKnownValue(),
-            $this->params->timeout,
-            $this->params->retryDelay,
-            $this->params->maxRetries,
-            $this->params->caCert,
-            $this->params->cert,
-            $this->params->key,
+            $params->timeout,
+            $params->retryDelay,
+            $params->maxRetries,
+            $params->caCert,
+            $params->cert,
+            $params->key,
         );
     }
 }

@@ -15,6 +15,6 @@ class NoopLoggerProviderFactoryTest extends TestCase
     {
         self::expectNotToPerformAssertions();
 
-        NoopLoggerProviderFactory::createProvider(new NoopLogRecordProcessor());
+        (new NoopLoggerProviderFactory())->createProvider(new NoopLogRecordProcessor());
     }
 }

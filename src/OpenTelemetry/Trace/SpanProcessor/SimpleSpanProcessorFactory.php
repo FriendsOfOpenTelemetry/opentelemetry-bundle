@@ -6,11 +6,11 @@ use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 use OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor;
 use OpenTelemetry\SDK\Trace\SpanProcessorInterface;
 
-final class SimpleSpanProcessorFactory implements SpanProcessorFactoryInterface
+final class SimpleSpanProcessorFactory extends AbstractSpanProcessorFactory
 {
     public static function createProcessor(
         array $processors = [],
-        SpanExporterInterface $exporter = null
+        ?SpanExporterInterface $exporter = null
     ): SpanProcessorInterface {
         if (null === $exporter) {
             throw new \InvalidArgumentException('Exporter is null');

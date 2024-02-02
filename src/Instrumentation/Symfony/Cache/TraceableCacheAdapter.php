@@ -21,7 +21,7 @@ class TraceableCacheAdapter implements AdapterInterface, CacheInterface, Pruneab
         $this->adapter = $adapter;
     }
 
-    public function get(string $key, callable $callback, float $beta = null, array &$metadata = null): mixed
+    public function get(string $key, callable $callback, ?float $beta = null, ?array &$metadata = null): mixed
     {
         return $this->tracer->traceFunction(
             'cache.get',

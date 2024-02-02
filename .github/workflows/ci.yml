@@ -96,7 +96,7 @@ jobs:
       - name: Run PHPStan analysis
         run: |
           ./vendor/bin/phpstan --version
-          ./vendor/bin/phpstan analyse --no-interaction --no-progress --ansi --format=github
+          ./vendor/bin/phpstan analyse --no-interaction --no-progress --ansi --error-format=github --memory-limit=256M
   phpunit:
     name: PHPUnit (PHP ${{ matrix.php }})
     runs-on: ubuntu-latest

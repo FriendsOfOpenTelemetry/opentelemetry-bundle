@@ -5,27 +5,20 @@ namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Trace\SpanExp
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Exporter\ExporterDsn;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Exporter\ExporterOptionsInterface;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Trace\TraceExporterEndpoint;
-use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Transport\TransportEnum;
-use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Transport\TransportFactoryInterface;
 use OpenTelemetry\Contrib\Otlp\SpanExporter;
 
-final readonly class OtlpSpanExporterFactory implements SpanExporterFactoryInterface
+final readonly class OtlpSpanExporterFactory extends AbstractSpanExporterFactory
 {
-    public static function createExporter(ExporterDsn $dsn, ExporterOptionsInterface $options): SpanExporter
+    public function supports(#[\SensitiveParameter] ExporterDsn $dsn, ExporterOptionsInterface $options): bool
     {
-        $exporter = TraceExporterEnum::fromDsn($dsn);
-        if (TraceExporterEnum::Otlp !== $exporter) {
-            throw new \InvalidArgumentException('DSN exporter must be of type Otlp.');
-        }
+        return TraceExporterEnum::Otlp === TraceExporterEnum::tryFrom($dsn->getExporter());
+    }
 
-        $transportFactoryClass = TransportEnum::from($dsn->getTransport())->getFactoryClass();
-        /** @var TransportFactoryInterface $transportFactory */
-        $transportFactory = call_user_func(
-            [$transportFactoryClass, 'fromExporter'],
+    public function createExporter(#[\SensitiveParameter] ExporterDsn $dsn, ExporterOptionsInterface $options): SpanExporter
+    {
+        return new SpanExporter($this->transportFactory->createTransport(
             TraceExporterEndpoint::fromDsn($dsn),
             $options,
-        );
-
-        return new SpanExporter($transportFactory->createTransport());
+        ));
     }
 }

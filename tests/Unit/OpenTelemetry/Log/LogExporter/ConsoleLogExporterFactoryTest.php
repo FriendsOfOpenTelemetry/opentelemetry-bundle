@@ -6,24 +6,26 @@ use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Exporter\EmptyExpor
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Exporter\ExporterDsn;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Exporter\ExporterOptionsInterface;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Log\LogExporter\ConsoleLogExporterFactory;
+use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Transport\StreamTransportFactory;
+use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Transport\TransportFactory;
 use OpenTelemetry\SDK\Common\Export\Stream\StreamTransport;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @coversDefaultClass \FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Log\LogExporter\ConsoleLogExporterFactory
- */
+#[CoversClass(ConsoleLogExporterFactory::class)]
 class ConsoleLogExporterFactoryTest extends TestCase
 {
-    /**
-     * @dataProvider exporterProvider
-     */
+    #[DataProvider('exporterProvider')]
     public function testCreateExporter(string $dsn, ExporterOptionsInterface $options, ?\Exception $exception): void
     {
         if (null !== $exception) {
             self::expectExceptionObject($exception);
         }
 
-        $exporter = ConsoleLogExporterFactory::createExporter(ExporterDsn::fromString($dsn), $options);
+        $exporter = (new ConsoleLogExporterFactory(new TransportFactory([
+            new StreamTransportFactory(),
+        ])))->createExporter(ExporterDsn::fromString($dsn), $options);
 
         $reflection = new \ReflectionObject($exporter);
         $transport = $reflection->getProperty('transport');
@@ -34,7 +36,7 @@ class ConsoleLogExporterFactoryTest extends TestCase
     /**
      * @return \Generator<array{0: string, 1: ExporterOptionsInterface, 2: ?\Exception}>
      */
-    public function exporterProvider(): \Generator
+    public static function exporterProvider(): \Generator
     {
         yield [
             'stream+console://default',
@@ -58,25 +60,25 @@ class ConsoleLogExporterFactoryTest extends TestCase
         yield [
             'in-memory://default',
             new EmptyExporterOptions(),
-            new \InvalidArgumentException('Unsupported exporter endpoint or options for this transport.'),
+            new \InvalidArgumentException('No transport supports the given endpoint.'),
         ];
 
         yield [
             'http+otlp://default',
             new EmptyExporterOptions(),
-            new \InvalidArgumentException('Unsupported exporter endpoint or options for this transport.'),
+            new \InvalidArgumentException('No transport supports the given endpoint.'),
         ];
 
         yield [
             'grpc+otlp://default',
             new EmptyExporterOptions(),
-            new \InvalidArgumentException('Unsupported exporter endpoint or options for this transport.'),
+            new \InvalidArgumentException('No transport supports the given endpoint.'),
         ];
 
         yield [
             'noop://default',
             new EmptyExporterOptions(),
-            new \InvalidArgumentException('Unsupported exporter endpoint or options for this transport.'),
+            new \InvalidArgumentException('No transport supports the given endpoint.'),
         ];
     }
 }

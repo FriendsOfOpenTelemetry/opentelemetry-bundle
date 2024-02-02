@@ -6,20 +6,21 @@ use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Exporter\ExporterDs
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Exporter\ExporterOptionsInterface;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Exporter\OtlpExporterOptions;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Trace\SpanExporter\ZipkinSpanExporterFactory;
+use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Transport\PsrHttpTransportFactory;
+use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Transport\TransportFactory;
 use OpenTelemetry\SDK\Common\Export\Http\PsrTransport;
 use OpenTelemetry\SDK\Common\Export\TransportInterface;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @coversDefaultClass \FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Trace\SpanExporter\ZipkinSpanExporterFactory
- */
+#[CoversClass(ZipkinSpanExporterFactory::class)]
 class ZipkinSpanExporterFactoryTest extends TestCase
 {
     /**
-     * @dataProvider exporterProvider
-     *
      * @param ?class-string<TransportInterface<string>> $transportClass
      */
+    #[DataProvider('exporterProvider')]
     public function testCreateExporter(
         string $dsn,
         ExporterOptionsInterface $options,
@@ -30,7 +31,9 @@ class ZipkinSpanExporterFactoryTest extends TestCase
             self::expectExceptionObject($exception);
         }
 
-        $exporter = ZipkinSpanExporterFactory::createExporter(ExporterDsn::fromString($dsn), $options);
+        $exporter = (new ZipkinSpanExporterFactory(new TransportFactory([
+            new PsrHttpTransportFactory(),
+        ])))->createExporter(ExporterDsn::fromString($dsn), $options);
 
         $reflection = new \ReflectionObject($exporter);
         $transport = $reflection->getProperty('transport');
@@ -46,7 +49,7 @@ class ZipkinSpanExporterFactoryTest extends TestCase
      *     3: ?\Exception,
      * }>
      */
-    public function exporterProvider(): \Generator
+    public static function exporterProvider(): \Generator
     {
         yield [
             'http+zipkin://default',

@@ -6,11 +6,11 @@ use OpenTelemetry\SDK\Logs\LogRecordExporterInterface;
 use OpenTelemetry\SDK\Logs\LogRecordProcessorInterface;
 use OpenTelemetry\SDK\Logs\Processor\SimpleLogRecordProcessor;
 
-final class SimpleLogProcessorFactory implements LogProcessorFactoryInterface
+final class SimpleLogProcessorFactory extends AbstractLogProcessorFactory
 {
     public static function createProcessor(
         array $processors = [],
-        LogRecordExporterInterface $exporter = null,
+        ?LogRecordExporterInterface $exporter = null,
     ): LogRecordProcessorInterface {
         if (null === $exporter) {
             throw new \InvalidArgumentException('Exporter is null');

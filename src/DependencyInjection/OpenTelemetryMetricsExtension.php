@@ -2,13 +2,8 @@
 
 namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\DependencyInjection;
 
-use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Exporter\ExporterDsn;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Exporter\ExporterOptionsInterface;
-use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Metric\MeterProvider\ExemplarFilterEnum;
-use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Metric\MeterProvider\MeterProviderEnum;
-use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Metric\MeterProvider\MeterProviderFactoryInterface;
-use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Metric\MetricExporter\MetricExporterEnum;
-use OpenTelemetry\SDK\Metrics\MeterProviderInterface;
+use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Metric\ExemplarFilterEnum;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
@@ -68,24 +63,15 @@ final class OpenTelemetryMetricsExtension
      */
     private function loadMetricExporter(string $name, array $options): void
     {
-        $exporterId = sprintf('open_telemetry.metrics.exporters.%s', $name);
-        $dsn = ExporterDsn::fromString($options['dsn']);
-        $exporter = MetricExporterEnum::from($dsn->getExporter());
-
-        $exporterDefinitionsFactory = new ExporterDefinitionsFactory($this->container);
+        $dsn = $this->container->getDefinition('open_telemetry.exporter_dsn')->setArguments([$options['dsn']]);
+        $exporterOptions = $this->container->getDefinition('open_telemetry.metric_exporter_options')->setArguments([$options['options'] ?? []]);
 
         $this->container
-            ->setDefinition($exporterId, new ChildDefinition('open_telemetry.metrics.exporter'))
-            ->setClass($exporter->getClass())
-            ->setFactory([$exporter->getFactoryClass(), 'createExporter'])
-            ->setArguments([
-                '$dsn' => $exporterDefinitionsFactory->createExporterDsnDefinition($options['dsn']),
-                '$options' => $exporterDefinitionsFactory->createExporterOptionsDefinition(
-                    $options['options'] ?? [],
-                    'open_telemetry.metric_exporter_options',
-                    ExporterDefinitionsFactory::METRIC_EXPORTER_OPTIONS,
-                ),
-            ]);
+            ->setDefinition(
+                sprintf('open_telemetry.metrics.exporters.%s', $name),
+                new ChildDefinition('open_telemetry.metrics.exporter_interface'),
+            )
+            ->setArguments([$dsn, $exporterOptions]);
     }
 
     /**
@@ -97,58 +83,18 @@ final class OpenTelemetryMetricsExtension
      */
     private function loadMetricProvider(string $name, array $provider): void
     {
-        $providerId = sprintf('open_telemetry.metrics.providers.%s', $name);
-        $options = $this->getMetricProviderOptions($provider);
+        $filter = $this->container->getDefinition('open_telemetry.metrics.exemplar_factory')->setArguments([$provider['filter'] ?? ExemplarFilterEnum::All->value]);
 
         $this->container
-            ->setDefinition($providerId, new ChildDefinition('open_telemetry.metrics.provider'))
-            ->setClass($options['class'])
-            ->setFactory([$options['factory'], 'createProvider'])
+            ->setDefinition(
+                sprintf('open_telemetry.metrics.providers.%s', $name),
+                new ChildDefinition('open_telemetry.metrics.provider_interface'),
+            )
+            ->setFactory([new Reference(sprintf('open_telemetry.metrics.provider_factory.%s', $provider['type'])), 'createProvider'])
             ->setArguments([
-                '$exporter' => $options['exporter'],
-                '$filter' => $options['filter'],
+                new Reference($provider['exporter'] ?? '', ContainerBuilder::NULL_ON_INVALID_REFERENCE),
+                $filter,
             ]);
-    }
-
-    /**
-     * @param array{
-     *     type: string,
-     *     exporter?: string,
-     *     filter?: string,
-     * } $provider
-     *
-     * @return array{
-     *     factory: class-string<MeterProviderFactoryInterface>,
-     *     class: class-string<MeterProviderInterface>,
-     *     exporter: ?Reference,
-     *     filter: ?Reference,
-     * }
-     */
-    private function getMetricProviderOptions(array $provider): array
-    {
-        $providerEnum = MeterProviderEnum::from($provider['type']);
-        $options = [
-            'factory' => $providerEnum->getFactoryClass(),
-            'class' => $providerEnum->getClass(),
-            'exporter' => null,
-            'filter' => null,
-        ];
-
-        if (MeterProviderEnum::Default === $providerEnum) {
-            if (!isset($provider['exporter'])) {
-                throw new \InvalidArgumentException('Exporter is not set');
-            }
-            $options['exporter'] = new Reference(sprintf('open_telemetry.metrics.exporters.%s', $provider['exporter']));
-        }
-
-        $filter = isset($provider['filter']) ? ExemplarFilterEnum::from($provider['filter']) : ExemplarFilterEnum::All;
-        $options['filter'] = match ($filter) {
-            ExemplarFilterEnum::WithSampledTrace => new Reference('open_telemetry.metrics.exemplar_filters.with_sampled_trace'),
-            ExemplarFilterEnum::All => new Reference('open_telemetry.metrics.exemplar_filters.all'),
-            ExemplarFilterEnum::None => new Reference('open_telemetry.metrics.exemplar_filters.none'),
-        };
-
-        return $options;
     }
 
     /**
@@ -160,15 +106,13 @@ final class OpenTelemetryMetricsExtension
      */
     private function loadMetricMeter(string $name, array $meter): void
     {
-        $meterId = sprintf('open_telemetry.metrics.meters.%s', $name);
-
         $this->container
-            ->setDefinition($meterId, new ChildDefinition('open_telemetry.metrics.meter'))
+            ->setDefinition(
+                sprintf('open_telemetry.metrics.meters.%s', $name),
+                new ChildDefinition('open_telemetry.metrics.meter')
+            )
             ->setPublic(true)
-            ->setFactory([
-                new Reference(sprintf('open_telemetry.metrics.providers.%s', $meter['provider'])),
-                'getMeter',
-            ])
+            ->setFactory([new Reference($meter['provider']), 'getMeter'])
             ->setArguments([
                 $meter['name'] ?? $this->container->getParameter('open_telemetry.bundle.name'),
                 $meter['version'] ?? $this->container->getParameter('open_telemetry.bundle.version'),
