@@ -5,3 +5,13 @@ parameters:
         - tests/
     editorUrl: 'phpstorm://open?file=%%file%%&line=%%line%%'
     tmpDir: %currentWorkingDirectory%/.phpstan
+    unused_public:
+        methods: true
+        properties: true
+        constants: true
+
+services:
+    -
+        class: FriendsOfOpenTelemetry\OpenTelemetryBundle\DeadCodeEntrypoint
+        tags:
+            - shipmonk.deadCode.entrypointProvider
