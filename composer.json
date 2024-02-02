@@ -70,6 +70,7 @@
         "phpunit/phpunit": "^10.5",
         "pyrech/composer-changelogs": "^2.1",
         "roave/security-advisories": "dev-master",
+        "shipmonk/composer-dependency-analyser": "^1.0",
         "symfony/cache": "^6.4 || ^7.0",
         "symfony/framework-bundle": "^6.4 || ^7.0",
         "symfony/http-kernel": "^6.4 || ^7.0",
