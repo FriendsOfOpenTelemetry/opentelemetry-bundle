@@ -1,6 +1,8 @@
 name: CI
 on:
   push:
+    branches:
+      - main
   pull_request:
 concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
@@ -98,7 +100,7 @@ jobs:
           ./vendor/bin/phpstan --version
           ./vendor/bin/phpstan analyse --no-interaction --no-progress --ansi --error-format=github --memory-limit=256M
   phpunit:
-    name: PHPUnit (PHP ${{ matrix.php }})
+    name: PHPUnit (PHP ${{ matrix.php }}, ${{ matrix.dependencies }})
     runs-on: ubuntu-latest
     timeout-minutes: 20
     strategy:
@@ -106,10 +108,12 @@ jobs:
         php:
           - '8.2'
           - '8.3'
+        dependencies:
+          - 'lowest'
+          - 'highest'
         include:
-          - php: '8.2'
-            coverage: true
           - php: '8.3'
+            dependencies: 'highest'
             coverage: true
       fail-fast: false
     steps:
@@ -134,12 +138,10 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ${{ steps.composercache.outputs.dir }}
-          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
-          restore-keys: ${{ runner.os }}-composer-
-      - name: List PHP installed extensions
-        run: php -m
+          key: ${{ runner.os }}-composer-${{ matrix.dependencies }}-${{ hashFiles('**/composer.json') }}
+          restore-keys: ${{ runner.os }}-composer-${{ matrix.dependencies }}-
       - name: Update project dependencies
-        run: composer update --no-interaction --no-progress --ansi
+        run: composer update --no-interaction --no-progress --ansi ${{ matrix.dependencies == 'lowest' && '--prefer-lowest --prefer-stable' || '' }}
       - name: Run PHPUnit tests
         run: vendor/bin/phpunit --log-junit build/logs/phpunit/junit.xml ${{ matrix.coverage && '--coverage-clover build/logs/phpunit/clover.xml' || '' }}
         env:
@@ -148,7 +150,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: phpunit-logs-php${{ matrix.php }}
+          name: phpunit-logs-php${{ matrix.php }}-${{ matrix.dependencies }}
           path: build/logs/phpunit
       - name: Upload coverage results to Codecov
         if: matrix.coverage

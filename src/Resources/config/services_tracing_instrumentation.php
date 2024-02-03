@@ -25,6 +25,7 @@ return static function (ContainerConfigurator $container): void {
         ->defaults()
         ->private()
 
+        // Cache
         ->set('open_telemetry.instrumentation.cache.trace.adapter', TraceableCacheAdapter::class)
             ->arg('$tracer', service('open_telemetry.traces.default_tracer'))
             ->abstract()
@@ -35,10 +36,12 @@ return static function (ContainerConfigurator $container): void {
             ->abstract()
             ->tag('monolog.logger', ['channel' => 'open_telemetry'])
 
+        // Console
         ->set('open_telemetry.instrumentation.console.trace.event_subscriber', TraceableConsoleEventSubscriber::class)
             ->arg('$tracer', service('open_telemetry.traces.default_tracer'))
             ->tag('kernel.event_subscriber')
 
+        // Doctrine
         ->set('open_telemetry.instrumentation.doctrine.trace.event_subscriber', TraceableDoctrineEntityEventSubscriber::class)
             ->arg('$tracer', service('open_telemetry.traces.default_tracer'))
             ->tag('doctrine.event_subscriber')
@@ -49,10 +52,12 @@ return static function (ContainerConfigurator $container): void {
             ->tag('doctrine.middleware')
             ->tag('monolog.logger', ['channel' => 'open_telemetry'])
 
+        // HTTP Client
         ->set('open_telemetry.instrumentation.http_client.trace.client', TraceableHttpClient::class)
             ->arg('$tracer', service('open_telemetry.traces.default_tracer'))
             ->tag('monolog.logger', ['channel' => 'open_telemetry'])
 
+        // HTTP Kernel
         ->set('open_telemetry.instrumentation.http_kernel.trace.event_subscriber', TraceableHttpKernelEventSubscriber::class)
             ->arg('$tracer', service('open_telemetry.traces.default_tracer'))
             ->arg('$propagator', service('open_telemetry.propagator_text_map.noop'))
@@ -62,6 +67,7 @@ return static function (ContainerConfigurator $container): void {
             ->tag('kernel.event_subscriber')
             ->tag('monolog.logger', ['channel' => 'open_telemetry'])
 
+        // Mailer
         ->set('open_telemetry.instrumentation.mailer.trace.event_subscriber', TraceableMailerEventSubscriber::class)
             ->arg('$tracer', service('open_telemetry.traces.default_tracer'))
             ->tag('kernel.event_subscriber')
@@ -79,6 +85,7 @@ return static function (ContainerConfigurator $container): void {
             ->arg('$mailer', service('.inner'))
             ->tag('monolog.logger', ['channel' => 'open_telemetry'])
 
+        // Messenger
         ->set('open_telemetry.instrumentation.messenger.trace.event_subscriber', TraceableMessengerEventSubscriber::class)
             ->arg('$tracer', service('open_telemetry.traces.default_tracer'))
             ->tag('kernel.event_subscriber')
@@ -101,6 +108,7 @@ return static function (ContainerConfigurator $container): void {
             ->tag('monolog.logger', ['channel' => 'open_telemetry'])
         ->alias('messenger.middleware.open_telemetry_tracer', 'open_telemetry.instrumentation.messenger.trace.middleware')
 
+        // Twig
         ->set('open_telemetry.instrumentation.twig.trace.extension', TraceableTwigExtension::class)
             ->arg('$tracer', service('open_telemetry.traces.default_tracer'))
             ->tag('twig.extension')

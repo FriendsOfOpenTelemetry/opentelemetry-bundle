@@ -16,7 +16,6 @@ use OpenTelemetry\SDK\Metrics\MeterProviderInterface;
 use OpenTelemetry\SDK\Metrics\MetricExporterInterface;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 
-use function Symfony\Component\DependencyInjection\Loader\Configurator\abstract_arg;
 use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
 use function Symfony\Component\DependencyInjection\Loader\Configurator\tagged_iterator;
 
@@ -27,16 +26,10 @@ return static function (ContainerConfigurator $container): void {
 
         ->set('open_telemetry.metric_exporter_options', MetricExporterOptions::class)
             ->factory([MetricExporterOptions::class, 'fromConfiguration'])
-//            ->args([
-//                abstract_arg('options'),
-//            ])
 
         // Exemplar Filters
-        ->set('open_telemetry.metrics.exemplar_factory', ExemplarFilterFactory::class)
+        ->set('open_telemetry.metrics.exemplar_filter_factory', ExemplarFilterFactory::class)
             ->factory([ExemplarFilterFactory::class, 'create'])
-//            ->args([
-//                abstract_arg('name'),
-//            ])
 
         // Exporters
         ->set('open_telemetry.metrics.exporter_factory.abstract', AbstractMetricExporterFactory::class)
@@ -70,10 +63,6 @@ return static function (ContainerConfigurator $container): void {
 
         ->set('open_telemetry.metrics.exporter_interface', MetricExporterInterface::class)
             ->factory([service('open_telemetry.metrics.exporter_factory'), 'createExporter'])
-//            ->args([
-//                abstract_arg('dsn'),
-//                abstract_arg('options'),
-//            ])
 
         // Providers
         ->set('open_telemetry.metrics.provider_factory.abstract', AbstractMeterProviderFactory::class)
@@ -90,12 +79,8 @@ return static function (ContainerConfigurator $container): void {
             ->parent('open_telemetry.metrics.provider_factory.abstract')
 
         ->set('open_telemetry.metrics.provider_interface', MeterProviderInterface::class)
-//            ->args([
-//                abstract_arg('exporter'),
-//                abstract_arg('filter'),
-//            ])
 
         // Meter
-        ->set('open_telemetry.metrics.meter', MeterInterface::class)
+        ->set('open_telemetry.metrics.meter_interface', MeterInterface::class)
     ;
 };

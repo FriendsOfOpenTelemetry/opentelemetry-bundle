@@ -36,7 +36,7 @@
         "psr/http-factory": "^1.0",
         "symfony/config": "^6.4 || ^7.0",
         "symfony/dependency-injection": "^6.4 || ^7.0",
-        "symfony/event-dispatcher": "^7.0",
+        "symfony/event-dispatcher": "^6.4 || ^7.0",
         "symfony/http-client": "^6.4 || ^7.0",
         "zenstruck/dsn": "^0.2",
         "zenstruck/uri": "^2.3"
@@ -49,14 +49,14 @@
         "ext-xdebug": "*",
         "doctrine/dbal": "^3.8",
         "doctrine/doctrine-bundle": "^2.11",
-        "doctrine/orm": "^2.17",
+        "doctrine/orm": "^2.18",
         "ergebnis/composer-normalize": "^2.42",
         "friendsofphp/php-cs-fixer": "^3.49",
         "guzzlehttp/promises": "^2.0",
         "maglnet/composer-require-checker": "^4.8",
         "matthiasnoback/symfony-config-test": "^5.1",
         "matthiasnoback/symfony-dependency-injection-test": "^5.1",
-        "nyholm/symfony-bundle-test": "^3.0",
+        "nyholm/symfony-bundle-test": "^2.0 || ^3.0",
         "open-telemetry/exporter-otlp": "^1.0",
         "open-telemetry/exporter-zipkin": "^1.0",
         "open-telemetry/transport-grpc": "^1.0",
@@ -79,7 +79,8 @@
         "symfony/phpunit-bridge": "^6.4 || ^7.0",
         "symfony/twig-bundle": "^6.4 || ^7.0",
         "symfony/yaml": "^6.4 || ^7.0",
-        "twig/twig": "^3.8"
+        "twig/twig": "^3.8",
+        "zalas/phpunit-globals": "^3.2"
     },
     "suggest": {
         "doctrine/dbal": "Needed to enable Doctrine DBAL instrumentation",
@@ -132,11 +133,13 @@
             "@phpstan",
             "@composer normalize --dry-run"
         ],
+        "lowest": "@composer update --prefer-lowest --prefer-stable",
         "php-cs-fixer:fix": "@php ./vendor/bin/php-cs-fixer fix",
         "php-cs-fixer:lint": "@php ./vendor/bin/php-cs-fixer check",
         "phpstan": "@php vendor/bin/phpstan analyse",
         "phpunit": "@php vendor/bin/phpunit",
         "test": [
+            "@putenv XDEBUG_MODE=off",
             "@phpunit"
         ]
     }

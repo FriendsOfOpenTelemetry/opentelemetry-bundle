@@ -100,6 +100,6 @@ return static function (ContainerConfigurator $container): void {
         ->set('open_telemetry.traces.provider_interface', TracerProviderInterface::class)
 
         // Tracer
-        ->set('open_telemetry.traces.tracer', TracerInterface::class)
+        ->set('open_telemetry.traces.tracer_interface', TracerInterface::class)
     ;
 };

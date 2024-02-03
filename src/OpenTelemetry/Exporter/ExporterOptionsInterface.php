@@ -6,7 +6,6 @@ use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Transport\Transport
 
 /**
  * @phpstan-type ExporterOptions array{
- *     temporality?: string,
  *     format?: string,
  *     headers?: array<string, string>,
  *     compression?: string,

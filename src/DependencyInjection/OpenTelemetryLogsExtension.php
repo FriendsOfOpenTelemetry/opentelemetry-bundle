@@ -3,9 +3,10 @@
 namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\DependencyInjection;
 
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Exporter\ExporterOptionsInterface;
+use Monolog\Level;
+use OpenTelemetry\Contrib\Logs\Monolog\Handler;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
@@ -21,6 +22,7 @@ final class OpenTelemetryLogsExtension
 
     /**
      * @param array{
+     *     monolog: array<string, mixed>,
      *     loggers: array<string, mixed>,
      *     exporters: array<string, mixed>,
      *     processors: array<string, mixed>,
@@ -56,18 +58,20 @@ final class OpenTelemetryLogsExtension
         if (null !== $defaultLogger) {
             $this->container->setAlias('open_telemetry.logs.default_logger', new Reference(sprintf('open_telemetry.logs.loggers.%s', $defaultLogger)));
         }
+
+        $this->loadMonologHandlers();
     }
 
     /**
      * @param array{
      *      dsn: string,
      *      options?: ExporterOptions
-     *  } $options
+     *  } $config
      */
-    private function loadLogExporter(string $name, array $options): void
+    private function loadLogExporter(string $name, array $config): void
     {
-        $dsn = $this->container->getDefinition('open_telemetry.exporter_dsn')->setArguments([$options['dsn']]);
-        $exporterOptions = $this->container->getDefinition('open_telemetry.otlp_exporter_options')->setArguments([$options['options'] ?? []]);
+        $dsn = (new ChildDefinition('open_telemetry.exporter_dsn'))->setArguments([$config['dsn']]);
+        $exporterOptions = (new ChildDefinition('open_telemetry.otlp_exporter_options'))->setArguments([$config['options'] ?? []]);
 
         $this->container
             ->setDefinition(
@@ -82,19 +86,19 @@ final class OpenTelemetryLogsExtension
      *      type: string,
      *      processors?: string[],
      *      exporter?: string
-     *  } $processor
+     *  } $config
      */
-    private function loadLogProcessor(string $name, array $processor): void
+    private function loadLogProcessor(string $name, array $config): void
     {
         $this->container
             ->setDefinition(
                 sprintf('open_telemetry.logs.processors.%s', $name),
                 new ChildDefinition('open_telemetry.logs.processor_interface')
             )
-            ->setFactory([new Reference(sprintf('open_telemetry.logs.processor_factory.%s', $processor['type'])), 'createProcessor'])
+            ->setFactory([new Reference(sprintf('open_telemetry.logs.processor_factory.%s', $config['type'])), 'createProcessor'])
             ->setArguments([
-                array_map(fn (string $processor) => new Reference($processor), $processor['processors'] ?? []),
-                new Reference($processor['exporter'], ContainerInterface::NULL_ON_INVALID_REFERENCE),
+                array_map(fn (string $processor) => new Reference($processor), $config['processors'] ?? []),
+                isset($config['exporter']) ? new Reference($config['exporter']) : null,
             ]);
     }
 
@@ -102,18 +106,18 @@ final class OpenTelemetryLogsExtension
      * @param array{
      *     type: string,
      *     processor?: string,
-     * } $provider
+     * } $config
      */
-    private function loadLogProvider(string $name, array $provider): void
+    private function loadLogProvider(string $name, array $config): void
     {
         $this->container
             ->setDefinition(
                 sprintf('open_telemetry.logs.providers.%s', $name),
                 new ChildDefinition('open_telemetry.logs.provider_interface')
             )
-            ->setFactory([new Reference(sprintf('open_telemetry.logs.provider_factory.%s', $provider['type'])), 'createProvider'])
+            ->setFactory([new Reference(sprintf('open_telemetry.logs.provider_factory.%s', $config['type'])), 'createProvider'])
             ->setArguments([
-                new Reference($provider['processor'] ?? ''),
+                isset($config['processor']) ? new Reference($config['processor']) : null,
             ]);
     }
 
@@ -122,20 +126,43 @@ final class OpenTelemetryLogsExtension
      *     provider: string,
      *     name?: string,
      *     version?: string,
-     * } $logger
+     * } $config
      */
-    private function loadLogLogger(string $name, array $logger): void
+    private function loadLogLogger(string $name, array $config): void
     {
         $this->container
             ->setDefinition(
                 sprintf('open_telemetry.logs.loggers.%s', $name),
-                new ChildDefinition('open_telemetry.logs.logger'),
+                new ChildDefinition('open_telemetry.logs.logger_interface'),
             )
             ->setPublic(true)
-            ->setFactory([new Reference($logger['provider']), 'getLogger'])
+            ->setFactory([new Reference($config['provider']), 'getLogger'])
             ->setArguments([
-                $logger['name'] ?? $this->container->getParameter('open_telemetry.bundle.name'),
-                $logger['version'] ?? $this->container->getParameter('open_telemetry.bundle.version'),
+                $config['name'] ?? $this->container->getParameter('open_telemetry.bundle.name'),
+                $config['version'] ?? $this->container->getParameter('open_telemetry.bundle.version'),
             ]);
+    }
+
+    private function loadMonologHandlers(): void
+    {
+        if (false === $this->config['monolog']['enabled']) {
+            return;
+        }
+
+        if (!class_exists(Handler::class)) {
+            throw new \LogicException('To configure the Monolog handler, you must first install the open-telemetry/opentelemetry-logger-monolog package.');
+        }
+
+        foreach ($this->config['monolog']['handlers'] as $name => $handler) {
+            $handlerId = sprintf('open_telemetry.logs.monolog.handlers.%s', $name);
+            $this->container
+                ->setDefinition($handlerId, new ChildDefinition('open_telemetry.logs.monolog.handler'))
+                ->setPublic(true)
+                ->setArguments([
+                    '$loggerProvider' => new Reference($handler['provider']),
+                    '$level' => Level::fromName(ucfirst($handler['level'])),
+                    '$bubble' => $handler['bubble'],
+                ]);
+        }
     }
 }

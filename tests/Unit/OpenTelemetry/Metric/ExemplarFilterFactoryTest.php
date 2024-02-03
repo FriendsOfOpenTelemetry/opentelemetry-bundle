@@ -18,15 +18,13 @@ class ExemplarFilterFactoryTest extends TestCase
     #[DataProvider('exemplarFilter')]
     public function testCreate(string $name, ?string $class): void
     {
-        $exemplarFactory = new ExemplarFilterFactory();
-
         if (null === $class) {
             self::expectExceptionObject(
                 new \InvalidArgumentException(sprintf('Unknown exemplar filter: %s', $name)),
             );
         }
 
-        self::assertInstanceOf($class, $exemplarFactory->create($name));
+        self::assertInstanceOf($class, ExemplarFilterFactory::create($name));
     }
 
     /**

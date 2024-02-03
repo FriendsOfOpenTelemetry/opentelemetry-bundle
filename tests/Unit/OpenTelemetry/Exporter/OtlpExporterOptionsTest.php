@@ -6,6 +6,7 @@ use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Exporter\ExporterOp
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Exporter\OtlpExporterCompressionEnum;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Exporter\OtlpExporterFormatEnum;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Exporter\OtlpExporterOptions;
+use FriendsOfOpenTelemetry\OpenTelemetryBundle\Tests\Unit\OpenTelemetry\HeadersHelper;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -24,7 +25,7 @@ class OtlpExporterOptionsTest extends TestCase
 
         self::assertSame(OtlpExporterFormatEnum::Json, $options->getFormat());
         self::assertSame([
-            'User-Agent' => 'OTel OTLP Exporter PHP/1.0.8, Symfony OTEL Bundle',
+            'User-Agent' => sprintf('%s, Symfony OTEL Bundle', HeadersHelper::getOpenTelemetryUserAgentHeaderValue()),
         ], $options->getHeaders());
         self::assertSame(OtlpExporterCompressionEnum::None, $options->getCompression());
         self::assertSame(.10, $options->getTimeout());
@@ -66,7 +67,7 @@ class OtlpExporterOptionsTest extends TestCase
             ['headers' => ['X-Foo' => 'Bar']],
             fn (OtlpExporterOptions $options) => self::assertSame([
                 'X-Foo' => 'Bar',
-                'User-Agent' => 'OTel OTLP Exporter PHP/1.0.8, Symfony OTEL Bundle',
+                'User-Agent' => sprintf('%s, Symfony OTEL Bundle', HeadersHelper::getOpenTelemetryUserAgentHeaderValue()),
             ], $options->getHeaders()),
         ];
 

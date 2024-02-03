@@ -17,7 +17,8 @@ class HttpClientTracingPass implements CompilerPassInterface
             return;
         }
 
-        if (true === $container->getParameter('open_telemetry.instrumentation.http_client.tracing.enabled')) {
+        if (true === $container->hasParameter('open_telemetry.instrumentation.http_client.tracing.enabled')
+            && true === $container->getParameter('open_telemetry.instrumentation.http_client.tracing.enabled')) {
             $container->getDefinition('open_telemetry.instrumentation.http_client.trace.client')
                 ->setArgument('$client', new Reference('.inner'))
                 ->setDecoratedService($decoratedService[0], null, $decoratedService[1]);
@@ -25,7 +26,8 @@ class HttpClientTracingPass implements CompilerPassInterface
             $container->removeDefinition('open_telemetry.instrumentation.http_client.trace.client');
         }
 
-        if (true === $container->getParameter('open_telemetry.instrumentation.http_client.metering.enabled')) {
+        if (true === $container->hasParameter('open_telemetry.instrumentation.http_client.metering.enabled')
+            && true === $container->getParameter('open_telemetry.instrumentation.http_client.metering.enabled')) {
         }
     }
 

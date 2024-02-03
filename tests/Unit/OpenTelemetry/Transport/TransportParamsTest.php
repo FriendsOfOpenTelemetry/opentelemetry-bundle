@@ -6,6 +6,7 @@ use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Exporter\OtlpExport
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Exporter\OtlpExporterFormatEnum;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Exporter\OtlpExporterOptions;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Transport\TransportParams;
+use FriendsOfOpenTelemetry\OpenTelemetryBundle\Tests\Unit\OpenTelemetry\HeadersHelper;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -79,7 +80,7 @@ class TransportParamsTest extends TestCase
             new OtlpExporterOptions(),
             [
                 'contentType' => 'application/json',
-                'headers' => ['User-Agent' => 'OTel OTLP Exporter PHP/1.0.8, Symfony OTEL Bundle'],
+                'headers' => ['User-Agent' => sprintf('%s, Symfony OTEL Bundle', HeadersHelper::getOpenTelemetryUserAgentHeaderValue())],
                 'compression' => 'none',
                 'timeout' => .10,
                 'retryDelay' => 100,
@@ -106,7 +107,7 @@ class TransportParamsTest extends TestCase
                 'contentType' => 'application/x-ndjson',
                 'headers' => [
                     'X-Foo' => 'Bar',
-                    'User-Agent' => 'OTel OTLP Exporter PHP/1.0.8, Symfony OTEL Bundle',
+                    'User-Agent' => sprintf('%s, Symfony OTEL Bundle', HeadersHelper::getOpenTelemetryUserAgentHeaderValue()),
                 ],
                 'compression' => 'gzip',
                 'timeout' => 1.0,
