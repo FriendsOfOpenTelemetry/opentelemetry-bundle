@@ -11,7 +11,7 @@ use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
 
 final class DefaultMeterProviderFactory extends AbstractMeterProviderFactory
 {
-    public static function createProvider(MetricExporterInterface $exporter, ExemplarFilterInterface $filter): MeterProviderInterface
+    public function createProvider(MetricExporterInterface $exporter, ExemplarFilterInterface $filter): MeterProviderInterface
     {
         $reader = new ExportingReader($exporter);
         $resource = ResourceInfoFactory::defaultResource();

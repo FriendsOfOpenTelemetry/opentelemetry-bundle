@@ -93,7 +93,7 @@ class OtlpSpanExporterFactoryTest extends TestCase
             'noop://default',
             new OtlpExporterOptions(),
             null,
-            new \InvalidArgumentException('Unsupported DSN exporter.'),
+            new \InvalidArgumentException('Unsupported DSN for Trace exporter'),
         ];
     }
 }

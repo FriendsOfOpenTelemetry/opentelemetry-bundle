@@ -34,6 +34,6 @@ final class MetricExporterFactory implements MetricExporterFactoryInterface
             }
         }
 
-        throw new \InvalidArgumentException('No metric exporter supports the given DSN.');
+        throw new \InvalidArgumentException('No Metric exporter factory supports the given DSN.');
     }
 }

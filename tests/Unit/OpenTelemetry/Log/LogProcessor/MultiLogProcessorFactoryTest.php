@@ -13,10 +13,10 @@ class MultiLogProcessorFactoryTest extends TestCase
 {
     public function testCreateProcessor(): void
     {
-        MultiLogProcessorFactory::createProcessor([NoopLogProcessorFactory::createProcessor()]);
+        (new MultiLogProcessorFactory())->createProcessor([(new NoopLogProcessorFactory())->createProcessor()]);
 
         self::expectExceptionObject(new \InvalidArgumentException('Processors should not be empty'));
 
-        MultiLogProcessorFactory::createProcessor();
+        (new MultiLogProcessorFactory())->createProcessor();
     }
 }

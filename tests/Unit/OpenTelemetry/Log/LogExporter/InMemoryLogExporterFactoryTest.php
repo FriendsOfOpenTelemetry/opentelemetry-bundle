@@ -15,26 +15,38 @@ use PHPUnit\Framework\TestCase;
 class InMemoryLogExporterFactoryTest extends TestCase
 {
     #[DataProvider('exporterProvider')]
-    public function testCreateExporter(string $dsn, ExporterOptionsInterface $options, ?\Exception $exception): void
+    public function testCreateExporter(string $dsn, ExporterOptionsInterface $options, bool $supports): void
     {
-        if (null !== $exception) {
-            self::expectExceptionObject($exception);
+        $dsn = ExporterDsn::fromString($dsn);
+        $exporterFactory = new InMemoryLogExporterFactory(new TransportFactory([]));
+
+        self::assertEquals($supports, $exporterFactory->supports($dsn, $options));
+        if (false === $supports) {
+            return;
         }
 
-        $this->expectNotToPerformAssertions();
-
-        (new InMemoryLogExporterFactory(new TransportFactory([])))->createExporter(ExporterDsn::fromString($dsn), $options);
+        $exporterFactory->createExporter($dsn, $options);
     }
 
     /**
-     * @return \Generator<array{0: string, 1: ExporterOptionsInterface, 2: ?\Exception}>
+     * @return \Generator<string, array{
+     *     string,
+     *     ExporterOptionsInterface,
+     *     bool,
+     * }>
      */
     public static function exporterProvider(): \Generator
     {
-        yield [
+        yield 'in-memory' => [
             'in-memory://default',
             new EmptyExporterOptions(),
-            null,
+            true,
+        ];
+
+        yield 'unsupported' => [
+            'foo://default',
+            new EmptyExporterOptions(),
+            false,
         ];
     }
 }

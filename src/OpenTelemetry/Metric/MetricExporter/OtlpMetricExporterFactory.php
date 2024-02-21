@@ -12,6 +12,10 @@ final class OtlpMetricExporterFactory extends AbstractMetricExporterFactory
 {
     public function supports(#[\SensitiveParameter] ExporterDsn $dsn, ExporterOptionsInterface $options): bool
     {
+        if (false === $options instanceof MetricExporterOptions) {
+            return false;
+        }
+
         return MetricExporterEnum::Otlp === MetricExporterEnum::tryFrom($dsn->getExporter());
     }
 

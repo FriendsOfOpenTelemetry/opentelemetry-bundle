@@ -19,7 +19,7 @@ class MeterProviderFactoryTest extends TestCase
     {
         self::expectNotToPerformAssertions();
 
-        DefaultMeterProviderFactory::createProvider(
+        (new DefaultMeterProviderFactory())->createProvider(
             (new NoopMetricExporterFactory(new TransportFactory([])))->createExporter(
                 ExporterDsn::fromString('null://default'),
                 EmptyExporterOptions::fromConfiguration([]),

@@ -15,72 +15,37 @@ use PHPUnit\Framework\TestCase;
 class NoopMetricExporterFactoryTest extends TestCase
 {
     #[DataProvider('exporterProvider')]
-    public function testCreateExporter(string $dsn, ExporterOptionsInterface $options, ?\Exception $exception): void
+    public function testCreateExporter(string $dsn, ExporterOptionsInterface $options, bool $supports): void
     {
-        if (null !== $exception) {
-            self::expectExceptionObject($exception);
-        } else {
-            self::expectNotToPerformAssertions();
+        $dsn = ExporterDsn::fromString($dsn);
+        $exporterFactory = (new NoopMetricExporterFactory(new TransportFactory([])));
+        self::assertEquals($supports, $exporterFactory->supports($dsn, $options));
+        if (false === $supports) {
+            return;
         }
 
-        (new NoopMetricExporterFactory(new TransportFactory([])))->createExporter(ExporterDsn::fromString($dsn), $options);
+        $exporterFactory->createExporter($dsn, $options);
     }
 
     /**
-     * @return \Generator<array{
+     * @return \Generator<string, array{
      *     0: string,
      *     1: ExporterOptionsInterface,
-     *     2: ?\Exception,
+     *     2: bool,
      * }>
      */
     public static function exporterProvider(): \Generator
     {
-        yield [
-            'stream+console://default',
-            new MetricExporterOptions(),
-            null,
-        ];
-
-        yield [
-            'stream+console://default',
-            new MetricExporterOptions(),
-            null,
-        ];
-
-        yield [
-            'stream+console://default/var/log/symfony.log',
-            new MetricExporterOptions(),
-            null,
-        ];
-
-        yield [
-            'stream+console://',
-            new MetricExporterOptions(),
-            new \InvalidArgumentException('The DSN is invalid.'),
-        ];
-
-        yield [
-            'in-memory://default',
-            new MetricExporterOptions(),
-            null,
-        ];
-
-        yield [
-            'http+otlp://default',
-            new MetricExporterOptions(),
-            null,
-        ];
-
-        yield [
-            'grpc+otlp://default',
-            new MetricExporterOptions(),
-            null,
-        ];
-
-        yield [
+        yield 'default' => [
             'noop://default',
             new MetricExporterOptions(),
-            null,
+            true,
+        ];
+
+        yield 'unsupported dsn' => [
+            'foo://default',
+            new MetricExporterOptions(),
+            false,
         ];
     }
 }

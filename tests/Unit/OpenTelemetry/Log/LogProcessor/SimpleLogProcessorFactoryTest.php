@@ -16,7 +16,7 @@ class SimpleLogProcessorFactoryTest extends TestCase
 {
     public function testCreateProcessor(): void
     {
-        SimpleLogProcessorFactory::createProcessor(
+        (new SimpleLogProcessorFactory())->createProcessor(
             [],
             (new NoopLogExporterFactory(new TransportFactory([])))
                 ->createExporter(
@@ -27,6 +27,6 @@ class SimpleLogProcessorFactoryTest extends TestCase
 
         self::expectExceptionObject(new \InvalidArgumentException('Exporter is null'));
 
-        SimpleLogProcessorFactory::createProcessor();
+        (new SimpleLogProcessorFactory())->createProcessor();
     }
 }

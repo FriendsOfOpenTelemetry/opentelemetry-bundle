@@ -27,17 +27,20 @@ class OtlpLogExporterFactoryTest extends TestCase
         string $dsn,
         ExporterOptionsInterface $options,
         ?string $transportClass,
-        ?\Exception $exception,
+        bool $supports,
     ): void {
-        if (null !== $exception) {
-            self::expectExceptionObject($exception);
-        }
-
-        $exporter = (new OtlpLogExporterFactory(new TransportFactory([
+        $dsn = ExporterDsn::fromString($dsn);
+        $exporterFactory = new OtlpLogExporterFactory(new TransportFactory([
             new GrpcTransportFactory(),
             new PsrHttpTransportFactory(),
-        ])))
-            ->createExporter(ExporterDsn::fromString($dsn), $options);
+        ]));
+
+        self::assertEquals($supports, $exporterFactory->supports($dsn, $options));
+        if (false === $supports) {
+            return;
+        }
+
+        $exporter = $exporterFactory->createExporter($dsn, $options);
 
         $reflection = new \ReflectionObject($exporter);
         $transport = $reflection->getProperty('transport');
@@ -46,55 +49,34 @@ class OtlpLogExporterFactoryTest extends TestCase
     }
 
     /**
-     * @return \Generator<array{
-     *     0: string,
-     *     1: ExporterOptionsInterface,
-     *     2: ?class-string<TransportInterface<string>>,
-     *     3: ?\Exception,
+     * @return \Generator<string, array{
+     *     string,
+     *     ExporterOptionsInterface,
+     *     ?class-string<TransportInterface<string>>,
+     *     bool,
      * }>
      */
     public static function exporterProvider(): \Generator
     {
-        yield [
+        yield 'http+otlp' => [
             'http+otlp://default',
             new OtlpExporterOptions(),
             PsrTransport::class,
-            null,
+            true,
         ];
 
-        yield [
+        yield 'grpc+otlp' => [
             'grpc+otlp://default',
             new OtlpExporterOptions(),
             GrpcTransport::class,
-            null,
+            true,
         ];
 
-        yield [
-            'stream+console://default',
+        yield 'unsupported' => [
+            'foo://default',
             new OtlpExporterOptions(),
             null,
-            new \InvalidArgumentException('DSN exporter must be of type Otlp.'),
-        ];
-
-        yield [
-            'http+zipkin://default',
-            new OtlpExporterOptions(),
-            null,
-            new \InvalidArgumentException('Unsupported DSN exporter.'),
-        ];
-
-        yield [
-            'in-memory://default',
-            new OtlpExporterOptions(),
-            null,
-            new \InvalidArgumentException('DSN exporter must be of type Otlp.'),
-        ];
-
-        yield [
-            'noop://default',
-            new OtlpExporterOptions(),
-            null,
-            new \InvalidArgumentException('DSN exporter must be of type Otlp.'),
+            false,
         ];
     }
 }

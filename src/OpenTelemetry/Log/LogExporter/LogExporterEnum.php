@@ -16,7 +16,7 @@ enum LogExporterEnum: string
         $exporter = self::tryFrom($dsn->getExporter());
 
         if (null === $exporter) {
-            throw new \InvalidArgumentException('Unsupported DSN exporter.');
+            throw new \InvalidArgumentException('Unsupported DSN for Log exporter.');
         }
 
         return $exporter;

@@ -17,15 +17,18 @@ use PHPUnit\Framework\TestCase;
 class ConsoleLogExporterFactoryTest extends TestCase
 {
     #[DataProvider('exporterProvider')]
-    public function testCreateExporter(string $dsn, ExporterOptionsInterface $options, ?\Exception $exception): void
+    public function testCreateExporter(string $dsn, ExporterOptionsInterface $options, bool $supports): void
     {
-        if (null !== $exception) {
-            self::expectExceptionObject($exception);
+        $dsn = ExporterDsn::fromString($dsn);
+        $exporterFactory = new ConsoleLogExporterFactory(new TransportFactory([
+            new StreamTransportFactory(),
+        ]));
+        self::assertEquals($supports, $exporterFactory->supports($dsn, $options));
+        if (false === $supports) {
+            return;
         }
 
-        $exporter = (new ConsoleLogExporterFactory(new TransportFactory([
-            new StreamTransportFactory(),
-        ])))->createExporter(ExporterDsn::fromString($dsn), $options);
+        $exporter = $exporterFactory->createExporter($dsn, $options);
 
         $reflection = new \ReflectionObject($exporter);
         $transport = $reflection->getProperty('transport');
@@ -34,51 +37,30 @@ class ConsoleLogExporterFactoryTest extends TestCase
     }
 
     /**
-     * @return \Generator<array{0: string, 1: ExporterOptionsInterface, 2: ?\Exception}>
+     * @return \Generator<string, array{
+     *     string,
+     *     ExporterOptionsInterface,
+     *     bool,
+     * }>
      */
     public static function exporterProvider(): \Generator
     {
-        yield [
+        yield 'stream+console' => [
             'stream+console://default',
             new EmptyExporterOptions(),
-            null,
+            true,
         ];
 
-        yield [
-            // This DSN is valid but given the context of the transport, the failure is expected.
-            'stream+console://default/var/log/symfony.log',
+        yield 'stream+console_with-path' => [
+            'stream+console://default/tmp/symfony.log',
             new EmptyExporterOptions(),
-            new \ErrorException('fopen(/var/log/symfony.log): Failed to open stream: Permission denied'),
+            true,
         ];
 
-        yield [
-            'stream+console://',
+        yield 'unsupported' => [
+            'foo://default',
             new EmptyExporterOptions(),
-            new \InvalidArgumentException('The DSN is invalid.'),
-        ];
-
-        yield [
-            'in-memory://default',
-            new EmptyExporterOptions(),
-            new \InvalidArgumentException('No transport supports the given endpoint.'),
-        ];
-
-        yield [
-            'http+otlp://default',
-            new EmptyExporterOptions(),
-            new \InvalidArgumentException('No transport supports the given endpoint.'),
-        ];
-
-        yield [
-            'grpc+otlp://default',
-            new EmptyExporterOptions(),
-            new \InvalidArgumentException('No transport supports the given endpoint.'),
-        ];
-
-        yield [
-            'noop://default',
-            new EmptyExporterOptions(),
-            new \InvalidArgumentException('No transport supports the given endpoint.'),
+            false,
         ];
     }
 }

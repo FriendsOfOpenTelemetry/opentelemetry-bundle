@@ -4,6 +4,7 @@ namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\Tests\Unit\OpenTelemetry\Me
 
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Exporter\ExporterDsn;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Exporter\ExporterOptionsInterface;
+use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Exporter\OtlpExporterOptions;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Metric\MetricExporter\ConsoleMetricExporterFactory;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Metric\MetricExporter\MetricTemporalityEnum;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Metric\MetricExporterOptions;
@@ -17,13 +18,17 @@ use PHPUnit\Framework\TestCase;
 class ConsoleMetricExporterFactoryTest extends TestCase
 {
     #[DataProvider('exporterProvider')]
-    public function testCreateExporter(string $dsn, ExporterOptionsInterface $options, ?string $temporality, ?\Exception $exception): void
+    public function testCreateExporter(string $dsn, ExporterOptionsInterface $options, ?string $temporality, bool $supports): void
     {
-        if (null !== $exception) {
-            self::expectExceptionObject($exception);
+        $dsn = ExporterDsn::fromString($dsn);
+        $exporterFactory = (new ConsoleMetricExporterFactory(new TransportFactory([])));
+
+        self::assertEquals($supports, $exporterFactory->supports($dsn, $options));
+        if (false === $supports) {
+            return;
         }
 
-        $exporter = (new ConsoleMetricExporterFactory(new TransportFactory([])))->createExporter(ExporterDsn::fromString($dsn), $options);
+        $exporter = $exporterFactory->createExporter($dsn, $options);
 
         $reflection = new \ReflectionObject($exporter);
         $reflectedTemporality = $reflection->getProperty('temporality');
@@ -36,7 +41,7 @@ class ConsoleMetricExporterFactoryTest extends TestCase
      *     0: string,
      *     1: ExporterOptionsInterface,
      *     2: ?string,
-     *     3: ?\Exception,
+     *     3: bool,
      * }>
      */
     public static function exporterProvider(): \Generator
@@ -45,56 +50,56 @@ class ConsoleMetricExporterFactoryTest extends TestCase
             'stream+console://default',
             new MetricExporterOptions(),
             Temporality::DELTA,
-            null,
+            true,
         ];
 
         yield [
             'stream+console://default',
             new MetricExporterOptions(MetricTemporalityEnum::Cumulative),
             Temporality::CUMULATIVE,
-            null,
+            true,
         ];
 
         yield [
             'stream+console://default/var/log/symfony.log',
             new MetricExporterOptions(),
             Temporality::DELTA,
-            null,
+            true,
         ];
 
         yield [
-            'stream+console://',
-            new MetricExporterOptions(),
-            null,
-            new \InvalidArgumentException('The DSN is invalid.'),
+            'stream+console://default',
+            new OtlpExporterOptions(),
+            Temporality::DELTA,
+            false,
         ];
 
         yield [
             'in-memory://default',
             new MetricExporterOptions(),
             Temporality::DELTA,
-            null,
+            false,
         ];
 
         yield [
             'http+otlp://default',
             new MetricExporterOptions(),
             Temporality::DELTA,
-            null,
+            false,
         ];
 
         yield [
             'grpc+otlp://default',
             new MetricExporterOptions(),
             Temporality::DELTA,
-            null,
+            false,
         ];
 
         yield [
             'noop://default',
             new MetricExporterOptions(),
             Temporality::DELTA,
-            null,
+            false,
         ];
     }
 }

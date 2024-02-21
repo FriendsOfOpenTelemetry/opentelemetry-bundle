@@ -24,7 +24,7 @@ class OtlpExporterOptionsTest extends TestCase
 
         self::assertSame(OtlpExporterFormatEnum::Json, $options->getFormat());
         self::assertSame([
-            'User-Agent' => 'OTel OTLP Exporter PHP/1.0.7, Symfony OTEL Bundle',
+            'User-Agent' => 'OTel OTLP Exporter PHP/1.0.8, Symfony OTEL Bundle',
         ], $options->getHeaders());
         self::assertSame(OtlpExporterCompressionEnum::None, $options->getCompression());
         self::assertSame(.10, $options->getTimeout());
@@ -66,7 +66,7 @@ class OtlpExporterOptionsTest extends TestCase
             ['headers' => ['X-Foo' => 'Bar']],
             fn (OtlpExporterOptions $options) => self::assertSame([
                 'X-Foo' => 'Bar',
-                'User-Agent' => 'OTel OTLP Exporter PHP/1.0.7, Symfony OTEL Bundle',
+                'User-Agent' => 'OTel OTLP Exporter PHP/1.0.8, Symfony OTEL Bundle',
             ], $options->getHeaders()),
         ];
 

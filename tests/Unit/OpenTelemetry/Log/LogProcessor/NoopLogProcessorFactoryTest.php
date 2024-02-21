@@ -14,6 +14,6 @@ class NoopLogProcessorFactoryTest extends TestCase
     {
         self::expectNotToPerformAssertions();
 
-        NoopLogProcessorFactory::createProcessor();
+        (new NoopLogProcessorFactory())->createProcessor();
     }
 }

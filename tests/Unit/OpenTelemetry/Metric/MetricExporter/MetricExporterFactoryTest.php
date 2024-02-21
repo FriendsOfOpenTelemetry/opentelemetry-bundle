@@ -40,6 +40,16 @@ class MetricExporterFactoryTest extends TestCase
         ]);
     }
 
+    private function getExporterFactory(): MetricExporterFactory
+    {
+        return new MetricExporterFactory([
+            new ConsoleMetricExporterFactory($this->getTransportFactory()),
+            new InMemoryMetricExporterFactory($this->getTransportFactory()),
+            new NoopMetricExporterFactory($this->getTransportFactory()),
+            new OtlpMetricExporterFactory($this->getTransportFactory()),
+        ]);
+    }
+
     #[DataProvider('exporterProvider')]
     public function testCreateExporter(
         string $dsn,
@@ -47,14 +57,12 @@ class MetricExporterFactoryTest extends TestCase
         ?string $exporterClass,
         ?string $transportClass,
     ): void {
-        $exporterFactory = (new MetricExporterFactory([
-            new ConsoleMetricExporterFactory($this->getTransportFactory()),
-            new InMemoryMetricExporterFactory($this->getTransportFactory()),
-            new NoopMetricExporterFactory($this->getTransportFactory()),
-            new OtlpMetricExporterFactory($this->getTransportFactory()),
-        ]));
+        $exporterFactory = $this->getExporterFactory();
 
-        $exporter = $exporterFactory->createExporter(ExporterDsn::fromString($dsn), $options);
+        $dsn = ExporterDsn::fromString($dsn);
+        self::assertTrue($exporterFactory->supports($dsn, $options));
+
+        $exporter = $exporterFactory->createExporter($dsn, $options);
 
         self::assertInstanceOf($exporterClass, $exporter);
 
@@ -111,5 +119,18 @@ class MetricExporterFactoryTest extends TestCase
             MetricExporter::class,
             GrpcTransport::class,
         ];
+    }
+
+    public function testUnsupportedDsn(): void
+    {
+        $exporterFactory = $this->getExporterFactory();
+
+        $dsn = ExporterDsn::fromString('foo://bar');
+        $options = new MetricExporterOptions();
+
+        self::assertFalse($exporterFactory->supports($dsn, $options));
+
+        self::expectExceptionObject(new \InvalidArgumentException('No Metric exporter factory supports the given DSN.'));
+        $exporterFactory->createExporter($dsn, $options);
     }
 }

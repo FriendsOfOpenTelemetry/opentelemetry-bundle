@@ -105,7 +105,7 @@ class TraceExporterEndpointTest extends TestCase
         yield [
             'noop://default',
             '',
-            new \InvalidArgumentException('Unsupported DSN exporter'),
+            new \InvalidArgumentException('Unsupported DSN for Trace exporter'),
         ];
     }
 }

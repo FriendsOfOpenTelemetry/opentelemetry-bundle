@@ -11,6 +11,10 @@ final class InMemoryMetricExporterFactory extends AbstractMetricExporterFactory
 {
     public function supports(#[\SensitiveParameter] ExporterDsn $dsn, ExporterOptionsInterface $options): bool
     {
+        if (!$options instanceof MetricExporterOptions) {
+            return false;
+        }
+
         return MetricExporterEnum::InMemory === MetricExporterEnum::tryFrom($dsn->getExporter());
     }
 

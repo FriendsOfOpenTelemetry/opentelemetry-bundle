@@ -42,6 +42,16 @@ class LogExporterFactoryTest extends TestCase
         ]);
     }
 
+    private function getExporterFactory(): LogExporterFactory
+    {
+        return new LogExporterFactory([
+            new ConsoleLogExporterFactory($this->getTransportFactory()),
+            new InMemoryLogExporterFactory($this->getTransportFactory()),
+            new NoopLogExporterFactory($this->getTransportFactory()),
+            new OtlpLogExporterFactory($this->getTransportFactory()),
+        ]);
+    }
+
     #[DataProvider('exporterProvider')]
     public function testCreateExporter(
         string $dsn,
@@ -49,14 +59,11 @@ class LogExporterFactoryTest extends TestCase
         ?string $exporterClass,
         ?string $transportClass,
     ): void {
-        $exporterFactory = (new LogExporterFactory([
-            new ConsoleLogExporterFactory($this->getTransportFactory()),
-            new InMemoryLogExporterFactory($this->getTransportFactory()),
-            new NoopLogExporterFactory($this->getTransportFactory()),
-            new OtlpLogExporterFactory($this->getTransportFactory()),
-        ]));
+        $dsn = ExporterDsn::fromString($dsn);
+        $exporterFactory = $this->getExporterFactory();
 
-        $exporter = $exporterFactory->createExporter(ExporterDsn::fromString($dsn), $options);
+        self::assertTrue($exporterFactory->supports($dsn, $options));
+        $exporter = $exporterFactory->createExporter($dsn, $options);
 
         self::assertInstanceOf($exporterClass, $exporter);
 
@@ -69,48 +76,61 @@ class LogExporterFactoryTest extends TestCase
     }
 
     /**
-     * @return \Generator<array{
-     *     0: string,
-     *     1: ExporterOptionsInterface,
-     *     2: class-string<LogRecordExporterInterface>,
-     *     3: ?class-string<TransportInterface<string>>,
+     * @return \Generator<string, array{
+     *     string,
+     *     ExporterOptionsInterface,
+     *     class-string<LogRecordExporterInterface>,
+     *     ?class-string<TransportInterface<string>>,
      * }>
      */
     public static function exporterProvider(): \Generator
     {
-        yield [
+        yield 'stream+console' => [
             'stream+console://default',
             new EmptyExporterOptions(),
             ConsoleExporter::class,
             StreamTransport::class,
         ];
 
-        yield [
+        yield 'in-memory' => [
             'in-memory://default',
             new EmptyExporterOptions(),
             InMemoryExporter::class,
             null,
         ];
 
-        yield [
+        yield 'noop' => [
             'noop://default',
             new EmptyExporterOptions(),
             NoopExporter::class,
             null,
         ];
 
-        yield [
+        yield 'http+otlp' => [
             'http+otlp://default',
             new OtlpExporterOptions(),
             LogsExporter::class,
             PsrTransport::class,
         ];
 
-        yield [
+        yield 'grpc+otlp' => [
             'grpc+otlp://default',
             new OtlpExporterOptions(),
             LogsExporter::class,
             GrpcTransport::class,
         ];
+    }
+
+    public function testUnsupportedDsn(): void
+    {
+        $exporterFactory = $this->getExporterFactory();
+
+        $dsn = ExporterDsn::fromString('foo://bar');
+        $options = new OtlpExporterOptions();
+
+        self::assertFalse($exporterFactory->supports($dsn, $options));
+
+        self::expectExceptionObject(new \InvalidArgumentException('No Log exporter supports the given DSN.'));
+        $exporterFactory->createExporter($dsn, $options);
     }
 }

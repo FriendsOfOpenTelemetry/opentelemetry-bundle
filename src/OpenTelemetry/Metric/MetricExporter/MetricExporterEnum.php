@@ -17,9 +17,9 @@ enum MetricExporterEnum: string
         $exporter = self::tryFrom($dsn->getExporter());
 
         if (null === $exporter) {
-            throw new \InvalidArgumentException('Unsupported DSN exporter.');
+            throw new \InvalidArgumentException('Unsupported DSN for Metric exporter');
         }
 
-        return $exporter;
+        return self::from($dsn->getExporter());
     }
 }

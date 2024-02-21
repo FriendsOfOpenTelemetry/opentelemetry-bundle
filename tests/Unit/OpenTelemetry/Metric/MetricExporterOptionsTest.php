@@ -26,7 +26,7 @@ class MetricExporterOptionsTest extends TestCase
         $otlpOptions = $options->getOtlpOptions();
         self::assertSame(OtlpExporterFormatEnum::Json, $otlpOptions->getFormat());
         self::assertSame([
-            'User-Agent' => 'OTel OTLP Exporter PHP/1.0.7, Symfony OTEL Bundle',
+            'User-Agent' => 'OTel OTLP Exporter PHP/1.0.8, Symfony OTEL Bundle',
         ], $otlpOptions->getHeaders());
         self::assertSame(OtlpExporterCompressionEnum::None, $otlpOptions->getCompression());
         self::assertSame(.10, $otlpOptions->getTimeout());
@@ -75,7 +75,7 @@ class MetricExporterOptionsTest extends TestCase
             ['headers' => ['X-Foo' => 'Bar']],
             fn (MetricExporterOptions $options) => self::assertSame([
                 'X-Foo' => 'Bar',
-                'User-Agent' => 'OTel OTLP Exporter PHP/1.0.7, Symfony OTEL Bundle',
+                'User-Agent' => 'OTel OTLP Exporter PHP/1.0.8, Symfony OTEL Bundle',
             ], $options->getOtlpOptions()->getHeaders()),
         ];
 

@@ -34,6 +34,6 @@ final class LogExporterFactory implements LogExporterFactoryInterface
             }
         }
 
-        throw new \InvalidArgumentException('No log exporter supports the given DSN.');
+        throw new \InvalidArgumentException('No Log exporter supports the given DSN.');
     }
 }

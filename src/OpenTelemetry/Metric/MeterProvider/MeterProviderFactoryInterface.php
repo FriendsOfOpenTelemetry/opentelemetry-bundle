@@ -8,5 +8,5 @@ use OpenTelemetry\SDK\Metrics\MetricExporterInterface;
 
 interface MeterProviderFactoryInterface
 {
-    public static function createProvider(MetricExporterInterface $exporter, ExemplarFilterInterface $filter): MeterProviderInterface;
+    public function createProvider(MetricExporterInterface $exporter, ExemplarFilterInterface $filter): MeterProviderInterface;
 }

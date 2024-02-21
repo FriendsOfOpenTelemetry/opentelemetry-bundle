@@ -8,7 +8,7 @@ use OpenTelemetry\SDK\Logs\Processor\SimpleLogRecordProcessor;
 
 final class SimpleLogProcessorFactory extends AbstractLogProcessorFactory
 {
-    public static function createProcessor(
+    public function createProcessor(
         array $processors = [],
         ?LogRecordExporterInterface $exporter = null,
     ): LogRecordProcessorInterface {

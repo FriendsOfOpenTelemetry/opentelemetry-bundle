@@ -4,6 +4,7 @@ namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\Tests\Unit\OpenTelemetry\Me
 
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Exporter\ExporterDsn;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Exporter\ExporterOptionsInterface;
+use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Exporter\OtlpExporterOptions;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Metric\MetricExporter\OtlpMetricExporterFactory;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Metric\MetricExporterOptions;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Transport\GrpcTransportFactory;
@@ -18,16 +19,19 @@ use PHPUnit\Framework\TestCase;
 class OtlpMetricExporterFactoryTest extends TestCase
 {
     #[DataProvider('exporterProvider')]
-    public function testCreateExporter(string $dsn, ExporterOptionsInterface $options, ?string $temporality, ?\Exception $exception): void
+    public function testCreateExporter(string $dsn, ExporterOptionsInterface $options, ?string $temporality, bool $supports): void
     {
-        if (null !== $exception) {
-            self::expectExceptionObject($exception);
-        }
-
-        $exporter = (new OtlpMetricExporterFactory(new TransportFactory([
+        $dsn = ExporterDsn::fromString($dsn);
+        $exporterFactory = new OtlpMetricExporterFactory(new TransportFactory([
             new GrpcTransportFactory(),
             new OtlpHttpTransportFactory(),
-        ])))->createExporter(ExporterDsn::fromString($dsn), $options);
+        ]));
+        self::assertEquals($supports, $exporterFactory->supports($dsn, $options));
+        if (false === $supports) {
+            return;
+        }
+
+        $exporter = $exporterFactory->createExporter($dsn, $options);
 
         $reflection = new \ReflectionObject($exporter);
         $reflectedTemporality = $reflection->getProperty('temporality');
@@ -36,55 +40,55 @@ class OtlpMetricExporterFactoryTest extends TestCase
     }
 
     /**
-     * @return \Generator<array{
+     * @return \Generator<string, array{
      *     0: string,
      *     1: ExporterOptionsInterface,
      *     2: ?string,
-     *     3: ?\Exception,
+     *     3: bool,
      * }>
      */
     public static function exporterProvider(): \Generator
     {
-        yield [
+        yield 'http+otlp' => [
             'http+otlp://default',
             new MetricExporterOptions(),
             Temporality::DELTA,
-            null,
+            true,
         ];
 
-        yield [
+        yield 'grpc+otlp' => [
             'grpc+otlp://default',
             new MetricExporterOptions(),
             Temporality::DELTA,
-            null,
+            true,
         ];
 
-        yield [
+        yield 'no transport' => [
             'noop://default',
             new MetricExporterOptions(),
             null,
-            new \InvalidArgumentException('No transport supports the given endpoint.'),
+            false,
         ];
 
-        yield [
+        yield 'unsupported transport' => [
             'stream+console://default',
             new MetricExporterOptions(),
             null,
-            new \InvalidArgumentException('No transport supports the given endpoint.'),
+            false,
         ];
 
-        yield [
-            'in-memory://default',
-            new MetricExporterOptions(),
-            null,
-            new \InvalidArgumentException('No transport supports the given endpoint.'),
-        ];
-
-        yield [
+        yield 'unsupported dsn' => [
             'http+zipkin://default',
             new MetricExporterOptions(),
             null,
-            new \InvalidArgumentException('Unsupported DSN exporter.'),
+            false,
+        ];
+
+        yield 'unsupported options' => [
+            'http+zipkin://default',
+            new OtlpExporterOptions(),
+            null,
+            false,
         ];
     }
 }

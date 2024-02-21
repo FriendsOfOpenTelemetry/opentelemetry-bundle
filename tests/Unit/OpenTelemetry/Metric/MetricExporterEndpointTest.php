@@ -22,7 +22,7 @@ class MetricExporterEndpointTest extends TestCase
     }
 
     /**
-     * @return \Generator<int, array{
+     * @return \Generator<string, array{
      *     0: string,
      *     1: ?string,
      *     2: ?\Exception,
@@ -30,82 +30,82 @@ class MetricExporterEndpointTest extends TestCase
      */
     public static function dsnProvider(): \Generator
     {
-        yield [
+        yield 'http+otlp' => [
             'http+otlp://localhost',
             'http://localhost:4318/v1/metrics',
             null,
         ];
 
-        yield [
+        yield 'http+otlp_with-url' => [
             'http+otlp://localhost/v2/metrics',
             'http://localhost:4318/v2/metrics',
             null,
         ];
 
-        yield [
+        yield 'http+otlp_with-port' => [
             'http+otlp://localhost:4319',
             'http://localhost:4319/v1/metrics',
             null,
         ];
 
-        yield [
+        yield 'http+otlp_with-url-port' => [
             'http+otlp://localhost:4319/v2/metrics',
             'http://localhost:4319/v2/metrics',
             null,
         ];
 
-        yield [
+        yield 'http+otlp_with_credentials' => [
             'http+otlp://test:test@localhost:4318/v1/metrics',
             'http://test:test@localhost:4318/v1/metrics',
             null,
         ];
 
-        yield [
+        yield 'grpc+otlp' => [
             'grpc+otlp://localhost',
             'http://localhost:4317/opentelemetry.proto.collector.metrics.v1.MetricsService/Export',
             null,
         ];
 
-        yield [
+        yield 'grpc+otlp_with-port' => [
             'grpc+otlp://localhost:4316',
             'http://localhost:4316/opentelemetry.proto.collector.metrics.v1.MetricsService/Export',
             null,
         ];
 
-        yield [
+        yield 'grpc+otlp_with-url' => [
             'grpc+otlp://localhost/opentelemetry.proto.collector.metrics.v2.MetricsService/Export',
             'http://localhost:4317/opentelemetry.proto.collector.metrics.v2.MetricsService/Export',
             null,
         ];
 
-        yield [
+        yield 'stream+console' => [
             'stream+console://default',
             'php://stdout',
             null,
         ];
 
-        yield [
+        yield 'stream+console_with-path' => [
             'stream+console://default/var/log/symfony.log',
             '/var/log/symfony.log',
             null,
         ];
 
-        yield [
-            'http+zipkin://localhost',
-            null,
-            new \InvalidArgumentException('Unsupported DSN exporter'),
-        ];
-
-        yield [
+        yield 'in-memory' => [
             'in-memory://default',
             '',
             null,
         ];
 
-        yield [
+        yield 'noop' => [
             'noop://default',
             '',
             null,
+        ];
+
+        yield 'unsupported dsn' => [
+            'foo://default',
+            '',
+            new \InvalidArgumentException('Unsupported DSN for Metric exporter'),
         ];
     }
 }

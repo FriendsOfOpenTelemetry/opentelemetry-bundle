@@ -93,7 +93,7 @@ class LogExporterEndpointTest extends TestCase
         yield [
             'http+zipkin://localhost',
             null,
-            new \InvalidArgumentException('Unsupported DSN exporter'),
+            new \InvalidArgumentException('Unsupported DSN for Log exporter'),
         ];
 
         yield [

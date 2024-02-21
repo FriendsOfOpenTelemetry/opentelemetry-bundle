@@ -16,11 +16,6 @@ final class OtlpLogExporterFactory extends AbstractLogExporterFactory
 
     public function createExporter(#[\SensitiveParameter] ExporterDsn $dsn, ExporterOptionsInterface $options): LogsExporter
     {
-        $exporter = LogExporterEnum::fromDsn($dsn);
-        if (LogExporterEnum::Otlp !== $exporter) {
-            throw new \InvalidArgumentException('DSN exporter must be of type Otlp.');
-        }
-
         return new LogsExporter($this->transportFactory->createTransport(LogExporterEndpoint::fromDsn($dsn), $options));
     }
 }
