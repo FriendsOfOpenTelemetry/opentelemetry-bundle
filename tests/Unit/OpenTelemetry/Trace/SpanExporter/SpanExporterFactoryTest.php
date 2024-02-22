@@ -41,6 +41,16 @@ class SpanExporterFactoryTest extends TestCase
         ]);
     }
 
+    private function getExporterFactory(): SpanExporterFactory
+    {
+        return new SpanExporterFactory([
+            new ConsoleSpanExporterFactory($this->getTransportFactory()),
+            new InMemorySpanExporterFactory($this->getTransportFactory()),
+            new OtlpSpanExporterFactory($this->getTransportFactory()),
+            new ZipkinSpanExporterFactory($this->getTransportFactory()),
+        ]);
+    }
+
     #[DataProvider('exporterProvider')]
     public function testCreateExporter(
         string $dsn,
@@ -48,14 +58,11 @@ class SpanExporterFactoryTest extends TestCase
         ?string $exporterClass,
         ?string $transportClass,
     ): void {
-        $exporterFactory = (new SpanExporterFactory([
-            new ConsoleSpanExporterFactory($this->getTransportFactory()),
-            new InMemorySpanExporterFactory($this->getTransportFactory()),
-            new OtlpSpanExporterFactory($this->getTransportFactory()),
-            new ZipkinSpanExporterFactory($this->getTransportFactory()),
-        ]));
+        $dsn = ExporterDsn::fromString($dsn);
+        $exporterFactory = $this->getExporterFactory();
 
-        $exporter = $exporterFactory->createExporter(ExporterDsn::fromString($dsn), $options);
+        self::assertTrue($exporterFactory->supports($dsn, $options));
+        $exporter = $exporterFactory->createExporter($dsn, $options);
 
         self::assertInstanceOf($exporterClass, $exporter);
 
@@ -68,16 +75,16 @@ class SpanExporterFactoryTest extends TestCase
     }
 
     /**
-     * @return \Generator<array{
-     *     0: string,
-     *     1: ExporterOptionsInterface,
-     *     2: class-string<SpanExporterInterface>,
-     *     3: ?class-string<TransportInterface<string>>,
+     * @return \Generator<string, array{
+     *     string,
+     *     ExporterOptionsInterface,
+     *     class-string<SpanExporterInterface>,
+     *     ?class-string<TransportInterface<string>>,
      * }>
      */
     public static function exporterProvider(): \Generator
     {
-        yield [
+        yield 'stream+console' => [
             'stream+console://default',
             new EmptyExporterOptions(),
             ConsoleSpanExporter::class,
@@ -85,32 +92,45 @@ class SpanExporterFactoryTest extends TestCase
             null,
         ];
 
-        yield [
+        yield 'in-memory' => [
             'in-memory://default',
             new EmptyExporterOptions(),
             InMemoryExporter::class,
             null,
         ];
 
-        yield [
+        yield 'http+otlp' => [
             'http+otlp://default',
             new OtlpExporterOptions(),
             SpanExporter::class,
             PsrTransport::class,
         ];
 
-        yield [
+        yield 'grpc+otlp' => [
             'grpc+otlp://default',
             new OtlpExporterOptions(),
             SpanExporter::class,
             GrpcTransport::class,
         ];
 
-        yield [
+        yield 'http+zipkin' => [
             'http+zipkin://default',
             new EmptyExporterOptions(),
             ZipkinExporter::class,
             PsrTransport::class,
         ];
+    }
+
+    public function testUnsupportedDsn(): void
+    {
+        $exporterFactory = $this->getExporterFactory();
+
+        $dsn = ExporterDsn::fromString('foo://bar');
+        $options = new OtlpExporterOptions();
+
+        self::assertFalse($exporterFactory->supports($dsn, $options));
+
+        self::expectExceptionObject(new \InvalidArgumentException('No span exporter supports the given DSN.'));
+        $exporterFactory->createExporter($dsn, $options);
     }
 }

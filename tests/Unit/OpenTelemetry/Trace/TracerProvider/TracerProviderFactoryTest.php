@@ -13,10 +13,10 @@ class TracerProviderFactoryTest extends TestCase
 {
     public function testCreateProvider(): void
     {
-        DefaultTracerProviderFactory::createProvider(processors: [NoopSpanProcessorFactory::createProcessor()]);
+        (new DefaultTracerProviderFactory())->createProvider(processors: [(new NoopSpanProcessorFactory())->createProcessor()]);
 
         self::expectExceptionObject(new \InvalidArgumentException('Processors should not be empty'));
 
-        DefaultTracerProviderFactory::createProvider();
+        (new DefaultTracerProviderFactory())->createProvider();
     }
 }

@@ -4,7 +4,7 @@ namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Trace\TracerP
 
 use Psr\Log\LoggerInterface;
 
-abstract class AbstractTracerProviderFactory implements TracerProviderFactoryInterface
+abstract readonly class AbstractTracerProviderFactory implements TracerProviderFactoryInterface
 {
     public function __construct(protected ?LoggerInterface $logger = null)
     {

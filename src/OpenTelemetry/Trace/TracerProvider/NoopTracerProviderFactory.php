@@ -6,9 +6,9 @@ use OpenTelemetry\SDK\Trace\NoopTracerProvider;
 use OpenTelemetry\SDK\Trace\SamplerInterface;
 use OpenTelemetry\SDK\Trace\TracerProviderInterface;
 
-final class NoopTracerProviderFactory implements TracerProviderFactoryInterface
+final readonly class NoopTracerProviderFactory extends AbstractTracerProviderFactory
 {
-    public static function createProvider(?SamplerInterface $sampler = null, array $processors = []): TracerProviderInterface
+    public function createProvider(?SamplerInterface $sampler = null, array $processors = []): TracerProviderInterface
     {
         return new NoopTracerProvider();
     }

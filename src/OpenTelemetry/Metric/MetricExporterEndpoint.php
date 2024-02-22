@@ -36,11 +36,7 @@ final class MetricExporterEndpoint implements ExporterEndpointInterface
             return (string) OtlpExporterEndpoint::fromDsn($this->dsn)->withSignal(Signals::METRICS);
         }
 
-        if (in_array($this->exporter, [MetricExporterEnum::InMemory, MetricExporterEnum::Noop], true)) {
-            return '';
-        }
-
-        throw new \InvalidArgumentException('Unsupported DSN for Metric endpoint');
+        return '';
     }
 
     public function getTransport(): ?string

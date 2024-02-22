@@ -25,15 +25,19 @@ class ZipkinSpanExporterFactoryTest extends TestCase
         string $dsn,
         ExporterOptionsInterface $options,
         ?string $transportClass,
-        ?\Exception $exception,
+        bool $supports,
     ): void {
-        if (null !== $exception) {
-            self::expectExceptionObject($exception);
+        $dsn = ExporterDsn::fromString($dsn);
+        $exporterFactory = new ZipkinSpanExporterFactory(new TransportFactory([
+            new PsrHttpTransportFactory(),
+        ]));
+
+        self::assertEquals($supports, $exporterFactory->supports($dsn, $options));
+        if (false === $supports) {
+            return;
         }
 
-        $exporter = (new ZipkinSpanExporterFactory(new TransportFactory([
-            new PsrHttpTransportFactory(),
-        ])))->createExporter(ExporterDsn::fromString($dsn), $options);
+        $exporter = $exporterFactory->createExporter($dsn, $options);
 
         $reflection = new \ReflectionObject($exporter);
         $transport = $reflection->getProperty('transport');
@@ -42,20 +46,27 @@ class ZipkinSpanExporterFactoryTest extends TestCase
     }
 
     /**
-     * @return \Generator<array{
-     *     0: string,
-     *     1: ExporterOptionsInterface,
-     *     2: ?class-string<TransportInterface<string>>,
-     *     3: ?\Exception,
+     * @return \Generator<string, array{
+     *     string,
+     *     ExporterOptionsInterface,
+     *     ?class-string<TransportInterface<string>>,
+     *     bool,
      * }>
      */
     public static function exporterProvider(): \Generator
     {
-        yield [
+        yield 'http+zipkin' => [
             'http+zipkin://default',
             new OtlpExporterOptions(),
             null,
+            true,
+        ];
+
+        yield 'unsupported' => [
+            'foo://default',
+            new OtlpExporterOptions(),
             null,
+            false,
         ];
     }
 }

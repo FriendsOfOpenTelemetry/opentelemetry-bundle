@@ -14,6 +14,6 @@ class NoopTracerProviderFactoryTest extends TestCase
     {
         self::expectNotToPerformAssertions();
 
-        NoopTracerProviderFactory::createProvider();
+        (new NoopTracerProviderFactory())->createProvider();
     }
 }

@@ -8,7 +8,7 @@ use OpenTelemetry\SDK\Trace\SpanProcessorInterface;
 
 final class SimpleSpanProcessorFactory extends AbstractSpanProcessorFactory
 {
-    public static function createProcessor(
+    public function createProcessor(
         array $processors = [],
         ?SpanExporterInterface $exporter = null
     ): SpanProcessorInterface {

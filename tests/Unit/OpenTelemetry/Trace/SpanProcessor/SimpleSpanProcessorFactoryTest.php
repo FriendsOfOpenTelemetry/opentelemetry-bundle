@@ -16,7 +16,7 @@ class SimpleSpanProcessorFactoryTest extends TestCase
 {
     public function testCreateProcessor(): void
     {
-        SimpleSpanProcessorFactory::createProcessor(
+        (new SimpleSpanProcessorFactory())->createProcessor(
             [],
             (new InMemorySpanExporterFactory(new TransportFactory([])))
                 ->createExporter(
@@ -26,6 +26,6 @@ class SimpleSpanProcessorFactoryTest extends TestCase
 
         self::expectExceptionObject(new \InvalidArgumentException('Exporter is null'));
 
-        SimpleSpanProcessorFactory::createProcessor();
+        (new SimpleSpanProcessorFactory())->createProcessor();
     }
 }

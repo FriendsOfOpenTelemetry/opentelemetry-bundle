@@ -13,10 +13,10 @@ class MultiSpanProcessorFactoryTest extends TestCase
 {
     public function testCreateProcessor(): void
     {
-        MultiSpanProcessorFactory::createProcessor([NoopSpanProcessorFactory::createProcessor()]);
+        (new MultiSpanProcessorFactory())->createProcessor([(new NoopSpanProcessorFactory())->createProcessor()]);
 
         self::expectExceptionObject(new \InvalidArgumentException('Processors should not be empty'));
 
-        MultiSpanProcessorFactory::createProcessor();
+        (new MultiSpanProcessorFactory())->createProcessor();
     }
 }

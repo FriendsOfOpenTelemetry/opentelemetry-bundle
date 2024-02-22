@@ -10,7 +10,7 @@ interface SpanProcessorFactoryInterface
     /**
      * @param SpanProcessorInterface[] $processors
      */
-    public static function createProcessor(
+    public function createProcessor(
         array $processors = [],
         ?SpanExporterInterface $exporter = null
     ): SpanProcessorInterface;

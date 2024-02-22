@@ -40,11 +40,7 @@ final class TraceExporterEndpoint implements ExporterEndpointInterface
             return (string) OtlpExporterEndpoint::fromDsn($this->dsn)->withSignal(Signals::TRACE);
         }
 
-        if (in_array($this->exporter, [TraceExporterEnum::InMemory], true)) {
-            return '';
-        }
-
-        throw new \RuntimeException('Unsupported DSN for Trace endpoint');
+        return '';
     }
 
     public function getExporter(): string

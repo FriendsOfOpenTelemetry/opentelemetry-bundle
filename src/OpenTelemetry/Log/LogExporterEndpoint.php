@@ -38,11 +38,7 @@ final class LogExporterEndpoint implements ExporterEndpointInterface
             return (string) OtlpExporterEndpoint::fromDsn($this->dsn)->withSignal(Signals::LOGS);
         }
 
-        if (in_array($this->exporter, [LogExporterEnum::InMemory, LogExporterEnum::Noop], true)) {
-            return '';
-        }
-
-        throw new \InvalidArgumentException('Unsupported DSN for Log endpoint');
+        return '';
     }
 
     public function getTransport(): ?string

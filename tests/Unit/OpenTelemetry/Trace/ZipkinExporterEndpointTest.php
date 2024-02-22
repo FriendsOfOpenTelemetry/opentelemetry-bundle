@@ -12,56 +12,80 @@ use PHPUnit\Framework\TestCase;
 class ZipkinExporterEndpointTest extends TestCase
 {
     #[DataProvider('dsnProvider')]
-    public function testFromDsn(string $dsn, ?string $endpoint, ?\Exception $exception): void
-    {
+    public function testFromDsn(
+        string $dsn,
+        string $exporter,
+        ?string $transport,
+        ?string $endpoint,
+        ?\Exception $exception
+    ): void {
         if (null !== $exception) {
             self::expectExceptionObject($exception);
         }
 
-        self::assertSame($endpoint, (string) ZipkinExporterEndpoint::fromDsn(ExporterDsn::fromString($dsn)));
+        $dsn = ExporterDsn::fromString($dsn);
+        $exporterEndpoint = ZipkinExporterEndpoint::fromDsn($dsn);
+
+        self::assertSame($exporter, $exporterEndpoint->getExporter());
+        self::assertSame($transport, $exporterEndpoint->getTransport());
+        self::assertSame($endpoint, (string) $exporterEndpoint);
     }
 
     /**
-     * @return \Generator<int, array{
-     *     0: string,
-     *     1: ?string,
-     *     2: ?\Exception
+     * @return \Generator<string, array{
+     *     string,
+     *     string,
+     *     ?string,
+     *     ?string,
+     *     ?\Exception
      * }>
      */
     public static function dsnProvider(): \Generator
     {
-        yield [
+        yield 'http+zipkin' => [
             'http+zipkin://localhost',
+            'zipkin',
+            'http',
             'http://localhost:9411/api/v2/spans',
             null,
         ];
 
-        yield [
+        yield 'http+zipkin_with-path' => [
             'http+zipkin://localhost/api/v3/spans',
+            'zipkin',
+            'http',
             'http://localhost:9411/api/v3/spans',
             null,
         ];
 
-        yield [
+        yield 'http+zipkin_with-port' => [
             'http+zipkin://localhost:9412',
+            'zipkin',
+            'http',
             'http://localhost:9412/api/v2/spans',
             null,
         ];
 
-        yield [
+        yield 'http+zipkin_with-path-port' => [
             'http+zipkin://localhost:9412/api/v3/spans',
+            'zipkin',
+            'http',
             'http://localhost:9412/api/v3/spans',
             null,
         ];
 
-        yield [
+        yield 'http+zipkin_with-credentials' => [
             'http+zipkin://test:test@localhost:9411/api/v2/spans',
+            'zipkin',
+            'http',
             'http://test:test@localhost:9411/api/v2/spans',
             null,
         ];
 
-        yield [
+        yield 'unsupported' => [
             'in-memory://default',
+            'in-memory',
+            null,
             null,
             new \InvalidArgumentException('Unsupported DSN exporter for this endpoint.'),
         ];

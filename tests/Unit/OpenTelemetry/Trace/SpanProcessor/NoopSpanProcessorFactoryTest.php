@@ -14,6 +14,6 @@ class NoopSpanProcessorFactoryTest extends TestCase
     {
         self::expectNotToPerformAssertions();
 
-        NoopSpanProcessorFactory::createProcessor();
+        (new NoopSpanProcessorFactory())->createProcessor();
     }
 }
