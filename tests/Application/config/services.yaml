@@ -1,0 +1,10 @@
+services:
+  _defaults:
+    autowire: true
+    autoconfigure: true
+
+  FriendsOfOpenTelemetry\OpenTelemetryBundle\Tests\Application\:
+    resource: '../src/'
+    exclude:
+      - '../src/Entity/'
+      - '../src/Kernel.php'

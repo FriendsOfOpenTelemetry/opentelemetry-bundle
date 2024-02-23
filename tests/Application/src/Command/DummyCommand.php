@@ -15,7 +15,7 @@ final class DummyCommand extends Command
     {
         $this->addOption('fail', 'f', InputOption::VALUE_OPTIONAL, 'Make the command fail');
         $this->addOption('throw', 't', InputOption::VALUE_OPTIONAL, 'Make the command trow');
-        $this->addOption('exit-code', 'e', InputOption::VALUE_OPTIONAL, 'Set a custom exit code');
+        $this->addOption('exit-code', 'c', InputOption::VALUE_OPTIONAL, 'Set a custom exit code');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int

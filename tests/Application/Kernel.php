@@ -5,11 +5,9 @@ namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\Tests\Application;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetryBundle;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
-use Symfony\Component\Config\Loader\LoaderInterface;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\HttpKernel\Kernel;
+use Symfony\Component\HttpKernel\Kernel as BaseKernel;
 
-class AppKernel extends Kernel
+class Kernel extends BaseKernel
 {
     use MicroKernelTrait;
 
@@ -21,10 +19,8 @@ class AppKernel extends Kernel
         ];
     }
 
-    protected function configureContainer(ContainerBuilder $container, LoaderInterface $loader): void
+    public function getProjectDir(): string
     {
-        $container->setParameter('kernel.project_dir', __DIR__);
-
-        $loader->load(__DIR__.'/config.yaml');
+        return __DIR__;
     }
 }

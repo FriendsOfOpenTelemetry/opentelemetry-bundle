@@ -5,3 +5,5 @@ parameters:
         - tests/
     editorUrl: 'phpstorm://open?file=%%file%%&line=%%line%%'
     tmpDir: %currentWorkingDirectory%/.phpstan
+    excludePaths:
+        - tests/*/var/*

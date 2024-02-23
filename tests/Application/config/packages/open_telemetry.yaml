@@ -1,0 +1,27 @@
+open_telemetry:
+  service:
+    namespace: 'FriendsOfOpenTelemetry/OpenTelemetry'
+    name: 'Test'
+    version: '0.0.0'
+    environment: test
+  instrumentation:
+    console:
+      tracing:
+        enabled: true
+  traces:
+    tracers:
+      main:
+        provider: 'open_telemetry.traces.providers.default'
+    providers:
+      default:
+        type: default
+        sampler: always_on
+        processors:
+          - 'open_telemetry.traces.processors.simple'
+    processors:
+      simple:
+        type: simple
+        exporter: 'open_telemetry.traces.exporters.in_memory'
+    exporters:
+      in_memory:
+        dsn: in-memory://default
