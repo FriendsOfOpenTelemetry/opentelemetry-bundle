@@ -4,13 +4,12 @@ namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\Tests\Unit\DependencyInject
 
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\DependencyInjection\Configuration;
 use Matthias\SymfonyConfigTest\PhpUnit\ConfigurationTestCaseTrait;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Definition\Dumper\YamlReferenceDumper;
 use Symfony\Component\Config\Definition\Processor;
 
-/**
- * @coversDefaultClass \FriendsOfOpenTelemetry\OpenTelemetryBundle\DependencyInjection\Configuration
- */
+#[CoversClass(Configuration::class)]
 final class ConfigurationTest extends TestCase
 {
     use ConfigurationTestCaseTrait;
@@ -18,6 +17,13 @@ final class ConfigurationTest extends TestCase
     protected function getConfiguration(): Configuration
     {
         return new Configuration();
+    }
+
+    public function testMissingRequiredServiceConfiguration(): void
+    {
+        $this->assertConfigurationIsInvalid([[
+            'service' => [],
+        ]], 'The child config "namespace" under "open_telemetry.service" must be configured');
     }
 
     /**
@@ -377,7 +383,7 @@ final class ConfigurationTest extends TestCase
                         # Required if processor type is multi
                         processors:           []
 
-                        # Required if processor type is simple or batch
+                        # Required if processor type is simple
                         exporter:             ~
                 exporters:
 

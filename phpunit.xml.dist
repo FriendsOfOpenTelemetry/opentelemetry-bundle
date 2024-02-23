@@ -11,14 +11,13 @@
 
     <php>
         <ini name="error_reporting" value="-1"/>
-        <env name="SYMFONY_DEPRECATIONS_HELPER" value="max[self]=0&amp;max[direct]=0&amp;quiet[]=indirect&amp;quiet[]=other"/>
-        <env name="APP_DEBUG" value="0"/>
-        <env name="KERNEL_CLASS" value="FriendsOfOpenTelemetry\OpenTelemetryBundle\Tests\Application\AppKernel"/>
     </php>
 
     <testsuites>
-        <testsuite name="default">
-            <directory>tests</directory>
+        <testsuite name="OpenTelemetry Bundle Test Suite">
+            <directory>tests/Acceptance/</directory>
+            <directory>tests/Functional/</directory>
+            <directory>tests/Unit/</directory>
         </testsuite>
     </testsuites>
 
@@ -27,4 +26,8 @@
             <directory suffix=".php">src</directory>
         </include>
     </source>
+
+    <extensions>
+        <bootstrap class="Zalas\PHPUnit\Globals\AttributeExtension" />
+    </extensions>
 </phpunit>

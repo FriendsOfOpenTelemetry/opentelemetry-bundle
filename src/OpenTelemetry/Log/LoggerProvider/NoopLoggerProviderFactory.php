@@ -8,7 +8,7 @@ use OpenTelemetry\SDK\Logs\NoopLoggerProvider;
 
 final class NoopLoggerProviderFactory extends AbstractLoggerProviderFactory
 {
-    public function createProvider(LogRecordProcessorInterface $processor): LoggerProviderInterface
+    public function createProvider(?LogRecordProcessorInterface $processor = null): LoggerProviderInterface
     {
         return new NoopLoggerProvider();
     }

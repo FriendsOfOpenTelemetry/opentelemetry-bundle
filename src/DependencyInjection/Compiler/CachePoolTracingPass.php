@@ -13,7 +13,8 @@ class CachePoolTracingPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container): void
     {
-        if (true === $container->getParameter('open_telemetry.instrumentation.cache.tracing.enabled')) {
+        if (true === $container->hasParameter('open_telemetry.instrumentation.cache.tracing.enabled')
+            && true === $container->getParameter('open_telemetry.instrumentation.cache.tracing.enabled')) {
             foreach ($container->findTaggedServiceIds('cache.pool') as $serviceId => $tags) {
                 $cachePoolDefinition = $container->getDefinition($serviceId);
 

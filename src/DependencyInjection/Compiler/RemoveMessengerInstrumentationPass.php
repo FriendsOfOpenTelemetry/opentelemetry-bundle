@@ -9,7 +9,8 @@ class RemoveMessengerInstrumentationPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container): void
     {
-        if (false === $container->getParameter('open_telemetry.instrumentation.messenger.tracing.enabled')) {
+        if (false === $container->hasParameter('open_telemetry.instrumentation.messenger.tracing.enabled')
+            || false === $container->getParameter('open_telemetry.instrumentation.messenger.tracing.enabled')) {
             $container->removeAlias('messenger.transport.open_telemetry_tracer.factory');
             $container->removeAlias('messenger.middleware.open_telemetry_tracer');
 
@@ -19,7 +20,8 @@ class RemoveMessengerInstrumentationPass implements CompilerPassInterface
             $container->removeDefinition('open_telemetry.instrumentation.messenger.trace.middleware');
         }
 
-        if (false === $container->getParameter('open_telemetry.instrumentation.messenger.metering.enabled')) {
+        if (false === $container->hasParameter('open_telemetry.instrumentation.messenger.metering.enabled')
+            || false === $container->getParameter('open_telemetry.instrumentation.messenger.metering.enabled')) {
         }
     }
 }

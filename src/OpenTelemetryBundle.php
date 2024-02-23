@@ -31,9 +31,9 @@ final class OpenTelemetryBundle extends Bundle
         parent::build($container);
 
         $container->addCompilerPass(new CachePoolTracingPass());
+        $container->addCompilerPass(new HttpClientTracingPass());
         $container->addCompilerPass(new RemoveConsoleInstrumentationPass());
         $container->addCompilerPass(new RemoveDoctrineInstrumentationPass());
-        $container->addCompilerPass(new HttpClientTracingPass());
         $container->addCompilerPass(new RemoveHttpKernelInstrumentationPass());
         $container->addCompilerPass(new RemoveMailerInstrumentationPass());
         $container->addCompilerPass(new RemoveMessengerInstrumentationPass());

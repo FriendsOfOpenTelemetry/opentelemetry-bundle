@@ -12,8 +12,6 @@ use OpenTelemetry\Contrib\Propagation\ServerTiming\ServerTimingPropagator;
 use OpenTelemetry\Contrib\Propagation\TraceResponse\TraceResponsePropagator;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 
-use function Symfony\Component\DependencyInjection\Loader\Configurator\abstract_arg;
-
 return static function (ContainerConfigurator $container): void {
     $container->parameters()
         ->set('open_telemetry.bundle.name', OpenTelemetryBundle::name())
@@ -36,16 +34,10 @@ return static function (ContainerConfigurator $container): void {
 
         ->set('open_telemetry.propagation_getter_setter.array_access', ArrayAccessGetterSetter::class)
 
-        ->set('open_telemetry.exporter_dsn', OtlpExporterOptions::class)
+        ->set('open_telemetry.exporter_dsn', ExporterDsn::class)
             ->factory([ExporterDsn::class, 'fromString'])
-//            ->args([
-//                abstract_arg('dsn'),
-//            ])
 
         ->set('open_telemetry.otlp_exporter_options', OtlpExporterOptions::class)
             ->factory([OtlpExporterOptions::class, 'fromConfiguration'])
-//            ->args([
-//                abstract_arg('options'),
-//            ])
     ;
 };

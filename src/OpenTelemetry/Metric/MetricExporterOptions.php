@@ -7,6 +7,9 @@ use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Exporter\OtlpExport
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Metric\MetricExporter\MetricTemporalityEnum;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Transport\TransportParams;
 
+/**
+ * @phpstan-import-type ExporterOptions from ExporterOptionsInterface
+ */
 final class MetricExporterOptions implements ExporterOptionsInterface
 {
     public function __construct(
@@ -15,6 +18,11 @@ final class MetricExporterOptions implements ExporterOptionsInterface
     ) {
     }
 
+    /**
+     * @param array{
+     *     temporality?: string,
+     * } $configuration
+     */
     public static function fromConfiguration(array $configuration): self
     {
         $options = new self();

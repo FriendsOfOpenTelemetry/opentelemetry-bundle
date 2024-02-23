@@ -7,6 +7,7 @@ use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Log\LogExporter\Log
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Log\LogExporter\NoopLogExporterFactory;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Log\LogExporter\OtlpLogExporterFactory;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Log\LoggerProvider\AbstractLoggerProviderFactory;
+use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Log\LoggerProvider\DefaultLoggerProviderFactory;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Log\LoggerProvider\NoopLoggerProviderFactory;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Log\LogProcessor\AbstractLogProcessorFactory;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Log\LogProcessor\MultiLogProcessorFactory;
@@ -92,12 +93,12 @@ return static function (ContainerConfigurator $container): void {
         ->set('open_telemetry.logs.provider_factory.noop', NoopLoggerProviderFactory::class)
             ->parent('open_telemetry.logs.provider_factory.abstract')
 
-        ->set('open_telemetry.logs.provider_factory.default', NoopLoggerProviderFactory::class)
+        ->set('open_telemetry.logs.provider_factory.default', DefaultLoggerProviderFactory::class)
             ->parent('open_telemetry.logs.provider_factory.abstract')
 
         ->set('open_telemetry.logs.provider_interface', LoggerProviderInterface::class)
 
         // Logger
-        ->set('open_telemetry.logs.logger', LoggerInterface::class)
+        ->set('open_telemetry.logs.logger_interface', LoggerInterface::class)
     ;
 };

@@ -32,21 +32,7 @@ open_telemetry:
   traces:
     tracers:
       main:
-        provider: noop
-    providers:
-      noop:
-        type: noop
-  metrics:
-    meters:
-      main:
-        provider: noop
-    providers:
-      noop:
-        type: noop
-  logs:
-    loggers:
-      main:
-        provider: noop
+        provider: 'open_telemetry.traces.providers.noop'
     providers:
       noop:
         type: noop

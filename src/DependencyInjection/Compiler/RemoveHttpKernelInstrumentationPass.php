@@ -9,11 +9,13 @@ class RemoveHttpKernelInstrumentationPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container): void
     {
-        if (false === $container->getParameter('open_telemetry.instrumentation.http_kernel.tracing.enabled')) {
+        if (false === $container->hasParameter('open_telemetry.instrumentation.http_kernel.tracing.enabled')
+            || false === $container->getParameter('open_telemetry.instrumentation.http_kernel.tracing.enabled')) {
             $container->removeDefinition('open_telemetry.instrumentation.http_kernel.trace.event_subscriber');
         }
 
-        if (false === $container->getParameter('open_telemetry.instrumentation.http_kernel.metering.enabled')) {
+        if (false === $container->hasParameter('open_telemetry.instrumentation.http_kernel.metering.enabled')
+            || false === $container->getParameter('open_telemetry.instrumentation.http_kernel.metering.enabled')) {
         }
     }
 }

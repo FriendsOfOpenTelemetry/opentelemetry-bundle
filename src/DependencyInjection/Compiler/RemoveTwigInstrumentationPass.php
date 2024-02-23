@@ -9,11 +9,13 @@ class RemoveTwigInstrumentationPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container): void
     {
-        if (false === $container->getParameter('open_telemetry.instrumentation.twig.tracing.enabled')) {
+        if (false === $container->hasParameter('open_telemetry.instrumentation.twig.tracing.enabled')
+            || false === $container->getParameter('open_telemetry.instrumentation.twig.tracing.enabled')) {
             $container->removeDefinition('open_telemetry.instrumentation.twig.trace.extension');
         }
 
-        if (false === $container->getParameter('open_telemetry.instrumentation.twig.metering.enabled')) {
+        if (false === $container->hasParameter('open_telemetry.instrumentation.twig.metering.enabled')
+            || false === $container->getParameter('open_telemetry.instrumentation.twig.metering.enabled')) {
         }
     }
 }

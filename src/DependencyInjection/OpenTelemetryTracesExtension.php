@@ -6,7 +6,6 @@ use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Exporter\ExporterOp
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Trace\TraceSamplerEnum;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
@@ -64,12 +63,12 @@ final class OpenTelemetryTracesExtension
      * @param array{
      *      dsn: string,
      *      options?: ExporterOptions
-     *  } $options
+     *  } $config
      */
-    private function loadTraceExporter(string $name, array $options): void
+    private function loadTraceExporter(string $name, array $config): void
     {
-        $dsn = $this->container->getDefinition('open_telemetry.exporter_dsn')->setArguments([$options['dsn']]);
-        $exporterOptions = $this->container->getDefinition('open_telemetry.otlp_exporter_options')->setArguments([$options['options'] ?? []]);
+        $dsn = (new ChildDefinition('open_telemetry.exporter_dsn'))->setArguments([$config['dsn']]);
+        $exporterOptions = (new ChildDefinition('open_telemetry.otlp_exporter_options'))->setArguments([$config['options'] ?? []]);
 
         $this->container
             ->setDefinition(
@@ -84,19 +83,19 @@ final class OpenTelemetryTracesExtension
      *      type: string,
      *      processors?: string[],
      *      exporter?: string
-     *  } $processor
+     *  } $config
      */
-    private function loadTraceProcessor(string $name, array $processor): void
+    private function loadTraceProcessor(string $name, array $config): void
     {
         $this->container
             ->setDefinition(
                 sprintf('open_telemetry.traces.processors.%s', $name),
                 new ChildDefinition('open_telemetry.traces.processor_interface'),
             )
-            ->setFactory([new Reference(sprintf('open_telemetry.traces.processor_factory.%s', $processor['type'])), 'createProcessor'])
+            ->setFactory([new Reference(sprintf('open_telemetry.traces.processor_factory.%s', $config['type'])), 'createProcessor'])
             ->setArguments([
-                array_map(fn (string $processor) => new Reference($processor), $processor['processors'] ?? []),
-                new Reference($processor['exporter'], ContainerInterface::NULL_ON_INVALID_REFERENCE),
+                isset($config['processors']) ? array_map(fn (string $processor) => new Reference($processor), $config['processors']) : [],
+                isset($config['exporter']) ? new Reference($config['exporter']) : null,
             ]);
     }
 
@@ -105,13 +104,13 @@ final class OpenTelemetryTracesExtension
      *     type: string,
      *     sampler?: array{type: string, probability?: float},
      *     processors?: string[]
-     * } $provider
+     * } $config
      */
-    private function loadTraceProvider(string $name, array $provider): void
+    private function loadTraceProvider(string $name, array $config): void
     {
-        $sampler = $this->container->getDefinition('open_telemetry.traces.sampler_factory')->setArguments([
-            $provider['sampler']['type'] ?? TraceSamplerEnum::AlwaysOn->value,
-            $provider['sampler']['probability'] ?? null,
+        $sampler = (new ChildDefinition('open_telemetry.traces.sampler_factory'))->setArguments([
+            $config['sampler']['type'] ?? TraceSamplerEnum::AlwaysOn->value,
+            $config['sampler']['probability'] ?? null,
         ]);
 
         $this->container
@@ -119,10 +118,10 @@ final class OpenTelemetryTracesExtension
                 sprintf('open_telemetry.traces.providers.%s', $name),
                 new ChildDefinition('open_telemetry.traces.provider_interface'),
             )
-            ->setFactory([new Reference(sprintf('open_telemetry.traces.provider_factory.%s', $provider['type'])), 'createProvider'])
+            ->setFactory([new Reference(sprintf('open_telemetry.traces.provider_factory.%s', $config['type'])), 'createProvider'])
             ->setArguments([
                 $sampler,
-                array_map(fn (string $processor) => new Reference($processor), $provider['processors'] ?? []),
+                isset($config['processors']) ? array_map(fn (string $processor) => new Reference($processor), $config['processors']) : null,
             ]);
     }
 
@@ -138,7 +137,7 @@ final class OpenTelemetryTracesExtension
         $this->container
             ->setDefinition(
                 sprintf('open_telemetry.traces.tracers.%s', $name),
-                new ChildDefinition('open_telemetry.traces.tracer'),
+                new ChildDefinition('open_telemetry.traces.tracer_interface'),
             )
             ->setPublic(true)
             ->setFactory([new Reference($tracer['provider']), 'getTracer'])

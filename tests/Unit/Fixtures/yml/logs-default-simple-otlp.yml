@@ -4,28 +4,18 @@ open_telemetry:
     name: 'Test'
     version: '0.0.0'
     environment: test
-  traces:
-    tracers:
-      main:
-        provider: default
-    providers:
-      default:
-        type: default
-        sampler: always_on
-        processors:
-          - simple
-    processors:
-      simple:
-        type: simple
-        exporter: otlp
-    exporters:
-      otlp:
-        dsn: http+otlp://localhost
-  metrics:
-    meters:
-      main:
-        provider: noop
   logs:
     loggers:
       main:
-        provider: noop
+        provider: 'open_telemetry.logs.providers.default'
+    providers:
+      default:
+        type: default
+        processor: 'open_telemetry.logs.processors.simple'
+    processors:
+      simple:
+        type: simple
+        exporter: 'open_telemetry.logs.exporters.otlp'
+    exporters:
+      otlp:
+        dsn: http+otlp://localhost

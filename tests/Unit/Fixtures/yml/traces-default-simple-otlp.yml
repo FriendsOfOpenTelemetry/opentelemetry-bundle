@@ -7,19 +7,17 @@ open_telemetry:
   traces:
     tracers:
       main:
-        provider: noop
-  metrics:
-    meters:
-      main:
-        provider: default
+        provider: 'open_telemetry.traces.providers.default'
     providers:
       default:
         type: default
-        exporter: otlp
+        sampler: always_on
+        processors:
+          - 'open_telemetry.traces.processors.simple'
+    processors:
+      simple:
+        type: simple
+        exporter: 'open_telemetry.traces.exporters.otlp'
     exporters:
       otlp:
         dsn: http+otlp://localhost
-  logs:
-    loggers:
-      main:
-        provider: noop

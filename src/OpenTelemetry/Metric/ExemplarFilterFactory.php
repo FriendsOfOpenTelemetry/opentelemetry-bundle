@@ -9,7 +9,7 @@ use OpenTelemetry\SDK\Metrics\Exemplar\ExemplarFilterInterface;
 
 final class ExemplarFilterFactory
 {
-    public function create(string $name): ExemplarFilterInterface
+    public static function create(string $name): ExemplarFilterInterface
     {
         $filter = ExemplarFilterEnum::tryFrom($name);
 
