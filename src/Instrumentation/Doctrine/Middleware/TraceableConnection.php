@@ -14,17 +14,8 @@ class TraceableConnection extends AbstractConnectionMiddleware
     public function __construct(
         ConnectionInterface $connection,
         private Tracer $tracer,
-        private SpanInterface $driverSpan,
     ) {
         parent::__construct($connection);
-    }
-
-    /**
-     * Disconnect.
-     */
-    public function __destruct()
-    {
-        $this->driverSpan->end();
     }
 
     public function prepare(string $sql): DriverStatement

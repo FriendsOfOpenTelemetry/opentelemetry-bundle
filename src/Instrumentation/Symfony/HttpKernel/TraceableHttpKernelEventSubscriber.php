@@ -51,7 +51,7 @@ final class TraceableHttpKernelEventSubscriber implements EventSubscriberInterfa
         private readonly TextMapPropagatorInterface $propagator,
         private readonly PropagationGetterInterface $propagationGetter,
         /** @phpstan-ignore-next-line  */
-        private readonly LoggerInterface $logger,
+        private readonly ?LoggerInterface $logger = null,
         iterable $requestHeaders = [],
         iterable $responseHeaders = [],
     ) {

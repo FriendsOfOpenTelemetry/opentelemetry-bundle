@@ -26,7 +26,7 @@ class TagAwareTraceableCacheAdapter implements TagAwareAdapterInterface, TagAwar
     {
         return $this->tracer->traceFunction(
             'cache.get',
-            function (?SpanInterface $span) use ($key, $callback, $beta, $metadata): bool {
+            function (?SpanInterface $span) use ($key, $callback, $beta, $metadata): mixed {
                 if (!$this->adapter instanceof CacheInterface) {
                     throw new \BadMethodCallException(sprintf('The %s::get() method is not supported because the decorated adapter does not implement the "%s" interface.', self::class, CacheInterface::class));
                 }

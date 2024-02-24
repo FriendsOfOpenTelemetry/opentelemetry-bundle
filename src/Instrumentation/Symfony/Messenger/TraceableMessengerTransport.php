@@ -7,7 +7,7 @@ use OpenTelemetry\API\Trace\TracerInterface;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Transport\TransportInterface;
 
-final readonly class TraceableMessengerTransport implements TransportInterface
+class TraceableMessengerTransport implements TransportInterface
 {
     private TransportTracer $tracer;
 

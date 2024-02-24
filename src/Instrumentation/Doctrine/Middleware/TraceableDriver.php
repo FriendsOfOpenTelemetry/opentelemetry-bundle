@@ -13,6 +13,7 @@ use Doctrine\DBAL\Platforms\OraclePlatform;
 use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Doctrine\DBAL\Platforms\SqlitePlatform;
 use Doctrine\DBAL\Platforms\SQLServerPlatform;
+use OpenTelemetry\API\Trace\SpanInterface;
 use OpenTelemetry\API\Trace\SpanKind;
 use OpenTelemetry\API\Trace\StatusCode;
 use OpenTelemetry\API\Trace\TracerInterface;
@@ -39,25 +40,37 @@ final class TraceableDriver extends AbstractDriverMiddleware
         #[\SensitiveParameter]
         array $params
     ): Connection {
+        $scope = Context::storage()->scope();
+        $span = null;
+
         try {
             $spanBuilder = $this->tracer
                 ->spanBuilder('doctrine.dbal.connection')
                 ->setSpanKind(SpanKind::KIND_CLIENT)
+                ->setParent($scope?->context())
                 ->setAttribute(TraceAttributes::DB_SYSTEM, $this->getSemanticDbSystem())
                 ->setAttribute(TraceAttributes::DB_CONNECTION_STRING, $params['url'] ?? $params['path'] ?? '')
                 ->setAttribute(TraceAttributes::DB_NAME, $params['dbname'] ?? 'default')
                 ->setAttribute(TraceAttributes::DB_USER, $params['user'])
             ;
 
-            $span = $spanBuilder->setParent(Context::getCurrent())->startSpan();
+            $span = $spanBuilder->startSpan();
+            if (null === $scope) {
+                $scope = $span->storeInContext(Context::getCurrent())->activate();
+            }
+            $span->setStatus(StatusCode::STATUS_OK);
 
-            return new TraceableConnection(parent::connect($params), new Tracer($this->tracer), $span);
+            return new TraceableConnection(parent::connect($params), new Tracer($this->tracer));
         } catch (Exception $exception) {
             $span->recordException($exception, [TraceAttributes::EXCEPTION_ESCAPED => true]);
             $span->setStatus(StatusCode::STATUS_ERROR, $exception->getMessage());
-            $span->end();
 
-            return parent::connect($params);
+            throw $exception;
+        } finally {
+            $scope?->detach();
+            if ($span instanceof SpanInterface) {
+                $span->end();
+            }
         }
     }
 

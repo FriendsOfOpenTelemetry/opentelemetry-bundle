@@ -109,7 +109,6 @@ jobs:
           - '8.2'
           - '8.3'
         dependencies:
-          - 'lowest'
           - 'highest'
         include:
           - php: '8.3'
@@ -142,6 +141,8 @@ jobs:
           restore-keys: ${{ runner.os }}-composer-${{ matrix.dependencies }}-
       - name: Update project dependencies
         run: composer update --no-interaction --no-progress --ansi ${{ matrix.dependencies == 'lowest' && '--prefer-lowest --prefer-stable' || '' }}
+      - name: Create database & schema
+        run: composer test:console -- doctrine:schema:update --force --complete
       - name: Run PHPUnit tests
         run: vendor/bin/phpunit --log-junit build/logs/phpunit/junit.xml ${{ matrix.coverage && '--coverage-clover build/logs/phpunit/clover.xml' || '' }}
         env:

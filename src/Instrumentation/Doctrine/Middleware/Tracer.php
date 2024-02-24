@@ -32,19 +32,22 @@ final readonly class Tracer
             $spanBuilder = $this->tracer
                 ->spanBuilder($name)
                 ->setSpanKind(SpanKind::KIND_CLIENT)
+                ->setParent(Context::storage()->scope()?->context())
             ;
 
-            $span = $spanBuilder->setParent(Context::getCurrent())->startSpan();
+            $span = $spanBuilder->startSpan();
 
             return $callback($span);
         } catch (Exception $exception) {
-            if (null !== $span) {
+            if ($span instanceof SpanInterface) {
                 $span->recordException($exception, [TraceAttributes::EXCEPTION_ESCAPED => true]);
                 $span->setStatus(StatusCode::STATUS_ERROR, $exception->getMessage());
             }
             throw $exception;
         } finally {
-            $span?->end();
+            if ($span instanceof SpanInterface) {
+                $span->end();
+            }
         }
     }
 }

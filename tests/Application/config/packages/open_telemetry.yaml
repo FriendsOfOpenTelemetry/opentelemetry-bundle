@@ -5,7 +5,28 @@ open_telemetry:
     version: '0.0.0'
     environment: test
   instrumentation:
+    cache:
+      tracing:
+        enabled: true
     console:
+      tracing:
+        enabled: true
+    doctrine:
+      tracing:
+        enabled: true
+    http_client:
+      tracing:
+        enabled: true
+    http_kernel:
+      tracing:
+        enabled: true
+    mailer:
+      tracing:
+        enabled: true
+    messenger:
+      tracing:
+        enabled: true
+    twig:
       tracing:
         enabled: true
   traces:
