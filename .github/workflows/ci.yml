@@ -109,7 +109,6 @@ jobs:
           - '8.2'
           - '8.3'
         dependencies:
-          - 'lowest'
           - 'highest'
         include:
           - php: '8.3'
