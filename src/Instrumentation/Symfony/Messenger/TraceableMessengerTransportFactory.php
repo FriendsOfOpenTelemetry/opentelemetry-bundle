@@ -3,6 +3,7 @@
 namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\Instrumentation\Symfony\Messenger;
 
 use OpenTelemetry\API\Trace\TracerInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 use Symfony\Component\Messenger\Transport\TransportFactory;
 use Symfony\Component\Messenger\Transport\TransportFactoryInterface;
@@ -17,6 +18,7 @@ class TraceableMessengerTransportFactory implements TransportFactoryInterface
     public function __construct(
         private TransportFactory $transportFactory,
         private TracerInterface $tracer,
+        private ?LoggerInterface $logger = null,
     ) {
     }
 
@@ -27,7 +29,7 @@ class TraceableMessengerTransportFactory implements TransportFactoryInterface
     {
         $transport = $this->transportFactory->createTransport(Dsn::parse($dsn)->inner(), $options, $serializer);
 
-        return new TraceableMessengerTransport($transport, $this->tracer);
+        return new TraceableMessengerTransport($transport, $this->tracer, $this->logger);
     }
 
     /**

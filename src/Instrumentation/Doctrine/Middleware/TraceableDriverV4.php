@@ -20,6 +20,7 @@ use OpenTelemetry\API\Trace\StatusCode;
 use OpenTelemetry\API\Trace\TracerInterface;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\SemConv\TraceAttributes;
+use Psr\Log\LoggerInterface;
 
 /**
  * @phpstan-import-type OverrideParams from DriverManager
@@ -30,6 +31,7 @@ final class TraceableDriverV4 extends AbstractDriverMiddleware
     public function __construct(
         private TracerInterface $tracer,
         DriverInterface $driver,
+        private ?LoggerInterface $logger = null,
     ) {
         parent::__construct($driver);
     }
@@ -42,6 +44,9 @@ final class TraceableDriverV4 extends AbstractDriverMiddleware
         array $params
     ): Connection {
         $scope = Context::storage()->scope();
+        if (null !== $scope) {
+            $this->logger?->debug(sprintf('Using scope "%s"', spl_object_id($scope)));
+        }
         $span = null;
 
         try {
@@ -55,11 +60,16 @@ final class TraceableDriverV4 extends AbstractDriverMiddleware
             ;
 
             $span = $spanBuilder->startSpan();
+
+            $this->logger?->debug(sprintf('Starting span "%s"', $span->getContext()->getSpanId()));
+
             if (null === $scope) {
                 $scope = $span->storeInContext(Context::getCurrent())->activate();
+                $this->logger?->debug(sprintf('No active scope, activating new scope "%s"', spl_object_id($scope)));
             }
 
             $connection = parent::connect($params);
+
             $span->setAttribute(TraceAttributes::DB_SYSTEM, $this->getSemanticDbSystem($connection->getServerVersion()));
             $span->setStatus(StatusCode::STATUS_OK);
 
@@ -69,8 +79,12 @@ final class TraceableDriverV4 extends AbstractDriverMiddleware
             $span->setStatus(StatusCode::STATUS_ERROR, $exception->getMessage());
             throw $exception;
         } finally {
-            $scope?->detach();
+            if (null !== $scope) {
+                $this->logger?->debug(sprintf('Detaching scope "%s"', spl_object_id($scope)));
+                $scope->detach();
+            }
             if ($span instanceof SpanInterface) {
+                $this->logger?->debug(sprintf('Ending span "%s"', $span->getContext()->getSpanId()));
                 $span->end();
             }
         }

@@ -4,6 +4,7 @@ namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\Instrumentation\Symfony\Mes
 
 use OpenTelemetry\API\Trace\SpanInterface;
 use OpenTelemetry\API\Trace\TracerInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Transport\TransportInterface;
 
@@ -14,8 +15,9 @@ class TraceableMessengerTransport implements TransportInterface
     public function __construct(
         private TransportInterface $transport,
         TracerInterface $tracer,
+        private ?LoggerInterface $logger = null,
     ) {
-        $this->tracer = new TransportTracer($tracer);
+        $this->tracer = new TransportTracer($tracer, $this->logger);
     }
 
     public function get(): iterable

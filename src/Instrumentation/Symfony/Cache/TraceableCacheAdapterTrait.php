@@ -5,6 +5,7 @@ namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\Instrumentation\Symfony\Cac
 use OpenTelemetry\API\Trace\SpanInterface;
 use OpenTelemetry\Context\Context;
 use Psr\Cache\CacheItemInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\Cache\Adapter\TagAwareAdapterInterface;
 use Symfony\Component\Cache\CacheItem;
@@ -17,6 +18,8 @@ trait TraceableCacheAdapterTrait
     private Tracer $tracer;
 
     private AdapterInterface|TagAwareAdapterInterface $adapter;
+
+    private ?LoggerInterface $logger = null;
 
     public function getItem(mixed $key): CacheItem
     {

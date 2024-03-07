@@ -8,12 +8,15 @@ use Doctrine\DBAL\Driver\Result;
 use Doctrine\DBAL\Driver\Statement as DriverStatement;
 use OpenTelemetry\API\Trace\SpanInterface;
 use OpenTelemetry\SemConv\TraceAttributes;
+use Psr\Log\LoggerInterface;
 
 class TraceableConnectionV4 extends AbstractConnectionMiddleware
 {
     public function __construct(
         ConnectionInterface $connection,
         private Tracer $tracer,
+        /** @phpstan-ignore-next-line */
+        private ?LoggerInterface $logger = null,
     ) {
         parent::__construct($connection);
     }

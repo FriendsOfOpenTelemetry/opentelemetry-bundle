@@ -8,6 +8,7 @@ use OpenTelemetry\API\Trace\StatusCode;
 use OpenTelemetry\API\Trace\TracerInterface;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\SemConv\TraceAttributes;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
@@ -20,6 +21,7 @@ final class TraceableConsoleEventSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private readonly TracerInterface $tracer,
+        private readonly ?LoggerInterface $logger = null,
     ) {
     }
 
@@ -61,7 +63,11 @@ final class TraceableConsoleEventSubscriber implements EventSubscriberInterface
 
         $span = $spanBuilder->setParent($parent)->startSpan();
 
+        $this->logger?->debug(sprintf('Starting span "%s"', $span->getContext()->getSpanId()));
+
         Context::storage()->attach($span->storeInContext($parent));
+
+        $this->logger?->debug(sprintf('Activating new scope "%s"', spl_object_id(Context::storage()->scope())));
     }
 
     public function handleError(ConsoleErrorEvent $event): void
@@ -79,6 +85,7 @@ final class TraceableConsoleEventSubscriber implements EventSubscriberInterface
         if (null === $scope) {
             return;
         }
+        $this->logger?->debug(sprintf('Detaching scope "%s"', spl_object_id($scope)));
         $scope->detach();
 
         $span = Span::fromContext($scope->context());
@@ -93,6 +100,7 @@ final class TraceableConsoleEventSubscriber implements EventSubscriberInterface
         };
         $span->setStatus($statusCode);
 
+        $this->logger?->debug(sprintf('Ending span "%s"', $span->getContext()->getSpanId()));
         $span->end();
     }
 

@@ -11,13 +11,12 @@ final class TraceableMiddleware implements MiddlewareInterface
 {
     public function __construct(
         private readonly TracerInterface $tracer,
-        /** @phpstan-ignore-next-line  */
         private readonly ?LoggerInterface $logger = null,
     ) {
     }
 
     public function wrap(DriverInterface $driver): DriverInterface
     {
-        return new TraceableDriver($this->tracer, $driver);
+        return new TraceableDriver($this->tracer, $driver, $this->logger);
     }
 }

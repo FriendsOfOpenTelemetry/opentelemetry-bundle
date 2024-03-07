@@ -50,7 +50,6 @@ final class TraceableHttpKernelEventSubscriber implements EventSubscriberInterfa
         private readonly TracerInterface $tracer,
         private readonly TextMapPropagatorInterface $propagator,
         private readonly PropagationGetterInterface $propagationGetter,
-        /** @phpstan-ignore-next-line  */
         private readonly ?LoggerInterface $logger = null,
         iterable $requestHeaders = [],
         iterable $responseHeaders = [],
@@ -97,6 +96,7 @@ final class TraceableHttpKernelEventSubscriber implements EventSubscriberInterfa
 
         $spanBuilder = $this->tracer
             ->spanBuilder(sprintf('HTTP %s', $request->getMethod()))
+            ->setSpanKind(SpanKind::KIND_INTERNAL)
             ->setAttributes($this->requestAttributes($request))
             ->setAttributes($this->headerAttributes($request->headers, $this->requestHeaderAttributes))
         ;
@@ -118,6 +118,9 @@ final class TraceableHttpKernelEventSubscriber implements EventSubscriberInterfa
         }
 
         $span = $spanBuilder->setParent($parent)->startSpan();
+
+        $this->logger?->debug(sprintf('Starting span "%s"', $span->getContext()->getSpanId()));
+
         $scope = $span->storeInContext($parent)->activate();
 
         $request->attributes->set(self::REQUEST_ATTRIBUTE_SPAN, $span);
@@ -207,6 +210,7 @@ final class TraceableHttpKernelEventSubscriber implements EventSubscriberInterfa
         if (null === $scope) {
             return;
         }
+        $this->logger?->debug(sprintf('Detaching scope "%s"', spl_object_id($scope)));
         $scope->detach();
     }
 
@@ -225,6 +229,7 @@ final class TraceableHttpKernelEventSubscriber implements EventSubscriberInterfa
             return;
         }
 
+        $this->logger?->debug(sprintf('Ending span "%s"', $span->getContext()->getSpanId()));
         $span->end();
     }
 
@@ -235,6 +240,7 @@ final class TraceableHttpKernelEventSubscriber implements EventSubscriberInterfa
             return;
         }
 
+        $this->logger?->debug(sprintf('Ending span "%s"', $span->getContext()->getSpanId()));
         $span->end();
     }
 

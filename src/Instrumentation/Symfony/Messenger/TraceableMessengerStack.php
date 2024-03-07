@@ -4,6 +4,7 @@ namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\Instrumentation\Symfony\Mes
 
 use OpenTelemetry\API\Trace\SpanInterface;
 use OpenTelemetry\API\Trace\StatusCode;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\Middleware\MiddlewareInterface;
 use Symfony\Component\Messenger\Middleware\StackInterface;
 
@@ -15,6 +16,7 @@ class TraceableMessengerStack implements StackInterface
         private SpanInterface $span,
         private StackInterface $stack,
         private string $busName,
+        private ?LoggerInterface $logger = null,
     ) {
     }
 
@@ -35,6 +37,7 @@ class TraceableMessengerStack implements StackInterface
     public function stop(): void
     {
         $this->span->setStatus(StatusCode::STATUS_OK);
+        $this->logger?->debug(sprintf('Ending span "%s"', $this->span->getContext()->getSpanId()));
         $this->span->end();
         $this->currentEvent = null;
     }

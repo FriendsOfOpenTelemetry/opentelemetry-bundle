@@ -24,8 +24,7 @@ class TraceableMailerTransport implements TransportInterface
     public function __construct(
         private TransportInterface $transport,
         private TracerInterface $tracer,
-        /** @phpstan-ignore-next-line */
-        private LoggerInterface $logger,
+        private ?LoggerInterface $logger = null,
     ) {
     }
 
@@ -37,6 +36,9 @@ class TraceableMailerTransport implements TransportInterface
     public function send(RawMessage $message, ?Envelope $envelope = null): ?SentMessage
     {
         $scope = Context::storage()->scope();
+        if (null !== $scope) {
+            $this->logger?->debug(sprintf('Using scope "%s"', spl_object_id($scope)));
+        }
         $span = null;
 
         try {
@@ -46,8 +48,12 @@ class TraceableMailerTransport implements TransportInterface
             ;
 
             $span = $spanBuilder->setParent($scope?->context())->startSpan();
-            if (null === $scope) {
+
+            $this->logger?->debug(sprintf('Starting span "%s"', $span->getContext()->getSpanId()));
+
+            if (null === $scope && null === $this->scope) {
                 $this->scope = $span->storeInContext(Context::getCurrent())->activate();
+                $this->logger?->debug(sprintf('No active scope, activating new scope "%s"', spl_object_id($this->scope)));
             }
 
             if ($message instanceof Email) {
@@ -66,8 +72,13 @@ class TraceableMailerTransport implements TransportInterface
             }
             throw $exception;
         } finally {
-            $this->scope?->detach();
+            if (null !== $this->scope) {
+                $this->logger?->debug(sprintf('Detaching scope "%s"', spl_object_id($this->scope)));
+                $this->scope->detach();
+                $this->scope = null;
+            }
             if ($span instanceof SpanInterface) {
+                $this->logger?->debug(sprintf('Ending span "%s"', $span->getContext()->getSpanId()));
                 $span->end();
             }
         }

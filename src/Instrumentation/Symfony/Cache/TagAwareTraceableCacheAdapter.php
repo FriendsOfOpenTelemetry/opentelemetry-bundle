@@ -4,6 +4,7 @@ namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\Instrumentation\Symfony\Cac
 
 use OpenTelemetry\API\Trace\SpanInterface;
 use OpenTelemetry\API\Trace\TracerInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Cache\Adapter\TagAwareAdapterInterface;
 use Symfony\Component\Cache\PruneableInterface;
 use Symfony\Component\Cache\ResettableInterface;
@@ -17,9 +18,11 @@ class TagAwareTraceableCacheAdapter implements TagAwareAdapterInterface, TagAwar
     public function __construct(
         TracerInterface $tracer,
         TagAwareAdapterInterface $adapter,
+        ?LoggerInterface $logger = null,
     ) {
-        $this->tracer = new Tracer($tracer);
+        $this->tracer = new Tracer($tracer, $logger);
         $this->adapter = $adapter;
+        $this->logger = $logger;
     }
 
     public function get(string $key, callable $callback, ?float $beta = null, ?array &$metadata = null): mixed

@@ -7,6 +7,7 @@ use OpenTelemetry\API\Trace\SpanKind;
 use OpenTelemetry\API\Trace\TracerInterface;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\ScopeInterface;
+use Psr\Log\LoggerInterface;
 use Twig\Extension\AbstractExtension;
 use Twig\Profiler\NodeVisitor\ProfilerNodeVisitor;
 use Twig\Profiler\Profile;
@@ -22,6 +23,7 @@ class TraceableTwigExtension extends AbstractExtension
 
     public function __construct(
         private readonly TracerInterface $tracer,
+        private readonly ?LoggerInterface $logger = null,
     ) {
         $this->spans = new \SplObjectStorage();
     }
@@ -29,17 +31,22 @@ class TraceableTwigExtension extends AbstractExtension
     public function enter(Profile $profile): void
     {
         $scope = Context::storage()->scope();
+        if (null !== $scope) {
+            $this->logger?->debug(sprintf('Using scope "%s"', spl_object_id($scope)));
+        }
 
         $spanBuilder = $this->tracer
             ->spanBuilder($this->getSpanName($profile))
             ->setSpanKind(SpanKind::KIND_INTERNAL)
         ;
 
-        $parent = Context::getCurrent();
+        $span = $spanBuilder->setParent($scope?->context())->startSpan();
 
-        $span = $spanBuilder->setParent($parent)->startSpan();
-        if (null === $scope) {
-            $this->scope = $span->storeInContext($parent)->activate();
+        $this->logger?->debug(sprintf('Starting span "%s"', $span->getContext()->getSpanId()));
+
+        if (null === $scope && null === $this->scope) {
+            $this->scope = $span->storeInContext(Context::getCurrent())->activate();
+            $this->logger?->debug(sprintf('No active scope, activating new scope "%s"', spl_object_id($this->scope)));
         }
 
         $this->spans[$profile] = $span;
@@ -47,19 +54,19 @@ class TraceableTwigExtension extends AbstractExtension
 
     public function leave(Profile $profile): void
     {
-        $scope = Context::storage()->scope() ?? $this->scope;
-        if (null === $scope) {
-            return;
-        }
-
         if (!isset($this->spans[$profile])) {
             return;
         }
+
         if (null !== $this->scope && 1 === count($this->spans)) {
+            $this->logger?->debug(sprintf('Detaching scope "%s"', spl_object_id($this->scope)));
             $this->scope->detach();
             $this->scope = null;
         }
-        $this->spans[$profile]->end();
+
+        $span = $this->spans[$profile];
+        $this->logger?->debug(sprintf('Ending span "%s"', $span->getContext()->getSpanId()));
+        $span->end();
         unset($this->spans[$profile]);
     }
 
