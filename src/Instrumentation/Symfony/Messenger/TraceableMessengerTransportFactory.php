@@ -35,6 +35,11 @@ class TraceableMessengerTransportFactory implements TransportFactoryInterface
      */
     public function supports(#[\SensitiveParameter] string $dsn, array $options): bool
     {
-        return Dsn::parse($dsn)->scheme()->equals('trace');
+        $dsn = Dsn::parse($dsn);
+        if (!$dsn instanceof Dsn\Decorated) {
+            return false;
+        }
+
+        return $dsn->scheme()->equals('trace');
     }
 }

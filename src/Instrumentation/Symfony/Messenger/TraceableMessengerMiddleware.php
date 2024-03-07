@@ -6,12 +6,15 @@ use OpenTelemetry\API\Trace\SpanKind;
 use OpenTelemetry\API\Trace\StatusCode;
 use OpenTelemetry\API\Trace\TracerInterface;
 use OpenTelemetry\Context\Context;
+use OpenTelemetry\Context\ScopeInterface;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Middleware\MiddlewareInterface;
 use Symfony\Component\Messenger\Middleware\StackInterface;
 
-final readonly class TraceableMessengerMiddleware implements MiddlewareInterface
+class TraceableMessengerMiddleware implements MiddlewareInterface
 {
+    private ?ScopeInterface $scope = null;
+
     public function __construct(
         private TracerInterface $tracer,
         private string $busName = 'default',
@@ -22,12 +25,12 @@ final readonly class TraceableMessengerMiddleware implements MiddlewareInterface
     public function handle(Envelope $envelope, StackInterface $stack): Envelope
     {
         $scope = Context::storage()->scope();
-        if (null === $scope) {
-            return $stack->next()->handle($envelope, $stack);
-        }
 
         $traceableStamp = $this->getTraceableStamp($envelope);
         if (null !== $traceableStamp && $traceableStamp->getSpan()->isRecording()) {
+            $this->scope?->detach();
+            $this->scope = null;
+
             $span = $traceableStamp->getSpan();
             $span->setStatus(StatusCode::STATUS_OK);
             $span->end();
@@ -40,9 +43,10 @@ final readonly class TraceableMessengerMiddleware implements MiddlewareInterface
             ->setAttribute('bus.name', $this->busName)
         ;
 
-        $parent = Context::getCurrent();
-
-        $span = $spanBuilder->setParent($parent)->startSpan();
+        $span = $spanBuilder->setParent($scope?->context())->startSpan();
+        if (null === $scope && null === $this->scope) {
+            $this->scope = $span->storeInContext(Context::getCurrent())->activate();
+        }
 
         $stack = new TraceableMessengerStack(
             $span,
@@ -55,6 +59,8 @@ final readonly class TraceableMessengerMiddleware implements MiddlewareInterface
         try {
             return $stack->next()->handle($envelope, $stack);
         } finally {
+            $this->scope?->detach();
+            $this->scope = null;
             $stack->stop();
         }
     }

@@ -1,0 +1,24 @@
+doctrine:
+  dbal:
+    default_connection: app
+    connections:
+      app:
+        url: 'sqlite:///%kernel.project_dir%/var/app.db'
+        profiling_collect_backtrace: '%kernel.debug%'
+      error:
+        url: 'sqlite:///%kernel.project_dir%/error/app.db'
+        profiling_collect_backtrace: '%kernel.debug%'
+  orm:
+    auto_generate_proxy_classes: true
+    enable_lazy_ghost_objects: true
+    validate_xml_mapping: true
+    naming_strategy: doctrine.orm.naming_strategy.underscore_number_aware
+    auto_mapping: true
+    report_fields_where_declared: true
+    mappings:
+      FriendsOfOpenTelemetry\OpenTelemetryBundle\Tests\Application:
+        type: attribute
+        is_bundle: false
+        dir: '%kernel.project_dir%/src/Entity'
+        prefix: 'FriendsOfOpenTelemetry\OpenTelemetryBundle\Tests\Application\Entity'
+        alias: FriendsOfOpenTelemetry\OpenTelemetryBundle\Tests\Application

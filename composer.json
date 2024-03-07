@@ -27,8 +27,8 @@
         "open-telemetry/api": "^1.0",
         "open-telemetry/context": "^1.0",
         "open-telemetry/opentelemetry-logger-monolog": "^1.0",
-        "open-telemetry/opentelemetry-propagation-server-timing": "^0.0.1",
-        "open-telemetry/opentelemetry-propagation-traceresponse": "^0.0.2",
+        "open-telemetry/opentelemetry-propagation-server-timing": "^0.0.2",
+        "open-telemetry/opentelemetry-propagation-traceresponse": "^0.0.3",
         "open-telemetry/sdk": "^1.0",
         "open-telemetry/sem-conv": "^1.24",
         "open-telemetry/symfony-sdk-bundle": "^0.0.24",
@@ -46,14 +46,17 @@
         "ext-grpc": "*",
         "ext-mbstring": "*",
         "ext-opentelemetry": "*",
+        "ext-pdo": "*",
+        "ext-pdo_sqlite": "*",
         "ext-xdebug": "*",
         "doctrine/dbal": "^3.8",
         "doctrine/doctrine-bundle": "^2.11",
+        "doctrine/doctrine-migrations-bundle": "^3.3",
         "doctrine/orm": "^2.18",
         "ergebnis/composer-normalize": "^2.42",
-        "friendsofphp/php-cs-fixer": "^3.49",
+        "friendsofphp/php-cs-fixer": "^3.51",
         "guzzlehttp/promises": "^2.0",
-        "maglnet/composer-require-checker": "^4.8",
+        "maglnet/composer-require-checker": "^4.9",
         "matthiasnoback/symfony-config-test": "^5.1",
         "matthiasnoback/symfony-dependency-injection-test": "^5.1",
         "nyholm/symfony-bundle-test": "^2.0 || ^3.0",
@@ -70,21 +73,22 @@
         "phpunit/phpunit": "^10.5",
         "pyrech/composer-changelogs": "^2.1",
         "roave/security-advisories": "dev-master",
+        "symfony/browser-kit": "^7.0",
         "symfony/cache": "^6.4 || ^7.0",
         "symfony/framework-bundle": "^6.4 || ^7.0",
         "symfony/http-kernel": "^6.4 || ^7.0",
-        "symfony/mailer": "^6.4 || ^7.0",
+        "symfony/mailer": "^7.0",
         "symfony/messenger": "^6.4 || ^7.0",
         "symfony/monolog-bundle": "^3.10",
         "symfony/phpunit-bridge": "^6.4 || ^7.0",
+        "symfony/runtime": "^6.4 || ^7.0",
         "symfony/twig-bundle": "^6.4 || ^7.0",
         "symfony/yaml": "^6.4 || ^7.0",
         "twig/twig": "^3.8",
         "zalas/phpunit-globals": "^3.2"
     },
     "suggest": {
-        "doctrine/dbal": "Needed to enable Doctrine DBAL instrumentation",
-        "doctrine/orm": "Needed to enable Doctrine ORM instrumentation",
+        "doctrine/doctrine-bundle": "Needed to enable Doctrine DBAL & ORM instrumentation",
         "open-telemetry/exporter-otlp": "Needed to export OpenTelemetry data via OTPL",
         "open-telemetry/exporter-zipkin": "Needed to export OpenTelemetry data via Zipkin",
         "open-telemetry/opentelemetry-logger-monolog": "Need to export logs from Monolog via OpenTelemetry",
@@ -107,7 +111,8 @@
     "autoload-dev": {
         "psr-4": {
             "FriendsOfOpenTelemetry\\OpenTelemetryBundle\\Tests\\": "tests/",
-            "FriendsOfOpenTelemetry\\OpenTelemetryBundle\\Tests\\Application\\": "tests/Application/src"
+            "FriendsOfOpenTelemetry\\OpenTelemetryBundle\\Tests\\Application\\": "tests/Application/src",
+            "FriendsOfOpenTelemetry\\OpenTelemetryBundle\\Tests\\Application\\Migrations\\": "tests/Application/migrations"
         }
     },
     "config": {
@@ -115,7 +120,8 @@
             "ergebnis/composer-normalize": true,
             "php-http/discovery": true,
             "phpstan/extension-installer": true,
-            "pyrech/composer-changelogs": true
+            "pyrech/composer-changelogs": true,
+            "symfony/runtime": true
         },
         "sort-packages": true
     },
@@ -142,6 +148,9 @@
         "test": [
             "@putenv XDEBUG_MODE=off",
             "@phpunit"
+        ],
+        "test:console": [
+            "@php ./tests/Application/bin/console"
         ]
     }
 }

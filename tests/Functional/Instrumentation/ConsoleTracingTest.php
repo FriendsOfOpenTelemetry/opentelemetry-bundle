@@ -3,8 +3,7 @@
 namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\Tests\Functional\Instrumentation;
 
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\Tests\Application\Kernel;
-use OpenTelemetry\SDK\Trace\Event;
-use OpenTelemetry\SDK\Trace\SpanDataInterface;
+use FriendsOfOpenTelemetry\OpenTelemetryBundle\Tests\Functional\TracingTestCaseTrait;
 use OpenTelemetry\SDK\Trace\SpanExporter\InMemoryExporter;
 use OpenTelemetry\SDK\Trace\StatusData;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
@@ -16,6 +15,8 @@ use Zalas\PHPUnit\Globals\Attribute\Env;
 #[Env('KERNEL_CLASS', Kernel::class)]
 class ConsoleTracingTest extends KernelTestCase
 {
+    use TracingTestCaseTrait;
+
     public function testSuccess(): void
     {
         $kernel = self::bootKernel();
@@ -28,22 +29,17 @@ class ConsoleTracingTest extends KernelTestCase
         $tester->run(['command' => 'dummy-command']);
         $tester->assertCommandIsSuccessful();
 
-        $exporter = self::getContainer()->get('open_telemetry.traces.exporters.in_memory');
-        self::assertInstanceOf(InMemoryExporter::class, $exporter);
+        self::assertSpansCount(1);
 
-        $spans = $exporter->getSpans();
-        self::assertContainsOnlyInstancesOf(SpanDataInterface::class, $spans);
-        self::assertCount(1, $spans);
-
-        /** @var SpanDataInterface $mainSpan */
-        $mainSpan = $spans[0];
-        self::assertSame('dummy-command', $mainSpan->getName());
-        self::assertSame(StatusData::ok(), $mainSpan->getStatus());
-        self::assertSame([
+        $mainSpan = self::getSpans()[0];
+        self::assertSpanName($mainSpan, 'dummy-command');
+        self::assertSpanStatus($mainSpan, StatusData::ok());
+        self::assertSpanAttributes($mainSpan, [
             'code.function' => 'execute',
             'code.namespace' => 'FriendsOfOpenTelemetry\OpenTelemetryBundle\Tests\Application\Command\DummyCommand',
             'symfony.console.exit_code' => 0,
-        ], $mainSpan->getAttributes()->toArray());
+        ]);
+        self::assertSpanEventsCount($mainSpan, 0);
     }
 
     public function testFailure(): void
@@ -61,22 +57,17 @@ class ConsoleTracingTest extends KernelTestCase
         ]);
         self::assertSame(1, $tester->getStatusCode());
 
-        $exporter = self::getContainer()->get('open_telemetry.traces.exporters.in_memory');
-        self::assertInstanceOf(InMemoryExporter::class, $exporter);
+        self::assertSpansCount(1);
 
-        $spans = $exporter->getSpans();
-        self::assertContainsOnlyInstancesOf(SpanDataInterface::class, $spans);
-        self::assertCount(1, $spans);
-
-        /** @var SpanDataInterface $mainSpan */
-        $mainSpan = $spans[0];
-        self::assertSame('dummy-command', $mainSpan->getName());
-        self::assertSame(StatusData::error(), $mainSpan->getStatus());
-        self::assertSame([
+        $mainSpan = self::getSpans()[0];
+        self::assertSpanName($mainSpan, 'dummy-command');
+        self::assertSpanStatus($mainSpan, StatusData::error());
+        self::assertSpanAttributes($mainSpan, [
             'code.function' => 'execute',
             'code.namespace' => 'FriendsOfOpenTelemetry\OpenTelemetryBundle\Tests\Application\Command\DummyCommand',
             'symfony.console.exit_code' => 1,
-        ], $mainSpan->getAttributes()->toArray());
+        ]);
+        self::assertSpanEventsCount($mainSpan, 0);
     }
 
     public function testException(): void
@@ -99,31 +90,25 @@ class ConsoleTracingTest extends KernelTestCase
         $exporter = self::getContainer()->get('open_telemetry.traces.exporters.in_memory');
         self::assertInstanceOf(InMemoryExporter::class, $exporter);
 
-        $spans = $exporter->getSpans();
-        self::assertContainsOnlyInstancesOf(SpanDataInterface::class, $spans);
-        self::assertCount(1, $spans);
+        self::assertSpansCount(1);
 
-        /** @var SpanDataInterface $mainSpan */
-        $mainSpan = $spans[0];
-        self::assertSame('dummy-command', $mainSpan->getName());
-        self::assertSame(StatusData::error(), $mainSpan->getStatus());
-        self::assertSame([
+        $mainSpan = self::getSpans()[0];
+        self::assertSpanName($mainSpan, 'dummy-command');
+        self::assertSpanStatus($mainSpan, StatusData::error());
+        self::assertSpanAttributes($mainSpan, [
             'code.function' => 'execute',
             'code.namespace' => 'FriendsOfOpenTelemetry\OpenTelemetryBundle\Tests\Application\Command\DummyCommand',
             'symfony.console.exit_code' => 1,
-        ], $mainSpan->getAttributes()->toArray());
+        ]);
 
-        $events = $mainSpan->getEvents();
-        self::assertCount(1, $events);
-        self::assertContainsOnlyInstancesOf(Event::class, $events);
+        self::assertSpanEventsCount($mainSpan, 1);
 
-        $exception = $events[0];
-        self::assertSame('exception', $exception->getName());
-        $exceptionAttributes = [
+        $exception = $mainSpan->getEvents()[0];
+        self::assertSpanEventName($exception, 'exception');
+        self::assertSpanEventAttributesSubSet($exception, [
             'exception.type' => 'RuntimeException',
             'exception.message' => 'Oops',
             'symfony.console.exit_code' => 1,
-        ];
-        self::assertSame($exceptionAttributes, array_intersect_assoc($exceptionAttributes, $exception->getAttributes()->toArray()));
+        ]);
     }
 }

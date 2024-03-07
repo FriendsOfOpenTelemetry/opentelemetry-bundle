@@ -3,6 +3,7 @@
 namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\Instrumentation\Symfony\Cache;
 
 use OpenTelemetry\API\Trace\SpanInterface;
+use OpenTelemetry\Context\Context;
 use Psr\Cache\CacheItemInterface;
 use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\Cache\Adapter\TagAwareAdapterInterface;
@@ -59,7 +60,7 @@ trait TraceableCacheAdapterTrait
     public function hasItem(string $key): bool
     {
         return $this->tracer->traceFunction('cache.has_item', function (?SpanInterface $span) use ($key): bool {
-            $span?->setAttribute('cache.item.exits', $key);
+            $span?->setAttribute('cache.item.has', $key);
 
             return $this->adapter->hasItem($key);
         });
@@ -125,6 +126,8 @@ trait TraceableCacheAdapterTrait
             if ($this->adapter instanceof ResettableInterface) {
                 $this->adapter->reset();
             }
+            $scope = Context::storage()->scope();
+            $id = spl_object_id($scope);
         });
     }
 }

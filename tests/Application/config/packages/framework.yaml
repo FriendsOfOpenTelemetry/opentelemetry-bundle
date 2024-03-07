@@ -1,3 +1,20 @@
 framework:
   secret: ThisIsSecret
   test: true
+  fragments: { path: /_fragment }
+  mailer:
+    transports:
+      default: null://null
+      exception: smtp://localhost:25
+  cache:
+    app: cache.adapter.array
+    system: cache.adapter.array
+  messenger:
+    transports:
+      main: 'trace(in-memory://default)'
+    routing:
+      'FriendsOfOpenTelemetry\OpenTelemetryBundle\Tests\Application\Message\*': main
+    buses:
+      messenger.bus.default:
+        middleware:
+          - open_telemetry_tracer

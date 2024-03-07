@@ -73,6 +73,12 @@ return static function (ContainerConfigurator $container): void {
             ->tag('kernel.event_subscriber')
             ->tag('monolog.logger', ['channel' => 'open_telemetry'])
 
+        ->set('open_telemetry.instrumentation.mailer.trace.transports', TraceableMailerTransport::class)
+            ->decorate('mailer.transports')
+            ->arg('$tracer', service('open_telemetry.traces.default_tracer'))
+            ->arg('$transport', service('.inner'))
+            ->tag('monolog.logger', ['channel' => 'open_telemetry'])
+
         ->set('open_telemetry.instrumentation.mailer.trace.default_transport', TraceableMailerTransport::class)
             ->decorate('mailer.default_transport')
             ->arg('$tracer', service('open_telemetry.traces.default_tracer'))
