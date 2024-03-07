@@ -8,7 +8,6 @@ use OpenTelemetry\API\Trace\SpanKind;
 use OpenTelemetry\API\Trace\StatusCode;
 use OpenTelemetry\API\Trace\TracerInterface;
 use OpenTelemetry\Context\Context;
-use OpenTelemetry\Context\ScopeInterface;
 use OpenTelemetry\SemConv\TraceAttributes;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
@@ -21,8 +20,6 @@ use Symfony\Contracts\Service\ResetInterface;
 
 final class TraceableHttpClient implements HttpClientInterface, LoggerAwareInterface, ResetInterface
 {
-    private ?ScopeInterface $scope = null;
-
     public function __construct(
         private HttpClientInterface $client,
         private readonly TracerInterface $tracer,
@@ -49,6 +46,7 @@ final class TraceableHttpClient implements HttpClientInterface, LoggerAwareInter
             $spanBuilder = $this->tracer
                 ->spanBuilder('http.client')
                 ->setSpanKind(SpanKind::KIND_CLIENT)
+                ->setParent($scope?->context())
                 ->setAttribute(TraceAttributes::URL_FULL, $url)
                 ->setAttribute(TraceAttributes::URL_SCHEME, $uri->getScheme())
                 ->setAttribute(TraceAttributes::URL_PATH, $uri->getPath())
@@ -57,14 +55,9 @@ final class TraceableHttpClient implements HttpClientInterface, LoggerAwareInter
                 ->setAttribute(TraceAttributes::HTTP_REQUEST_METHOD, $method)
             ;
 
-            $span = $spanBuilder->setParent($scope?->context())->startSpan();
+            $span = $spanBuilder->startSpan();
 
             $this->logger?->debug(sprintf('Starting span "%s"', $span->getContext()->getSpanId()));
-
-            if (null === $scope && null === $this->scope) {
-                $this->scope = $span->storeInContext(Context::getCurrent())->activate();
-                $this->logger?->debug(sprintf('No active scope, activating new scope "%s"', spl_object_id($this->scope)));
-            }
 
             return new TraceableResponse($this->client, $this->client->request($method, $url, $options), $span);
         } catch (ExceptionInterface $exception) {
@@ -72,11 +65,6 @@ final class TraceableHttpClient implements HttpClientInterface, LoggerAwareInter
             $span->setStatus(StatusCode::STATUS_ERROR, $exception->getMessage());
             throw $exception;
         } finally {
-            if (null !== $this->scope) {
-                $this->logger?->debug(sprintf('Detaching scope "%s"', spl_object_id($this->scope)));
-                $this->scope->detach();
-                $this->scope = null;
-            }
             if ($span instanceof SpanInterface) {
                 $this->logger?->debug(sprintf('Ending span "%s"', $span->getContext()->getSpanId()));
                 $span->end();

@@ -7,15 +7,12 @@ use OpenTelemetry\API\Trace\SpanKind;
 use OpenTelemetry\API\Trace\StatusCode;
 use OpenTelemetry\API\Trace\TracerInterface;
 use OpenTelemetry\Context\Context;
-use OpenTelemetry\Context\ScopeInterface;
 use OpenTelemetry\SemConv\TraceAttributes;
 use Psr\Cache\CacheException;
 use Psr\Log\LoggerInterface;
 
 class Tracer
 {
-    private ?ScopeInterface $scope = null;
-
     public function __construct(
         private readonly TracerInterface $tracer,
         private readonly ?LoggerInterface $logger = null,
@@ -49,11 +46,6 @@ class Tracer
 
             $this->logger?->debug(sprintf('Starting span "%s"', $span->getContext()->getSpanId()));
 
-            if (null === $scope && null === $this->scope) {
-                $this->scope = $span->storeInContext(Context::getCurrent())->activate();
-                $this->logger?->debug(sprintf('No active scope, activating new scope "%s"', spl_object_id($this->scope)));
-            }
-
             return $callback($span);
         } catch (CacheException $exception) {
             if ($span instanceof SpanInterface) {
@@ -62,11 +54,6 @@ class Tracer
             }
             throw $exception;
         } finally {
-            if (null !== $this->scope) {
-                $this->logger?->debug(sprintf('Detaching scope "%s"', spl_object_id($this->scope)));
-                $this->scope->detach();
-                $this->scope = null;
-            }
             if ($span instanceof SpanInterface) {
                 $this->logger?->debug(sprintf('Ending span "%s"', $span->getContext()->getSpanId()));
                 $span->end();

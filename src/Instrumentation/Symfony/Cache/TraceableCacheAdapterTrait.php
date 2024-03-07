@@ -129,8 +129,6 @@ trait TraceableCacheAdapterTrait
             if ($this->adapter instanceof ResettableInterface) {
                 $this->adapter->reset();
             }
-            $scope = Context::storage()->scope();
-            $id = spl_object_id($scope);
         });
     }
 }

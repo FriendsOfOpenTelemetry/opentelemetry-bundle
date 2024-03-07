@@ -7,15 +7,12 @@ use OpenTelemetry\API\Trace\SpanKind;
 use OpenTelemetry\API\Trace\StatusCode;
 use OpenTelemetry\API\Trace\TracerInterface;
 use OpenTelemetry\Context\Context;
-use OpenTelemetry\Context\ScopeInterface;
 use OpenTelemetry\SemConv\TraceAttributes;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\Exception\TransportException;
 
 class TransportTracer
 {
-    private ?ScopeInterface $scope = null;
-
     public function __construct(
         private TracerInterface $tracer,
         private ?LoggerInterface $logger = null,
@@ -43,16 +40,12 @@ class TransportTracer
             $spanBuilder = $this->tracer
                 ->spanBuilder($name)
                 ->setSpanKind(SpanKind::KIND_INTERNAL)
+                ->setParent($scope?->context())
             ;
 
-            $span = $spanBuilder->setParent($scope?->context())->startSpan();
+            $span = $spanBuilder->startSpan();
 
             $this->logger?->debug(sprintf('Starting span "%s"', $span->getContext()->getSpanId()));
-
-            if (null === $scope && null === $this->scope) {
-                $this->scope = $span->storeInContext(Context::getCurrent())->activate();
-                $this->logger?->debug(sprintf('No active scope, activating new scope "%s"', spl_object_id($this->scope)));
-            }
 
             return $callback($span);
         } catch (TransportException $exception) {
@@ -62,11 +55,6 @@ class TransportTracer
             }
             throw $exception;
         } finally {
-            if (null !== $this->scope) {
-                $this->logger?->debug(sprintf('Detaching scope "%s"', spl_object_id($this->scope)));
-                $this->scope->detach();
-                $this->scope = null;
-            }
             if ($span instanceof SpanInterface) {
                 $this->logger?->debug(sprintf('Ending span "%s"', $span->getContext()->getSpanId()));
                 $span->end();

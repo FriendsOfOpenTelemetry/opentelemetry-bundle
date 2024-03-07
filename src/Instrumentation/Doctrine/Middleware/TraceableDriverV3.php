@@ -65,11 +65,6 @@ final class TraceableDriverV3 extends AbstractDriverMiddleware
 
             $this->logger?->debug(sprintf('Starting span "%s"', $span->getContext()->getSpanId()));
 
-            if (null === $scope) {
-                $scope = $span->storeInContext(Context::getCurrent())->activate();
-                $this->logger?->debug(sprintf('No active scope, activating new scope "%s"', spl_object_id($scope)));
-            }
-
             $connection = parent::connect($params);
 
             $span->setStatus(StatusCode::STATUS_OK);
@@ -81,10 +76,6 @@ final class TraceableDriverV3 extends AbstractDriverMiddleware
 
             throw $exception;
         } finally {
-            if (null !== $scope) {
-                $this->logger?->debug(sprintf('Detaching scope "%s"', spl_object_id($scope)));
-                $scope->detach();
-            }
             if ($span instanceof SpanInterface) {
                 $this->logger?->debug(sprintf('Ending span "%s"', $span->getContext()->getSpanId()));
                 $span->end();

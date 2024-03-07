@@ -56,7 +56,6 @@ final class TraceableDriverV4 extends AbstractDriverMiddleware
                 ->spanBuilder('doctrine.dbal.connection')
                 ->setSpanKind(SpanKind::KIND_CLIENT)
                 ->setParent($scope?->context())
-//                ->setAttribute(TraceAttributes::DB_SYSTEM, $this->getSemanticDbSystem($connection->getServerVersion()))
                 ->setAttribute(TraceAttributes::DB_NAME, $params['dbname'] ?? 'default')
                 ->setAttribute(TraceAttributes::DB_USER, $params['user'])
             ;
@@ -64,11 +63,6 @@ final class TraceableDriverV4 extends AbstractDriverMiddleware
             $span = $spanBuilder->startSpan();
 
             $this->logger?->debug(sprintf('Starting span "%s"', $span->getContext()->getSpanId()));
-
-            if (null === $scope) {
-                $scope = $span->storeInContext(Context::getCurrent())->activate();
-                $this->logger?->debug(sprintf('No active scope, activating new scope "%s"', spl_object_id($scope)));
-            }
 
             $connection = parent::connect($params);
 
@@ -81,10 +75,6 @@ final class TraceableDriverV4 extends AbstractDriverMiddleware
             $span->setStatus(StatusCode::STATUS_ERROR, $exception->getMessage());
             throw $exception;
         } finally {
-            if (null !== $scope) {
-                $this->logger?->debug(sprintf('Detaching scope "%s"', spl_object_id($scope)));
-                $scope->detach();
-            }
             if ($span instanceof SpanInterface) {
                 $this->logger?->debug(sprintf('Ending span "%s"', $span->getContext()->getSpanId()));
                 $span->end();

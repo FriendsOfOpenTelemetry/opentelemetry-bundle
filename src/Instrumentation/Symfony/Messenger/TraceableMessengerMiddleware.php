@@ -6,7 +6,6 @@ use OpenTelemetry\API\Trace\SpanKind;
 use OpenTelemetry\API\Trace\StatusCode;
 use OpenTelemetry\API\Trace\TracerInterface;
 use OpenTelemetry\Context\Context;
-use OpenTelemetry\Context\ScopeInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Middleware\MiddlewareInterface;
@@ -14,8 +13,6 @@ use Symfony\Component\Messenger\Middleware\StackInterface;
 
 class TraceableMessengerMiddleware implements MiddlewareInterface
 {
-    private ?ScopeInterface $scope = null;
-
     public function __construct(
         private TracerInterface $tracer,
         private ?LoggerInterface $logger = null,
@@ -35,12 +32,6 @@ class TraceableMessengerMiddleware implements MiddlewareInterface
 
         $traceableStamp = $this->getTraceableStamp($envelope);
         if (null !== $traceableStamp && $traceableStamp->getSpan()->isRecording()) {
-            if (null !== $this->scope) {
-                $this->logger?->debug(sprintf('Detaching scope "%s"', spl_object_id($this->scope)));
-                $this->scope->detach();
-                $this->scope = null;
-            }
-
             $span = $traceableStamp->getSpan();
             $span->setStatus(StatusCode::STATUS_OK);
             $this->logger?->debug(sprintf('Ending span "%s"', $span->getContext()->getSpanId()));
@@ -50,18 +41,14 @@ class TraceableMessengerMiddleware implements MiddlewareInterface
         $spanBuilder = $this->tracer
             ->spanBuilder('messenger.middleware')
             ->setSpanKind(SpanKind::KIND_INTERNAL)
+            ->setParent($scope?->context())
             ->setAttribute('event.category', $this->eventCategory)
             ->setAttribute('bus.name', $this->busName)
         ;
 
-        $span = $spanBuilder->setParent($scope?->context())->startSpan();
+        $span = $spanBuilder->startSpan();
 
         $this->logger?->debug(sprintf('Starting span "%s"', $span->getContext()->getSpanId()));
-
-        if (null === $scope && null === $this->scope) {
-            $this->scope = $span->storeInContext(Context::getCurrent())->activate();
-            $this->logger?->debug(sprintf('No active scope, activating new scope "%s"', spl_object_id($this->scope)));
-        }
 
         $stack = new TraceableMessengerStack(
             $span,
@@ -75,11 +62,6 @@ class TraceableMessengerMiddleware implements MiddlewareInterface
         try {
             return $stack->next()->handle($envelope, $stack);
         } finally {
-            if (null !== $this->scope) {
-                $this->logger?->debug(sprintf('Detaching scope "%s"', spl_object_id($this->scope)));
-                $this->scope->detach();
-                $this->scope = null;
-            }
             $stack->stop();
         }
     }

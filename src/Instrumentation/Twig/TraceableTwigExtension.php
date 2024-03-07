@@ -6,7 +6,6 @@ use OpenTelemetry\API\Trace\SpanInterface;
 use OpenTelemetry\API\Trace\SpanKind;
 use OpenTelemetry\API\Trace\TracerInterface;
 use OpenTelemetry\Context\Context;
-use OpenTelemetry\Context\ScopeInterface;
 use Psr\Log\LoggerInterface;
 use Twig\Extension\AbstractExtension;
 use Twig\Profiler\NodeVisitor\ProfilerNodeVisitor;
@@ -18,8 +17,6 @@ class TraceableTwigExtension extends AbstractExtension
      * @var \SplObjectStorage<Profile, SpanInterface>
      */
     private \SplObjectStorage $spans;
-
-    private ?ScopeInterface $scope = null;
 
     public function __construct(
         private readonly TracerInterface $tracer,
@@ -40,16 +37,12 @@ class TraceableTwigExtension extends AbstractExtension
         $spanBuilder = $this->tracer
             ->spanBuilder($this->getSpanName($profile))
             ->setSpanKind(SpanKind::KIND_INTERNAL)
+            ->setParent($scope?->context())
         ;
 
-        $span = $spanBuilder->setParent($scope?->context())->startSpan();
+        $span = $spanBuilder->startSpan();
 
         $this->logger?->debug(sprintf('Starting span "%s"', $span->getContext()->getSpanId()));
-
-        if (null === $scope && null === $this->scope) {
-            $this->scope = $span->storeInContext(Context::getCurrent())->activate();
-            $this->logger?->debug(sprintf('No active scope, activating new scope "%s"', spl_object_id($this->scope)));
-        }
 
         $this->spans[$profile] = $span;
     }
@@ -58,12 +51,6 @@ class TraceableTwigExtension extends AbstractExtension
     {
         if (!isset($this->spans[$profile])) {
             return;
-        }
-
-        if (null !== $this->scope && 1 === count($this->spans)) {
-            $this->logger?->debug(sprintf('Detaching scope "%s"', spl_object_id($this->scope)));
-            $this->scope->detach();
-            $this->scope = null;
         }
 
         $span = $this->spans[$profile];
