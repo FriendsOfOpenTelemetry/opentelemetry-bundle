@@ -73,7 +73,7 @@ final class TraceableDriverV4 extends AbstractDriverMiddleware
             $span->setAttribute(TraceAttributes::DB_SYSTEM, $this->getSemanticDbSystem($connection->getServerVersion()));
             $span->setStatus(StatusCode::STATUS_OK);
 
-            return new TraceableConnection($connection, new Tracer($this->tracer));
+            return new TraceableConnection($connection, new Tracer($this->tracer, $this->logger));
         } catch (Exception $exception) {
             $span->recordException($exception, [TraceAttributes::EXCEPTION_ESCAPED => true]);
             $span->setStatus(StatusCode::STATUS_ERROR, $exception->getMessage());

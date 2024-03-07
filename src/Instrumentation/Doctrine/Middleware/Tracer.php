@@ -9,11 +9,13 @@ use OpenTelemetry\API\Trace\StatusCode;
 use OpenTelemetry\API\Trace\TracerInterface;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\SemConv\TraceAttributes;
+use Psr\Log\LoggerInterface;
 
-final readonly class Tracer
+class Tracer
 {
     public function __construct(
-        private TracerInterface $tracer
+        private TracerInterface $tracer,
+        private ?LoggerInterface $logger = null,
     ) {
     }
 
@@ -26,16 +28,22 @@ final readonly class Tracer
      */
     public function traceFunction(string $name, callable $callback)
     {
+        $scope = Context::storage()->scope();
+        if (null !== $scope) {
+            $this->logger?->debug(sprintf('Using scope "%s"', spl_object_id($scope)));
+        }
         $span = null;
 
         try {
             $spanBuilder = $this->tracer
                 ->spanBuilder($name)
                 ->setSpanKind(SpanKind::KIND_CLIENT)
-                ->setParent(Context::storage()->scope()?->context())
+                ->setParent($scope?->context())
             ;
 
             $span = $spanBuilder->startSpan();
+
+            $this->logger?->debug(sprintf('Starting span "%s"', $span->getContext()->getSpanId()));
 
             return $callback($span);
         } catch (Exception $exception) {
@@ -46,6 +54,7 @@ final readonly class Tracer
             throw $exception;
         } finally {
             if ($span instanceof SpanInterface) {
+                $this->logger?->debug(sprintf('Ending span "%s"', $span->getContext()->getSpanId()));
                 $span->end();
             }
         }
