@@ -3,7 +3,6 @@
 namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\Instrumentation\Symfony\Cache;
 
 use OpenTelemetry\API\Trace\SpanInterface;
-use OpenTelemetry\Context\Context;
 use Psr\Cache\CacheItemInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Cache\Adapter\AdapterInterface;
