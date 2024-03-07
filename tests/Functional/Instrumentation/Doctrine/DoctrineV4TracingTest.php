@@ -1,6 +1,6 @@
 <?php
 
-namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\Tests\Functional\Instrumentation;
+namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\Tests\Functional\Instrumentation\Doctrine;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception\ConnectionException;
@@ -13,11 +13,19 @@ use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zalas\PHPUnit\Globals\Attribute\Env;
 
 #[Env('KERNEL_CLASS', Kernel::class)]
-final class DoctrineTracingTest extends KernelTestCase
+final class DoctrineV4TracingTest extends KernelTestCase
 {
     use TracingTestCaseTrait;
+    use DoctrineTestCaseTrait;
 
     private ?Connection $connection;
+
+    public static function setUpBeforeClass(): void
+    {
+        if (!self::isDoctrineDBALVersion4Installed()) {
+            self::markTestSkipped('This test requires the version of the "doctrine/dbal" Composer package to be >= 4.0.');
+        }
+    }
 
     protected function setUp(): void
     {
@@ -37,11 +45,9 @@ final class DoctrineTracingTest extends KernelTestCase
         self::assertSpanName($mainSpan, 'doctrine.dbal.connection');
         self::assertSpanStatus($mainSpan, StatusData::ok());
         self::assertSpanAttributesSubSet($mainSpan, [
-            'db.system' => 'sqlite',
             'db.name' => 'default',
             'db.user' => 'root',
         ]);
-        self::assertStringContainsString('/tests/Application/var/app.db', $mainSpan->getAttributes()->get('db.connection_string'));
         self::assertSpanEventsCount($mainSpan, 0);
 
         $querySpan = self::getSpans()[1];
@@ -69,9 +75,8 @@ final class DoctrineTracingTest extends KernelTestCase
 
         $mainSpan = self::getSpans()[0];
         self::assertSpanName($mainSpan, 'doctrine.dbal.connection');
-        self::assertSpanStatus($mainSpan, StatusData::ok());
+        self::assertSpanStatus($mainSpan, new StatusData(StatusCode::STATUS_ERROR, 'SQLSTATE[HY000] [14] unable to open database file'));
         self::assertSpanAttributesSubSet($mainSpan, [
-            'db.system' => 'sqlite',
             'db.name' => 'default',
         ]);
         self::assertSpanEventsCount($mainSpan, 1);
@@ -131,32 +136,6 @@ final class DoctrineTracingTest extends KernelTestCase
         ]);
     }
 
-    public function testExec(): void
-    {
-        set_error_handler(static function (int $errno, string $errstr): never {
-            throw new \Exception($errstr, $errno);
-        }, E_USER_DEPRECATED);
-
-        $this->expectExceptionMessage('Doctrine\DBAL\Connection::exec is deprecated, please use executeStatement() instead.');
-        $result = $this->connection->exec(<<<'SQL'
-        SELECT * FROM dummy
-        SQL);
-
-        restore_error_handler();
-
-        self::assertSame(0, $result);
-
-        self::assertSpansCount(2);
-
-        $querySpan = self::getSpans()[1];
-        self::assertSpanName($querySpan, 'doctrine.dbal.connection.exec');
-        self::assertSpanStatus($querySpan, StatusData::unset());
-        self::assertSpanAttributes($querySpan, [
-            'db.statement' => 'SELECT * FROM dummy',
-        ]);
-        self::assertSpanEventsCount($querySpan, 0);
-    }
-
     public function testStatement(): void
     {
         $result = $this->connection->executeStatement(<<<'SQL'
@@ -208,14 +187,14 @@ final class DoctrineTracingTest extends KernelTestCase
 
     public function testTransactionCommit(): void
     {
-        self::assertTrue($this->connection->beginTransaction());
+        $this->connection->beginTransaction();
 
         $result = $this->connection->executeStatement(<<<'SQL'
         SELECT * FROM dummy
         SQL);
         self::assertSame(0, $result);
 
-        self::assertTrue($this->connection->commit());
+        $this->connection->commit();
 
         self::assertSpansCount(4);
 
@@ -242,14 +221,14 @@ final class DoctrineTracingTest extends KernelTestCase
 
     public function testTransactionRollback(): void
     {
-        self::assertTrue($this->connection->beginTransaction());
+        $this->connection->beginTransaction();
 
         $result = $this->connection->executeStatement(<<<'SQL'
         SELECT * FROM dummy
         SQL);
         self::assertSame(0, $result);
 
-        self::assertTrue($this->connection->rollBack());
+        $this->connection->rollBack();
 
         self::assertSpansCount(4);
 

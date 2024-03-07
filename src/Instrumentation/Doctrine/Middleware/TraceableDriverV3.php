@@ -24,7 +24,7 @@ use OpenTelemetry\SemConv\TraceAttributes;
  * @phpstan-import-type OverrideParams from DriverManager
  * @phpstan-import-type Params from DriverManager
  */
-final class TraceableDriver extends AbstractDriverMiddleware
+final class TraceableDriverV3 extends AbstractDriverMiddleware
 {
     public function __construct(
         private TracerInterface $tracer,

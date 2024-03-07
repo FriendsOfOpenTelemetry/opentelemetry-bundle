@@ -9,7 +9,7 @@ use Doctrine\DBAL\Driver\Statement as DriverStatement;
 use OpenTelemetry\API\Trace\SpanInterface;
 use OpenTelemetry\SemConv\TraceAttributes;
 
-class TraceableConnection extends AbstractConnectionMiddleware
+class TraceableConnectionV3 extends AbstractConnectionMiddleware
 {
     public function __construct(
         ConnectionInterface $connection,

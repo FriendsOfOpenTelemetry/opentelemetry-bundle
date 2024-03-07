@@ -7,7 +7,7 @@ use Doctrine\DBAL\Driver\Result;
 use Doctrine\DBAL\Driver\Statement as StatementInterface;
 use OpenTelemetry\API\Trace\SpanInterface;
 
-final class TraceableStatement extends AbstractStatementMiddleware
+final class TraceableStatementV4 extends AbstractStatementMiddleware
 {
     public function __construct(
         StatementInterface $statement,
@@ -16,12 +16,10 @@ final class TraceableStatement extends AbstractStatementMiddleware
         parent::__construct($statement);
     }
 
-    public function execute($params = null): Result
+    public function execute(): Result
     {
-        return $this->tracer->traceFunction('doctrine.dbal.statement.execute', function (SpanInterface $span) use ($params): Result {
-            $span->setAttribute('db.params', $params);
-
-            return parent::execute($params);
+        return $this->tracer->traceFunction('doctrine.dbal.statement.execute', function (SpanInterface $span): Result {
+            return parent::execute();
         });
     }
 }
