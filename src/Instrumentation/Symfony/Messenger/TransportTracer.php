@@ -34,6 +34,8 @@ class TransportTracer
         $scope = Context::storage()->scope();
         if (null !== $scope) {
             $this->logger?->debug(sprintf('Using scope "%s"', spl_object_id($scope)));
+        } else {
+            $this->logger?->debug('No active scope');
         }
         $span = null;
 

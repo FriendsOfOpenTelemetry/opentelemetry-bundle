@@ -29,6 +29,8 @@ class TraceableMessengerMiddleware implements MiddlewareInterface
         $scope = Context::storage()->scope();
         if (null !== $scope) {
             $this->logger?->debug(sprintf('Using scope "%s"', spl_object_id($scope)));
+        } else {
+            $this->logger?->debug('No active scope');
         }
 
         $traceableStamp = $this->getTraceableStamp($envelope);
@@ -73,8 +75,11 @@ class TraceableMessengerMiddleware implements MiddlewareInterface
         try {
             return $stack->next()->handle($envelope, $stack);
         } finally {
-            $this->scope?->detach();
-            $this->scope = null;
+            if (null !== $this->scope) {
+                $this->logger?->debug(sprintf('Detaching scope "%s"', spl_object_id($this->scope)));
+                $this->scope->detach();
+                $this->scope = null;
+            }
             $stack->stop();
         }
     }

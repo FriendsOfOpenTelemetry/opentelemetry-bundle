@@ -208,6 +208,8 @@ final class TraceableHttpKernelEventSubscriber implements EventSubscriberInterfa
     {
         $scope = $this->fetchRequestScope($event->getRequest());
         if (null === $scope) {
+            $this->logger?->debug('No active scope');
+
             return;
         }
         $this->logger?->debug(sprintf('Detaching scope "%s"', spl_object_id($scope)));

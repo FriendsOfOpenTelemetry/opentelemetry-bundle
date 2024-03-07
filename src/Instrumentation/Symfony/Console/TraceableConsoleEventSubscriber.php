@@ -83,6 +83,8 @@ final class TraceableConsoleEventSubscriber implements EventSubscriberInterface
     {
         $scope = Context::storage()->scope();
         if (null === $scope) {
+            $this->logger?->debug('No active scope');
+
             return;
         }
         $this->logger?->debug(sprintf('Detaching scope "%s"', spl_object_id($scope)));

@@ -5,6 +5,7 @@ namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\Instrumentation\Symfony\Htt
 use OpenTelemetry\API\Trace\SpanInterface;
 use OpenTelemetry\API\Trace\StatusCode;
 use OpenTelemetry\SemConv\TraceAttributes;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpClient\Response\StreamableInterface;
 use Symfony\Component\HttpClient\Response\StreamWrapper;
 use Symfony\Contracts\HttpClient\ChunkInterface;
@@ -16,7 +17,8 @@ final class TraceableResponse implements ResponseInterface, StreamableInterface
     public function __construct(
         public readonly HttpClientInterface $client,
         public readonly ResponseInterface $response,
-        public readonly ?SpanInterface $span
+        public readonly ?SpanInterface $span,
+        public readonly ?LoggerInterface $logger = null,
     ) {
     }
 
@@ -147,6 +149,7 @@ final class TraceableResponse implements ResponseInterface, StreamableInterface
             }
         }
 
+        $this->logger?->debug(sprintf('Ending span "%s"', $this->span->getContext()->getSpanId()));
         $this->span->end();
     }
 }
