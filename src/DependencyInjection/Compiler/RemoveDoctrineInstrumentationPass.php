@@ -12,7 +12,6 @@ class RemoveDoctrineInstrumentationPass implements CompilerPassInterface
         if (false === $container->hasParameter('open_telemetry.instrumentation.doctrine.tracing.enabled')
             || false === $container->getParameter('open_telemetry.instrumentation.doctrine.tracing.enabled')) {
             $container->removeDefinition('open_telemetry.instrumentation.doctrine.trace.middleware');
-            $container->removeDefinition('open_telemetry.instrumentation.doctrine.trace.event_subscriber');
         }
 
         if (false === $container->hasParameter('open_telemetry.instrumentation.doctrine.metering.enabled')

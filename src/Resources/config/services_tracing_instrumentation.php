@@ -1,6 +1,5 @@
 <?php
 
-use FriendsOfOpenTelemetry\OpenTelemetryBundle\Instrumentation\Doctrine\EventSubscriber\TraceableEntityEventSubscriber as TraceableDoctrineEntityEventSubscriber;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\Instrumentation\Doctrine\Middleware\TraceableMiddleware as TraceableDoctrineMiddleware;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\Instrumentation\Symfony\Cache\TagAwareTraceableCacheAdapter;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\Instrumentation\Symfony\Cache\TraceableCacheAdapter;
@@ -8,9 +7,7 @@ use FriendsOfOpenTelemetry\OpenTelemetryBundle\Instrumentation\Symfony\Console\T
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\Instrumentation\Symfony\HttpClient\TraceableHttpClient;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\Instrumentation\Symfony\HttpKernel\TraceableHttpKernelEventSubscriber;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\Instrumentation\Symfony\Mailer\TraceableMailer;
-use FriendsOfOpenTelemetry\OpenTelemetryBundle\Instrumentation\Symfony\Mailer\TraceableMailerEventSubscriber;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\Instrumentation\Symfony\Mailer\TraceableMailerTransport;
-use FriendsOfOpenTelemetry\OpenTelemetryBundle\Instrumentation\Symfony\Messenger\TraceableMessengerEventSubscriber;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\Instrumentation\Symfony\Messenger\TraceableMessengerMiddleware;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\Instrumentation\Symfony\Messenger\TraceableMessengerTransport;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\Instrumentation\Symfony\Messenger\TraceableMessengerTransportFactory;
@@ -42,11 +39,6 @@ return static function (ContainerConfigurator $container): void {
             ->tag('kernel.event_subscriber')
 
         // Doctrine
-        ->set('open_telemetry.instrumentation.doctrine.trace.event_subscriber', TraceableDoctrineEntityEventSubscriber::class)
-            ->arg('$tracer', service('open_telemetry.traces.default_tracer'))
-            ->tag('doctrine.event_subscriber')
-            ->tag('monolog.logger', ['channel' => 'open_telemetry'])
-
         ->set('open_telemetry.instrumentation.doctrine.trace.middleware', TraceableDoctrineMiddleware::class)
             ->arg('$tracer', service('open_telemetry.traces.default_tracer'))
             ->tag('doctrine.middleware')
@@ -68,11 +60,6 @@ return static function (ContainerConfigurator $container): void {
             ->tag('monolog.logger', ['channel' => 'open_telemetry'])
 
         // Mailer
-        ->set('open_telemetry.instrumentation.mailer.trace.event_subscriber', TraceableMailerEventSubscriber::class)
-            ->arg('$tracer', service('open_telemetry.traces.default_tracer'))
-            ->tag('kernel.event_subscriber')
-            ->tag('monolog.logger', ['channel' => 'open_telemetry'])
-
         ->set('open_telemetry.instrumentation.mailer.trace.transports', TraceableMailerTransport::class)
             ->decorate('mailer.transports')
             ->arg('$tracer', service('open_telemetry.traces.default_tracer'))
@@ -92,11 +79,6 @@ return static function (ContainerConfigurator $container): void {
             ->tag('monolog.logger', ['channel' => 'open_telemetry'])
 
         // Messenger
-        ->set('open_telemetry.instrumentation.messenger.trace.event_subscriber', TraceableMessengerEventSubscriber::class)
-            ->arg('$tracer', service('open_telemetry.traces.default_tracer'))
-            ->tag('kernel.event_subscriber')
-            ->tag('monolog.logger', ['channel' => 'open_telemetry'])
-
         ->set('open_telemetry.instrumentation.messenger.trace.transport', TraceableMessengerTransport::class)
             ->arg('$tracer', service('open_telemetry.traces.default_tracer'))
             ->tag('monolog.logger', ['channel' => 'open_telemetry'])

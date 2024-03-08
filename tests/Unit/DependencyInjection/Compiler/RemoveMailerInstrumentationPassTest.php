@@ -24,7 +24,6 @@ class RemoveMailerInstrumentationPassTest extends AbstractCompilerPassTestCase
     {
         $this->compile();
 
-        self::assertContainerBuilderNotHasService('open_telemetry.instrumentation.mailer.trace.event_subscriber');
         self::assertContainerBuilderNotHasService('open_telemetry.instrumentation.mailer.trace.transports');
         self::assertContainerBuilderNotHasService('open_telemetry.instrumentation.mailer.trace.default_transport');
         self::assertContainerBuilderNotHasService('open_telemetry.instrumentation.mailer.trace.mailer');

@@ -14,7 +14,6 @@ class RemoveMessengerInstrumentationPass implements CompilerPassInterface
             $container->removeAlias('messenger.transport.open_telemetry_tracer.factory');
             $container->removeAlias('messenger.middleware.open_telemetry_tracer');
 
-            $container->removeDefinition('open_telemetry.instrumentation.messenger.trace.event_subscriber');
             $container->removeDefinition('open_telemetry.instrumentation.messenger.trace.transport');
             $container->removeDefinition('open_telemetry.instrumentation.messenger.trace.transport_factory');
             $container->removeDefinition('open_telemetry.instrumentation.messenger.trace.middleware');

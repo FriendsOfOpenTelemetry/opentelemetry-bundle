@@ -30,7 +30,6 @@ class RemoveMessengerInstrumentationPassTest extends AbstractCompilerPassTestCas
         self::assertContainerBuilderNotHasService('messenger.transport.open_telemetry_tracer.factory');
         self::assertContainerBuilderNotHasService('messenger.middleware.open_telemetry_tracer');
 
-        self::assertContainerBuilderNotHasService('open_telemetry.instrumentation.messenger.trace.event_subscriber');
         self::assertContainerBuilderNotHasService('open_telemetry.instrumentation.messenger.trace.transport');
         self::assertContainerBuilderNotHasService('open_telemetry.instrumentation.messenger.trace.transport_factory');
         self::assertContainerBuilderNotHasService('open_telemetry.instrumentation.messenger.trace.middleware');

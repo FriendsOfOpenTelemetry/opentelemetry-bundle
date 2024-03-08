@@ -23,7 +23,6 @@ class RemoveDoctrineInstrumentationPassTest extends AbstractCompilerPassTestCase
         $this->compile();
 
         self::assertContainerBuilderNotHasService('open_telemetry.instrumentation.doctrine.trace.middleware');
-        self::assertContainerBuilderNotHasService('open_telemetry.instrumentation.doctrine.trace.event_subscriber');
     }
 
     public function testDoesNotRemoveInstrumentation(): void
