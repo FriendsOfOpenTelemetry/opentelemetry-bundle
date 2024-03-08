@@ -103,9 +103,9 @@ Here is table list of the available transport and exporter for traces:
 
 | Transport | Exporter  | Description                                                  | Example                                   | Default      |
 |-----------|-----------|--------------------------------------------------------------|-------------------------------------------|--------------|
-| http(s)   | otlp      | OpenTelemetry Protocol (OTLP) using HTTP protocol (over TLS) | http+otlp://localhost:4318/v1/traces      | N/A          |
-| grpc(s)   | otlp      | OpenTelemetry Protocol (OTLP) using gRPC protocol (over TLS) | grpc+otlp://localhost:4317                | N/A          |
-| http(s)   | zipkin    | Zipkin Protocol using HTTP protocol (over TLS)               | http+zipkin://localhost:9411/api/v2/spans | N/A          |
+| http(s)   | otlp      | OpenTelemetry exporter (OTLP) using HTTP protocol (over TLS) | http+otlp://localhost:4318/v1/traces      | N/A          |
+| grpc(s)   | otlp      | OpenTelemetry exporter (OTLP) using gRPC protocol (over TLS) | grpc+otlp://localhost:4317                | N/A          |
+| http(s)   | zipkin    | Zipkin exporter using HTTP protocol (over TLS)               | http+zipkin://localhost:9411/api/v2/spans | N/A          |
 | empty     | in-memory | In-memory exporter for testing purpose                       | in-memory://default                       | N/A          |
 | stream    | console   | Console exporter for testing purpose using a stream resource | stream+console://default                  | php://stdout |
 
