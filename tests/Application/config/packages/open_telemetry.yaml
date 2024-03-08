@@ -5,6 +5,7 @@ open_telemetry:
     version: '0.0.0'
     environment: test
   instrumentation:
+    no_root_span_warning: true
     cache:
       tracing:
         enabled: true

@@ -130,8 +130,10 @@ class OpenTelemetryExtensionTest extends AbstractExtensionTestCase
 
         $config = [
             'instrumentation' => [
+                'no_root_span_warning' => true,
                 'cache' => $instrumentationConfig,
                 'console' => $instrumentationConfig,
+                'doctrine' => $instrumentationConfig,
                 'http_client' => $instrumentationConfig,
                 'http_kernel' => $instrumentationConfig,
                 'mailer' => $instrumentationConfig,
@@ -142,13 +144,17 @@ class OpenTelemetryExtensionTest extends AbstractExtensionTestCase
 
         $this->load($config);
 
-        foreach (array_keys($config['instrumentation']) as $name) {
-            self::assertContainerBuilderHasParameter(sprintf('open_telemetry.instrumentation.%s.tracing.enabled', $name), true);
-            self::assertContainerBuilderHasParameter(sprintf('open_telemetry.instrumentation.%s.tracing.tracer', $name), 'default_tracer');
-            self::assertContainerBuilderHasParameter(sprintf('open_telemetry.instrumentation.%s.tracing.request_headers', $name), ['X-Cache']);
-            self::assertContainerBuilderHasParameter(sprintf('open_telemetry.instrumentation.%s.tracing.response_headers', $name), ['X-Cache']);
-            self::assertContainerBuilderHasParameter(sprintf('open_telemetry.instrumentation.%s.metering.enabled', $name), true);
-            self::assertContainerBuilderHasParameter(sprintf('open_telemetry.instrumentation.%s.metering.meter', $name), 'default_meter');
+        self::assertContainerBuilderHasParameter('open_telemetry.instrumentation.no_root_span_warning', true);
+
+        $components = ['cache', 'console', 'doctrine', 'http_client', 'http_kernel', 'mailer', 'messenger', 'twig'];
+
+        foreach ($components as $component) {
+            self::assertContainerBuilderHasParameter(sprintf('open_telemetry.instrumentation.%s.tracing.enabled', $component), true);
+            self::assertContainerBuilderHasParameter(sprintf('open_telemetry.instrumentation.%s.tracing.tracer', $component), 'default_tracer');
+            self::assertContainerBuilderHasParameter(sprintf('open_telemetry.instrumentation.%s.tracing.request_headers', $component), ['X-Cache']);
+            self::assertContainerBuilderHasParameter(sprintf('open_telemetry.instrumentation.%s.tracing.response_headers', $component), ['X-Cache']);
+            self::assertContainerBuilderHasParameter(sprintf('open_telemetry.instrumentation.%s.metering.enabled', $component), true);
+            self::assertContainerBuilderHasParameter(sprintf('open_telemetry.instrumentation.%s.metering.meter', $component), 'default_meter');
         }
     }
 }

@@ -45,6 +45,7 @@ final class ConfigurationTest extends TestCase
         self::assertSame([
             'service' => [],
             'instrumentation' => [
+                'no_root_span_warning' => true,
                 'cache' => [
                     'tracing' => [
                         'enabled' => false,
@@ -164,6 +165,9 @@ final class ConfigurationTest extends TestCase
                 version:              ~ # Required, Example: 1.0.0
                 environment:          ~ # Required, Example: '%kernel.environment%'
             instrumentation:
+
+                # Whether to log a warning when no root span is found
+                no_root_span_warning: true
                 cache:
                     tracing:
                         enabled:              false

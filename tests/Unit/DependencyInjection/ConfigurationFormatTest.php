@@ -31,6 +31,7 @@ final class ConfigurationFormatTest extends AbstractExtensionConfigurationTestCa
                 'environment' => 'test',
             ],
             'instrumentation' => [
+                'no_root_span_warning' => true,
                 'cache' => [
                     'tracing' => [
                         'enabled' => false,

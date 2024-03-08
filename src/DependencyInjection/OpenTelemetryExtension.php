@@ -62,6 +62,7 @@ final class OpenTelemetryExtension extends ConfigurableExtension
 
     /**
      * @param array{
+     *     no_root_span_warning: bool,
      *     cache: InstrumentationConfig,
      *     console: InstrumentationConfig,
      *     doctrine: InstrumentationConfig,
@@ -74,30 +75,37 @@ final class OpenTelemetryExtension extends ConfigurableExtension
      */
     private function loadInstrumentationParams(array $config, ContainerBuilder $container): void
     {
-        foreach ($config as $name => $instrumentation) {
+        $container->setParameter(
+            'open_telemetry.instrumentation.no_root_span_warning',
+            $config['no_root_span_warning'],
+        );
+
+        $components = ['cache', 'console', 'doctrine', 'http_client', 'http_kernel', 'mailer', 'messenger', 'twig'];
+
+        foreach ($components as $component) {
             $container->setParameter(
-                sprintf('open_telemetry.instrumentation.%s.tracing.enabled', $name),
-                $instrumentation['tracing']['enabled'],
+                sprintf('open_telemetry.instrumentation.%s.tracing.enabled', $component),
+                $config[$component]['tracing']['enabled'],
             );
             $container->setParameter(
-                sprintf('open_telemetry.instrumentation.%s.tracing.tracer', $name),
-                $instrumentation['tracing']['tracer'] ?? 'default_tracer',
+                sprintf('open_telemetry.instrumentation.%s.tracing.tracer', $component),
+                $config[$component]['tracing']['tracer'] ?? 'default_tracer',
             );
             $container->setParameter(
-                sprintf('open_telemetry.instrumentation.%s.tracing.request_headers', $name),
-                $instrumentation['tracing']['request_headers'],
+                sprintf('open_telemetry.instrumentation.%s.tracing.request_headers', $component),
+                $config[$component]['tracing']['request_headers'],
             );
             $container->setParameter(
-                sprintf('open_telemetry.instrumentation.%s.tracing.response_headers', $name),
-                $instrumentation['tracing']['response_headers'],
+                sprintf('open_telemetry.instrumentation.%s.tracing.response_headers', $component),
+                $config[$component]['tracing']['response_headers'],
             );
             $container->setParameter(
-                sprintf('open_telemetry.instrumentation.%s.metering.enabled', $name),
-                $instrumentation['metering']['enabled'],
+                sprintf('open_telemetry.instrumentation.%s.metering.enabled', $component),
+                $config[$component]['metering']['enabled'],
             );
             $container->setParameter(
-                sprintf('open_telemetry.instrumentation.%s.metering.meter', $name),
-                $instrumentation['metering']['meter'] ?? 'default_meter',
+                sprintf('open_telemetry.instrumentation.%s.metering.meter', $component),
+                $config[$component]['metering']['meter'] ?? 'default_meter',
             );
         }
     }
