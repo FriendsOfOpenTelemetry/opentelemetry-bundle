@@ -24,6 +24,8 @@ It misses a few features, and it is not yet tested in a real-world application. 
 As long as the release goals are not reached and fully defined, no stable version will be released.
 But you are welcome to try this bundle and give feedback or contribute to it.
 
+In case you want to try it, a Symfony demo is maintained on this [repository](https://github.com/FriendsOfOpenTelemetry/symfony-demo).
+
 ## Installation
 
 The bundle requires PHP 8.2 or higher, Symfony 7 or higher. Run the following command to install it in your application:
