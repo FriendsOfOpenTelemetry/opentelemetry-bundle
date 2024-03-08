@@ -1,4 +1,4 @@
-# friendsofsymfony/opentelemetry-bundle
+# friendsofopentelemetry/opentelemetry-bundle
 
 [![GitHub Actions: CI][github-actions-ci-badge]][github-actions-ci-page]
 [![Codecov: Coverage][codecov-badge]][codecov-page]
