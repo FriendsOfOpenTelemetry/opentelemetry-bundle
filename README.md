@@ -9,14 +9,6 @@
 
 > Traces, metrics, and logs instrumentation for Symfony applications using OpenTelemetry PHP SDK.
 
-## Abstract
-
-There are two packages (`open-telemetry/opentelemetry-auto-symfony` & `open-telemetry/symfony-sdk-bundle`) maintained by OpenTelemetry that could do the job.
-But within a Symfony project you expect an experience that is the similar to other bundle you use in your project, most of the work should be done with configuration and dependency injection.
-My point here is not diminishing the work done by the maintainers but to explain why I started this, and it is worth to mention that I have been heavily inspired by their work.
-I could have contributed to these packages, but I didn't know where I was heading and I needed to learn first how to develop a Symfony bundle and how to use OpenTelemetry PHP implementation.
-That's why I started this project.
-
 ## Should you use this bundle in production?
 
 No, not yet. This bundle is still in development and should not be used in production or at your own risk.
