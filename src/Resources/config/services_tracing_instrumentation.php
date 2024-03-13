@@ -4,6 +4,7 @@ use FriendsOfOpenTelemetry\OpenTelemetryBundle\Instrumentation\Doctrine\Middlewa
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\Instrumentation\Symfony\Cache\TagAwareTraceableCacheAdapter;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\Instrumentation\Symfony\Cache\TraceableCacheAdapter;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\Instrumentation\Symfony\Console\TraceableConsoleEventSubscriber;
+use FriendsOfOpenTelemetry\OpenTelemetryBundle\Instrumentation\Symfony\Framework\Routing\TraceableRouteLoader;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\Instrumentation\Symfony\HttpClient\TraceableHttpClient;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\Instrumentation\Symfony\HttpKernel\TraceableHttpKernelEventSubscriber;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\Instrumentation\Symfony\Mailer\TraceableMailer;
@@ -54,6 +55,11 @@ return static function (ContainerConfigurator $container): void {
             ->arg('$propagator', service('open_telemetry.propagator_text_map.noop'))
             ->arg('$propagationGetter', service('open_telemetry.propagation_getter.headers'))
             ->tag('kernel.event_subscriber')
+            ->tag('monolog.logger', ['channel' => 'open_telemetry'])
+
+        ->set('open_telemetry.instrumentation.http_kernel.trace.route_loader', TraceableRouteLoader::class)
+            ->decorate('routing.loader')
+            ->arg('$loader', service('.inner'))
             ->tag('monolog.logger', ['channel' => 'open_telemetry'])
 
         // Mailer

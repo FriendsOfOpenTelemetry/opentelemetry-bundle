@@ -18,6 +18,7 @@ open_telemetry:
       tracing:
         enabled: true
     http_kernel:
+      type: attribute
       tracing:
         enabled: true
     mailer:

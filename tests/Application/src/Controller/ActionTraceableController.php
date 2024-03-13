@@ -3,14 +3,16 @@
 namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\Tests\Application\Controller;
 
 use Doctrine\ORM\EntityManagerInterface;
+use FriendsOfOpenTelemetry\OpenTelemetryBundle\Instrumentation\Attribute\Traceable;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\Tests\Application\Entity\Dummy;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-class DummyController extends AbstractController
+class ActionTraceableController extends AbstractController
 {
+    #[Traceable]
     #[Route('/ok', methods: ['GET'])]
     public function ok(): Response
     {
@@ -19,6 +21,7 @@ class DummyController extends AbstractController
         ]);
     }
 
+    #[Traceable]
     #[Route('/failure', methods: ['GET'])]
     public function failure(): Response
     {
@@ -27,18 +30,21 @@ class DummyController extends AbstractController
         ], Response::HTTP_SERVICE_UNAVAILABLE);
     }
 
+    #[Traceable]
     #[Route('/exception', methods: ['GET'])]
     public function exception(): Response
     {
         throw new \RuntimeException('Oops');
     }
 
+    #[Traceable]
     #[Route('/view', methods: ['GET'])]
     public function view(): Response
     {
         return $this->render('dummy.html.twig');
     }
 
+    #[Traceable]
     #[Route('/fragment', methods: ['GET'])]
     public function segment(): Response
     {
@@ -67,5 +73,11 @@ class DummyController extends AbstractController
             'id' => $dummy->id,
             'name' => $dummy->name,
         ]);
+    }
+
+    #[Route('/not-traceable', methods: ['GET'])]
+    public function notTraceable(): Response
+    {
+        return new Response(null, Response::HTTP_FOUND);
     }
 }

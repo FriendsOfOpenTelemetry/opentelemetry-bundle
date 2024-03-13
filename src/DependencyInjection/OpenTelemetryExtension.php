@@ -2,6 +2,7 @@
 
 namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\DependencyInjection;
 
+use FriendsOfOpenTelemetry\OpenTelemetryBundle\Instrumentation\InstrumentationTypeEnum;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
@@ -9,6 +10,7 @@ use Symfony\Component\HttpKernel\DependencyInjection\ConfigurableExtension;
 
 /**
  * @phpstan-type InstrumentationConfig array{
+ *     type?: string,
  *     tracing: TracingInstrumentationConfig,
  *     metering: MeteringInstrumentationConfig,
  * }
@@ -77,6 +79,12 @@ final class OpenTelemetryExtension extends ConfigurableExtension
                 sprintf('open_telemetry.instrumentation.%s.tracing.enabled', $name),
                 $instrumentation['tracing']['enabled'],
             );
+            if (isset($instrumentation['type'])) {
+                $container->setParameter(
+                    sprintf('open_telemetry.instrumentation.%s.type', $name),
+                    InstrumentationTypeEnum::from($instrumentation['type']),
+                );
+            }
             $container->setParameter(
                 sprintf('open_telemetry.instrumentation.%s.tracing.tracer', $name),
                 $instrumentation['tracing']['tracer'] ?? 'default_tracer',

@@ -2,6 +2,9 @@
 
 namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\Instrumentation\Symfony\HttpKernel;
 
+use FriendsOfOpenTelemetry\OpenTelemetryBundle\Instrumentation\InstrumentationTypeEnum;
+use FriendsOfOpenTelemetry\OpenTelemetryBundle\Instrumentation\InstrumentationTypeInterface;
+use FriendsOfOpenTelemetry\OpenTelemetryBundle\Instrumentation\Symfony\Framework\Routing\TraceableRouteLoader;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Context\Attribute\HttpKernelTraceAttributeEnum;
 use OpenTelemetry\API\Trace\SpanInterface;
 use OpenTelemetry\API\Trace\SpanKind;
@@ -13,6 +16,7 @@ use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
 use OpenTelemetry\Context\ScopeInterface;
 use OpenTelemetry\SemConv\TraceAttributes;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\HeaderBag;
 use Symfony\Component\HttpFoundation\Request;
@@ -25,8 +29,9 @@ use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\Event\TerminateEvent;
 use Symfony\Component\HttpKernel\Event\ViewEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
+use Symfony\Contracts\Service\ServiceSubscriberInterface;
 
-final class TraceableHttpKernelEventSubscriber implements EventSubscriberInterface
+final class TraceableHttpKernelEventSubscriber implements EventSubscriberInterface, ServiceSubscriberInterface, InstrumentationTypeInterface
 {
     private const REQUEST_ATTRIBUTE_SPAN = '__opentelemetry_symfony_internal_span';
     private const REQUEST_ATTRIBUTE_SCOPE = '__opentelemetry_symfony_internal_scope';
@@ -42,6 +47,8 @@ final class TraceableHttpKernelEventSubscriber implements EventSubscriberInterfa
      */
     private array $responseHeaderAttributes;
 
+    private InstrumentationTypeEnum $instrumentationType = InstrumentationTypeEnum::Auto;
+
     /**
      * @param iterable<string> $requestHeaders
      * @param iterable<string> $responseHeaders
@@ -50,6 +57,8 @@ final class TraceableHttpKernelEventSubscriber implements EventSubscriberInterfa
         private readonly TracerInterface $tracer,
         private readonly TextMapPropagatorInterface $propagator,
         private readonly PropagationGetterInterface $propagationGetter,
+        /** @var ServiceLocator<TracerInterface> */
+        private readonly ServiceLocator $tracerLocator,
         private readonly ?LoggerInterface $logger = null,
         iterable $requestHeaders = [],
         iterable $responseHeaders = [],
@@ -63,7 +72,7 @@ final class TraceableHttpKernelEventSubscriber implements EventSubscriberInterfa
         return [
             KernelEvents::REQUEST => [
                 ['startRequest', 10000],
-                ['recordRoute', 31], // after RouterListener
+                ['recordRoute', 31], // after \Symfony\Component\HttpKernel\EventListener\RouterListener
             ],
             KernelEvents::CONTROLLER => [
                 ['recordController'],
@@ -93,8 +102,41 @@ final class TraceableHttpKernelEventSubscriber implements EventSubscriberInterfa
     public function startRequest(RequestEvent $event): void
     {
         $request = $event->getRequest();
+        if (true === $event->isMainRequest() && false === $this->isAutoTraceable($request)) {
+            return;
+        }
 
-        $spanBuilder = $this->tracer
+        $span = $this->startSpan($event);
+    }
+
+    public function recordRoute(RequestEvent $event): void
+    {
+        $request = $event->getRequest();
+        $span = $this->fetchRequestSpan($request);
+
+        if (null === $span && true === $this->isAttributeTraceable($request)) {
+            $span = $this->startSpan($event);
+        }
+
+        if (null === $span) {
+            return;
+        }
+
+        $routeName = $request->attributes->get('_route', '');
+        if ('' === $routeName) {
+            return;
+        }
+
+        $span->updateName($routeName);
+        $span->setAttribute(TraceAttributes::HTTP_ROUTE, $routeName);
+    }
+
+    private function startSpan(RequestEvent $event): SpanInterface
+    {
+        $request = $event->getRequest();
+        $tracer = $this->getTracer($request);
+
+        $spanBuilder = $tracer
             ->spanBuilder(sprintf('HTTP %s', $request->getMethod()))
             ->setSpanKind(SpanKind::KIND_INTERNAL)
             ->setAttributes($this->requestAttributes($request))
@@ -125,22 +167,8 @@ final class TraceableHttpKernelEventSubscriber implements EventSubscriberInterfa
 
         $request->attributes->set(self::REQUEST_ATTRIBUTE_SPAN, $span);
         $request->attributes->set(self::REQUEST_ATTRIBUTE_SCOPE, $scope);
-    }
 
-    public function recordRoute(RequestEvent $event): void
-    {
-        $span = $this->fetchRequestSpan($event->getRequest());
-        if (null === $span) {
-            return;
-        }
-
-        $routeName = $event->getRequest()->attributes->get('_route', '');
-        if ('' === $routeName) {
-            return;
-        }
-
-        $span->updateName($routeName);
-        $span->setAttribute(TraceAttributes::HTTP_ROUTE, $routeName);
+        return $span;
     }
 
     public function recordController(ControllerEvent $event): void
@@ -246,6 +274,27 @@ final class TraceableHttpKernelEventSubscriber implements EventSubscriberInterfa
         $span->end();
     }
 
+    private function isAutoTraceable(Request $request): bool
+    {
+        return InstrumentationTypeEnum::Auto === $this->instrumentationType;
+    }
+
+    private function isAttributeTraceable(Request $request): bool
+    {
+        return InstrumentationTypeEnum::Attribute === $this->instrumentationType
+            && true === $request->attributes->get(TraceableRouteLoader::DEFAULT_KEY, false);
+    }
+
+    private function getTracer(Request $request): TracerInterface
+    {
+        $tracer = $request->attributes->get(TraceableRouteLoader::TRACER_KEY);
+        if (null !== $tracer) {
+            return $this->tracerLocator->get($tracer);
+        }
+
+        return $this->tracer;
+    }
+
     private function fetchRequestSpan(Request $request): ?SpanInterface
     {
         return $this->fetchRequestAttribute($request, self::REQUEST_ATTRIBUTE_SPAN, SpanInterface::class);
@@ -328,5 +377,15 @@ final class TraceableHttpKernelEventSubscriber implements EventSubscriberInterfa
         }
 
         return $headerAttributes;
+    }
+
+    public static function getSubscribedServices(): array
+    {
+        return [TracerInterface::class];
+    }
+
+    public function setInstrumentationType(InstrumentationTypeEnum $type): void
+    {
+        $this->instrumentationType = $type;
     }
 }

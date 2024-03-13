@@ -40,6 +40,7 @@ final class ConfigurationFormatTest extends AbstractExtensionConfigurationTestCa
                     ],
                 ],
                 'console' => [
+                    'type' => 'auto',
                     'tracing' => [
                         'enabled' => false,
                     ],
@@ -64,6 +65,7 @@ final class ConfigurationFormatTest extends AbstractExtensionConfigurationTestCa
                     ],
                 ],
                 'http_kernel' => [
+                    'type' => 'auto',
                     'tracing' => [
                         'enabled' => false,
                     ],
@@ -80,6 +82,7 @@ final class ConfigurationFormatTest extends AbstractExtensionConfigurationTestCa
                     ],
                 ],
                 'messenger' => [
+                    'type' => 'auto',
                     'tracing' => [
                         'enabled' => false,
                     ],
