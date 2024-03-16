@@ -48,8 +48,6 @@ final class ConfigurationTest extends TestCase
                 'cache' => [
                     'tracing' => [
                         'enabled' => false,
-                        'request_headers' => [],
-                        'response_headers' => [],
                     ],
                     'metering' => [
                         'enabled' => false,
@@ -58,8 +56,6 @@ final class ConfigurationTest extends TestCase
                 'console' => [
                     'tracing' => [
                         'enabled' => false,
-                        'request_headers' => [],
-                        'response_headers' => [],
                     ],
                     'metering' => [
                         'enabled' => false,
@@ -68,8 +64,6 @@ final class ConfigurationTest extends TestCase
                 'doctrine' => [
                     'tracing' => [
                         'enabled' => false,
-                        'request_headers' => [],
-                        'response_headers' => [],
                     ],
                     'metering' => [
                         'enabled' => false,
@@ -78,8 +72,6 @@ final class ConfigurationTest extends TestCase
                 'http_client' => [
                     'tracing' => [
                         'enabled' => false,
-                        'request_headers' => [],
-                        'response_headers' => [],
                     ],
                     'metering' => [
                         'enabled' => false,
@@ -88,8 +80,6 @@ final class ConfigurationTest extends TestCase
                 'http_kernel' => [
                     'tracing' => [
                         'enabled' => false,
-                        'request_headers' => [],
-                        'response_headers' => [],
                     ],
                     'metering' => [
                         'enabled' => false,
@@ -98,8 +88,6 @@ final class ConfigurationTest extends TestCase
                 'mailer' => [
                     'tracing' => [
                         'enabled' => false,
-                        'request_headers' => [],
-                        'response_headers' => [],
                     ],
                     'metering' => [
                         'enabled' => false,
@@ -108,8 +96,6 @@ final class ConfigurationTest extends TestCase
                 'messenger' => [
                     'tracing' => [
                         'enabled' => false,
-                        'request_headers' => [],
-                        'response_headers' => [],
                     ],
                     'metering' => [
                         'enabled' => false,
@@ -118,8 +104,6 @@ final class ConfigurationTest extends TestCase
                 'twig' => [
                     'tracing' => [
                         'enabled' => false,
-                        'request_headers' => [],
-                        'response_headers' => [],
                     ],
                     'metering' => [
                         'enabled' => false,
@@ -170,8 +154,6 @@ final class ConfigurationTest extends TestCase
 
                         # The tracer to use, defaults to `traces.default_tracer` or first tracer in `traces.tracers`
                         tracer:               ~
-                        request_headers:      []
-                        response_headers:     []
                     metering:
                         enabled:              false
 
@@ -183,8 +165,6 @@ final class ConfigurationTest extends TestCase
 
                         # The tracer to use, defaults to `traces.default_tracer` or first tracer in `traces.tracers`
                         tracer:               ~
-                        request_headers:      []
-                        response_headers:     []
                     metering:
                         enabled:              false
 
@@ -196,8 +176,6 @@ final class ConfigurationTest extends TestCase
 
                         # The tracer to use, defaults to `traces.default_tracer` or first tracer in `traces.tracers`
                         tracer:               ~
-                        request_headers:      []
-                        response_headers:     []
                     metering:
                         enabled:              false
 
@@ -209,8 +187,6 @@ final class ConfigurationTest extends TestCase
 
                         # The tracer to use, defaults to `traces.default_tracer` or first tracer in `traces.tracers`
                         tracer:               ~
-                        request_headers:      []
-                        response_headers:     []
                     metering:
                         enabled:              false
 
@@ -222,8 +198,6 @@ final class ConfigurationTest extends TestCase
 
                         # The tracer to use, defaults to `traces.default_tracer` or first tracer in `traces.tracers`
                         tracer:               ~
-                        request_headers:      []
-                        response_headers:     []
                     metering:
                         enabled:              false
 
@@ -235,8 +209,6 @@ final class ConfigurationTest extends TestCase
 
                         # The tracer to use, defaults to `traces.default_tracer` or first tracer in `traces.tracers`
                         tracer:               ~
-                        request_headers:      []
-                        response_headers:     []
                     metering:
                         enabled:              false
 
@@ -248,8 +220,6 @@ final class ConfigurationTest extends TestCase
 
                         # The tracer to use, defaults to `traces.default_tracer` or first tracer in `traces.tracers`
                         tracer:               ~
-                        request_headers:      []
-                        response_headers:     []
                     metering:
                         enabled:              false
 
@@ -261,8 +231,6 @@ final class ConfigurationTest extends TestCase
 
                         # The tracer to use, defaults to `traces.default_tracer` or first tracer in `traces.tracers`
                         tracer:               ~
-                        request_headers:      []
-                        response_headers:     []
                     metering:
                         enabled:              false
 

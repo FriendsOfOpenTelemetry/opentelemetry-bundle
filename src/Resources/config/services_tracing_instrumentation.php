@@ -14,7 +14,6 @@ use FriendsOfOpenTelemetry\OpenTelemetryBundle\Instrumentation\Symfony\Messenger
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\Instrumentation\Twig\TraceableTwigExtension;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 
-use function Symfony\Component\DependencyInjection\Loader\Configurator\param;
 use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
 
 return static function (ContainerConfigurator $container): void {
@@ -54,8 +53,6 @@ return static function (ContainerConfigurator $container): void {
             ->arg('$tracer', service('open_telemetry.traces.default_tracer'))
             ->arg('$propagator', service('open_telemetry.propagator_text_map.noop'))
             ->arg('$propagationGetter', service('open_telemetry.propagation_getter.headers'))
-            ->arg('$requestHeaders', param('open_telemetry.instrumentation.http_kernel.tracing.request_headers'))
-            ->arg('$responseHeaders', param('open_telemetry.instrumentation.http_kernel.tracing.response_headers'))
             ->tag('kernel.event_subscriber')
             ->tag('monolog.logger', ['channel' => 'open_telemetry'])
 

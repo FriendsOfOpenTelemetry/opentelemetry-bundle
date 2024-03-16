@@ -146,14 +146,6 @@ final class Configuration implements ConfigurationInterface
                     ->info('The tracer to use, defaults to `traces.default_tracer` or first tracer in `traces.tracers`')
                     ->cannotBeEmpty()
                 ->end()
-                ->arrayNode('request_headers')
-                    ->defaultValue([])
-                    ->scalarPrototype()->end()
-                ->end()
-                ->arrayNode('response_headers')
-                    ->defaultValue([])
-                    ->scalarPrototype()->end()
-                ->end()
             ->end();
 
         return $node;
@@ -226,6 +218,7 @@ final class Configuration implements ConfigurationInterface
                         ->values(array_map(fn (TraceProviderEnum $enum) => $enum->value, TraceProviderEnum::cases()))
                         ->isRequired()
                     ->end()
+                    // TODO: Add support for service
                     ->arrayNode('sampler')
                         ->beforeNormalization()
                             ->ifString()
@@ -353,6 +346,7 @@ final class Configuration implements ConfigurationInterface
                     ->scalarNode('exporter')
                         ->cannotBeEmpty()
                     ->end()
+                    // TODO: Add support for service
                     ->enumNode('filter')
                         ->defaultValue(ExemplarFilterEnum::None->value)
                         ->values(array_map(fn (ExemplarFilterEnum $enum) => $enum->value, ExemplarFilterEnum::cases()))

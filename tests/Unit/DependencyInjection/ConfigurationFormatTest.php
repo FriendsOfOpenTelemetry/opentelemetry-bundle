@@ -34,8 +34,6 @@ final class ConfigurationFormatTest extends AbstractExtensionConfigurationTestCa
                 'cache' => [
                     'tracing' => [
                         'enabled' => false,
-                        'request_headers' => [],
-                        'response_headers' => [],
                     ],
                     'metering' => [
                         'enabled' => false,
@@ -44,8 +42,6 @@ final class ConfigurationFormatTest extends AbstractExtensionConfigurationTestCa
                 'console' => [
                     'tracing' => [
                         'enabled' => false,
-                        'request_headers' => [],
-                        'response_headers' => [],
                     ],
                     'metering' => [
                         'enabled' => false,
@@ -54,8 +50,6 @@ final class ConfigurationFormatTest extends AbstractExtensionConfigurationTestCa
                 'doctrine' => [
                     'tracing' => [
                         'enabled' => false,
-                        'request_headers' => [],
-                        'response_headers' => [],
                     ],
                     'metering' => [
                         'enabled' => false,
@@ -64,8 +58,6 @@ final class ConfigurationFormatTest extends AbstractExtensionConfigurationTestCa
                 'http_client' => [
                     'tracing' => [
                         'enabled' => false,
-                        'request_headers' => [],
-                        'response_headers' => [],
                     ],
                     'metering' => [
                         'enabled' => false,
@@ -74,8 +66,6 @@ final class ConfigurationFormatTest extends AbstractExtensionConfigurationTestCa
                 'http_kernel' => [
                     'tracing' => [
                         'enabled' => false,
-                        'request_headers' => [],
-                        'response_headers' => [],
                     ],
                     'metering' => [
                         'enabled' => false,
@@ -84,8 +74,6 @@ final class ConfigurationFormatTest extends AbstractExtensionConfigurationTestCa
                 'mailer' => [
                     'tracing' => [
                         'enabled' => false,
-                        'request_headers' => [],
-                        'response_headers' => [],
                     ],
                     'metering' => [
                         'enabled' => false,
@@ -94,8 +82,6 @@ final class ConfigurationFormatTest extends AbstractExtensionConfigurationTestCa
                 'messenger' => [
                     'tracing' => [
                         'enabled' => false,
-                        'request_headers' => [],
-                        'response_headers' => [],
                     ],
                     'metering' => [
                         'enabled' => false,
@@ -104,8 +90,6 @@ final class ConfigurationFormatTest extends AbstractExtensionConfigurationTestCa
                 'twig' => [
                     'tracing' => [
                         'enabled' => false,
-                        'request_headers' => [],
-                        'response_headers' => [],
                     ],
                     'metering' => [
                         'enabled' => false,

@@ -120,8 +120,6 @@ class OpenTelemetryExtensionTest extends AbstractExtensionTestCase
         $instrumentationConfig = [
             'tracing' => [
                 'enabled' => true,
-                'request_headers' => ['X-Cache'],
-                'response_headers' => ['X-Cache'],
             ],
             'metering' => [
                 'enabled' => true,
@@ -145,8 +143,6 @@ class OpenTelemetryExtensionTest extends AbstractExtensionTestCase
         foreach (array_keys($config['instrumentation']) as $name) {
             self::assertContainerBuilderHasParameter(sprintf('open_telemetry.instrumentation.%s.tracing.enabled', $name), true);
             self::assertContainerBuilderHasParameter(sprintf('open_telemetry.instrumentation.%s.tracing.tracer', $name), 'default_tracer');
-            self::assertContainerBuilderHasParameter(sprintf('open_telemetry.instrumentation.%s.tracing.request_headers', $name), ['X-Cache']);
-            self::assertContainerBuilderHasParameter(sprintf('open_telemetry.instrumentation.%s.tracing.response_headers', $name), ['X-Cache']);
             self::assertContainerBuilderHasParameter(sprintf('open_telemetry.instrumentation.%s.metering.enabled', $name), true);
             self::assertContainerBuilderHasParameter(sprintf('open_telemetry.instrumentation.%s.metering.meter', $name), 'default_meter');
         }

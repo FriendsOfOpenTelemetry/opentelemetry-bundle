@@ -15,8 +15,6 @@ use Symfony\Component\HttpKernel\DependencyInjection\ConfigurableExtension;
  * @phpstan-type TracingInstrumentationConfig array{
  *     enabled: bool,
  *     tracer: ?string,
- *     request_headers: array<string, mixed>,
- *     response_headers: array<string, mixed>,
  * }
  * @phpstan-type MeteringInstrumentationConfig array{
  *     enabled: bool,
@@ -82,14 +80,6 @@ final class OpenTelemetryExtension extends ConfigurableExtension
             $container->setParameter(
                 sprintf('open_telemetry.instrumentation.%s.tracing.tracer', $name),
                 $instrumentation['tracing']['tracer'] ?? 'default_tracer',
-            );
-            $container->setParameter(
-                sprintf('open_telemetry.instrumentation.%s.tracing.request_headers', $name),
-                $instrumentation['tracing']['request_headers'],
-            );
-            $container->setParameter(
-                sprintf('open_telemetry.instrumentation.%s.tracing.response_headers', $name),
-                $instrumentation['tracing']['response_headers'],
             );
             $container->setParameter(
                 sprintf('open_telemetry.instrumentation.%s.metering.enabled', $name),
