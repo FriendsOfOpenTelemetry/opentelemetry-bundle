@@ -304,7 +304,7 @@ class OpenTelemetryTracesExtensionTest extends AbstractExtensionTestCase
     /**
      * @param ?array{
      *     type: string,
-     *     probability: ?float,
+     *     options?: array<int, mixed>,
      * } $sampler
      * @param ?string[] $processors
      */
@@ -318,8 +318,8 @@ class OpenTelemetryTracesExtensionTest extends AbstractExtensionTestCase
             $providerConfig['sampler'] = [
                 'type' => $sampler['type'],
             ];
-            if (null != $sampler['probability']) {
-                $providerConfig['sampler']['probability'] = $sampler['probability'];
+            if (isset($sampler['options'])) {
+                $providerConfig['sampler']['options'] = $sampler['options'];
             }
         }
         if (null !== $processors) {
@@ -336,16 +336,21 @@ class OpenTelemetryTracesExtensionTest extends AbstractExtensionTestCase
 
         self::assertTrue($this->container->hasDefinition('open_telemetry.traces.providers.main'));
         self::assertContainerBuilderHasServiceDefinitionWithParent('open_telemetry.traces.providers.main', 'open_telemetry.traces.provider_interface');
+
+        $samplerArg = [
+            'always_on',
+            [],
+        ];
+        if (null !== $sampler) {
+            $samplerArg = [
+                $sampler['type'],
+                $sampler['options'] ?? [],
+            ];
+        }
         self::assertContainerBuilderHasServiceDefinitionWithArgument(
             'open_telemetry.traces.providers.main',
             0,
-            (new ChildDefinition('open_telemetry.traces.sampler_factory'))->setArguments(null !== $sampler ? [
-                $sampler['type'],
-                $sampler['probability'],
-            ] : [
-                'always_on',
-                null,
-            ]),
+            (new ChildDefinition('open_telemetry.traces.sampler_factory'))->setArguments($samplerArg),
         );
         self::assertContainerBuilderHasServiceDefinitionWithArgument(
             'open_telemetry.traces.providers.main',
@@ -361,7 +366,7 @@ class OpenTelemetryTracesExtensionTest extends AbstractExtensionTestCase
      *     type: string,
      *     sampler: ?array{
      *         type: string,
-     *         probability: ?float,
+     *         options?: array<int, mixed>,
      *     },
      *     processors: ?string[],
      * }>
@@ -372,7 +377,6 @@ class OpenTelemetryTracesExtensionTest extends AbstractExtensionTestCase
             'type' => 'default',
             'sampler' => [
                 'type' => 'always_on',
-                'probability' => null,
             ],
             'processors' => ['open_telemetry.traces.processors.default'],
         ];
@@ -381,7 +385,7 @@ class OpenTelemetryTracesExtensionTest extends AbstractExtensionTestCase
             'type' => 'default',
             'sampler' => [
                 'type' => 'trace_id_ratio',
-                'probability' => 0.2,
+                'options' => [0.2],
             ],
             'processors' => ['open_telemetry.traces.processors.default'],
         ];

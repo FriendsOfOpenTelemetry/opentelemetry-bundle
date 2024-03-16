@@ -102,7 +102,7 @@ final class OpenTelemetryTracesExtension
     /**
      * @param array{
      *     type: string,
-     *     sampler?: array{type: string, probability?: float},
+     *     sampler?: array{type: string, options?: array<int, mixed>},
      *     processors?: string[]
      * } $config
      */
@@ -110,7 +110,7 @@ final class OpenTelemetryTracesExtension
     {
         $sampler = (new ChildDefinition('open_telemetry.traces.sampler_factory'))->setArguments([
             $config['sampler']['type'] ?? TraceSamplerEnum::AlwaysOn->value,
-            $config['sampler']['probability'] ?? null,
+            $config['sampler']['options'] ?? [],
         ]);
 
         $this->container

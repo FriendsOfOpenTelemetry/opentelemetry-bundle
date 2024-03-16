@@ -15,10 +15,13 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(SamplerFactory::class)]
 class SamplerFactoryTest extends TestCase
 {
+    /**
+     * @param array<int, mixed> $params
+     */
     #[DataProvider('samplerProvider')]
-    public function testCreateSampler(string $name, string $expectedClass, string $description, ?float $probability): void
+    public function testCreateSampler(string $name, string $expectedClass, string $description, array $params = []): void
     {
-        $sampler = SamplerFactory::create($name, $probability);
+        $sampler = SamplerFactory::create($name, $params);
 
         self::assertInstanceOf($expectedClass, $sampler);
         self::assertSame($description, $sampler->getDescription());
@@ -29,7 +32,7 @@ class SamplerFactoryTest extends TestCase
      *     0: string,
      *     1: class-string<SamplerInterface>,
      *     2: string,
-     *     3: float|null,
+     *     3?: array<int, mixed>,
      * }>
      */
     public static function samplerProvider(): \Generator
@@ -38,42 +41,38 @@ class SamplerFactoryTest extends TestCase
             'always_off',
             AlwaysOffSampler::class,
             'AlwaysOffSampler',
-            null,
         ];
 
         yield [
             'always_on',
             AlwaysOnSampler::class,
             'AlwaysOnSampler',
-            null,
         ];
 
         yield [
             'parent_based_always_off',
             ParentBased::class,
             'ParentBased+AlwaysOffSampler',
-            null,
         ];
 
         yield [
             'parent_based_always_on',
             ParentBased::class,
             'ParentBased+AlwaysOnSampler',
-            null,
         ];
 
         yield [
             'parent_based_trace_id_ratio',
             ParentBased::class,
             'ParentBased+TraceIdRatioBasedSampler{0.600000}',
-            0.6,
+            [0.6],
         ];
 
         yield [
             'trace_id_ratio',
             TraceIdRatioBasedSampler::class,
             'TraceIdRatioBasedSampler{0.200000}',
-            0.2,
+            [0.2],
         ];
     }
 }

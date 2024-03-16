@@ -10,7 +10,10 @@ use OpenTelemetry\SDK\Trace\SamplerInterface;
 
 final class SamplerFactory
 {
-    public static function create(string $name, ?float $probability = null): SamplerInterface
+    /**
+     * @param array<int, mixed> $params
+     */
+    public static function create(string $name, array $params = []): SamplerInterface
     {
         $sampler = TraceSamplerEnum::tryFrom($name);
 
@@ -19,8 +22,8 @@ final class SamplerFactory
             TraceSamplerEnum::AlwaysOff => new AlwaysOffSampler(),
             TraceSamplerEnum::ParentBasedAlwaysOn => new ParentBased(new AlwaysOnSampler()),
             TraceSamplerEnum::ParentBasedAlwaysOff => new ParentBased(new AlwaysOffSampler()),
-            TraceSamplerEnum::ParentBasedTraceIdRatio => new ParentBased(new TraceIdRatioBasedSampler($probability)),
-            TraceSamplerEnum::TraceIdRatio => new TraceIdRatioBasedSampler($probability),
+            TraceSamplerEnum::ParentBasedTraceIdRatio => new ParentBased(new TraceIdRatioBasedSampler(...$params)),
+            TraceSamplerEnum::TraceIdRatio => new TraceIdRatioBasedSampler(...$params),
             default => throw new \InvalidArgumentException(sprintf('Unknown sampler: %s', $name)),
         };
     }
