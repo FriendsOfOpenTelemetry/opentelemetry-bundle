@@ -34,6 +34,8 @@ open_telemetry:
     tracers:
       main:
         provider: 'open_telemetry.traces.providers.default'
+      fallback:
+        provider: 'open_telemetry.traces.providers.default'
     providers:
       default:
         type: default

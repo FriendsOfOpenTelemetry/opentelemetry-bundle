@@ -32,9 +32,10 @@ final class OpenTelemetryBundle extends Bundle
     {
         parent::build($container);
 
+        $container->addCompilerPass(new SetInstrumentationTypePass());
         $container->addCompilerPass(new CachePoolTracingPass());
         $container->addCompilerPass(new HttpClientTracingPass());
-        $container->addCompilerPass(new SetInstrumentationTypePass());
+        $container->addCompilerPass(new HttpKernelTracerLocatorPass());
         $container->addCompilerPass(new RemoveConsoleInstrumentationPass());
         $container->addCompilerPass(new RemoveDoctrineInstrumentationPass());
         $container->addCompilerPass(new RemoveHttpKernelInstrumentationPass());
@@ -42,6 +43,5 @@ final class OpenTelemetryBundle extends Bundle
         $container->addCompilerPass(new RemoveMessengerInstrumentationPass());
         $container->addCompilerPass(new RemoveTwigInstrumentationPass());
         $container->addCompilerPass(new RemoveTwigInstrumentationPass());
-        $container->addCompilerPass(new HttpKernelTracerLocatorPass());
     }
 }
