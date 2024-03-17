@@ -10,4 +10,5 @@ enum TraceSamplerEnum: string
     case ParentBasedAlwaysOn = 'parent_based_always_on';
     case ParentBasedTraceIdRatio = 'parent_based_trace_id_ratio';
     case TraceIdRatio = 'trace_id_ratio';
+    case AttributeBased = 'attribute_based';
 }

@@ -2,6 +2,7 @@
 
 namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\Tests\Unit\OpenTelemetry\Trace;
 
+use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Trace\Sampler\AttributeBasedSampler;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Trace\SamplerFactory;
 use OpenTelemetry\SDK\Trace\Sampler\AlwaysOffSampler;
 use OpenTelemetry\SDK\Trace\Sampler\AlwaysOnSampler;
@@ -73,6 +74,13 @@ class SamplerFactoryTest extends TestCase
             TraceIdRatioBasedSampler::class,
             'TraceIdRatioBasedSampler{0.200000}',
             [0.2],
+        ];
+
+        yield [
+            'attribute_based',
+            AttributeBasedSampler::class,
+            'AttributeBasedSampler{traceable, 1}',
+            ['traceable', true],
         ];
     }
 }

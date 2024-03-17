@@ -250,7 +250,7 @@ final class ConfigurationTest extends TestCase
                     provider:
                         type:                 default # One of "default"; "noop", Required
                         sampler:
-                            type:                 always_on # One of "always_off"; "always_on"; "parent_based_always_off"; "parent_based_always_on"; "parent_based_trace_id_ratio"; "trace_id_ratio", Required
+                            type:                 always_on # One of "always_off"; "always_on"; "parent_based_always_off"; "parent_based_always_on"; "parent_based_trace_id_ratio"; "trace_id_ratio"; "attribute_based", Required
                             options:              []
                         processors:           []
                 processors:
