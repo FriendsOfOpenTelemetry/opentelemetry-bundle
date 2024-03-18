@@ -26,13 +26,13 @@ class ConsoleTracingTest extends KernelTestCase
 
         $tester = new ApplicationTester($application);
 
-        $tester->run(['command' => 'dummy-command']);
+        $tester->run(['command' => 'traceable-command']);
         $tester->assertCommandIsSuccessful();
 
         self::assertSpansCount(1);
 
         $mainSpan = self::getSpans()[0];
-        self::assertSpanName($mainSpan, 'dummy-command');
+        self::assertSpanName($mainSpan, 'traceable-command');
         self::assertSpanStatus($mainSpan, StatusData::ok());
         self::assertSpanAttributes($mainSpan, [
             'code.function' => 'execute',
@@ -52,7 +52,7 @@ class ConsoleTracingTest extends KernelTestCase
         $tester = new ApplicationTester($application);
 
         $tester->run([
-            'command' => 'dummy-command',
+            'command' => 'traceable-command',
             '--fail' => true,
         ]);
         self::assertSame(1, $tester->getStatusCode());
@@ -60,7 +60,7 @@ class ConsoleTracingTest extends KernelTestCase
         self::assertSpansCount(1);
 
         $mainSpan = self::getSpans()[0];
-        self::assertSpanName($mainSpan, 'dummy-command');
+        self::assertSpanName($mainSpan, 'traceable-command');
         self::assertSpanStatus($mainSpan, StatusData::error());
         self::assertSpanAttributes($mainSpan, [
             'code.function' => 'execute',
@@ -80,7 +80,7 @@ class ConsoleTracingTest extends KernelTestCase
         $tester = new ApplicationTester($application);
 
         $tester->run([
-            'command' => 'dummy-command',
+            'command' => 'traceable-command',
             '--throw' => true,
         ], [
             'verbosity' => OutputInterface::VERBOSITY_QUIET,
@@ -93,7 +93,7 @@ class ConsoleTracingTest extends KernelTestCase
         self::assertSpansCount(1);
 
         $mainSpan = self::getSpans()[0];
-        self::assertSpanName($mainSpan, 'dummy-command');
+        self::assertSpanName($mainSpan, 'traceable-command');
         self::assertSpanStatus($mainSpan, StatusData::error());
         self::assertSpanAttributes($mainSpan, [
             'code.function' => 'execute',
@@ -110,5 +110,32 @@ class ConsoleTracingTest extends KernelTestCase
             'exception.message' => 'Oops',
             'symfony.console.exit_code' => 1,
         ]);
+    }
+
+    public function testFallback(): void
+    {
+        $kernel = self::bootKernel();
+
+        $application = new Application($kernel);
+        $application->setAutoExit(false);
+
+        $tester = new ApplicationTester($application);
+
+        $tester->run(['command' => 'fallback-command']);
+        $tester->assertCommandIsSuccessful();
+
+        self::assertSpansCount(0);
+
+        self::assertSpansCount(1, 'open_telemetry.traces.exporters.fallback');
+
+        $mainSpan = self::getSpans('open_telemetry.traces.exporters.fallback')[0];
+        self::assertSpanName($mainSpan, 'fallback-command');
+        self::assertSpanStatus($mainSpan, StatusData::ok());
+        self::assertSpanAttributes($mainSpan, [
+            'code.function' => 'execute',
+            'code.namespace' => 'FriendsOfOpenTelemetry\OpenTelemetryBundle\Tests\Application\Command\FallbackCommand',
+            'symfony.console.exit_code' => 0,
+        ]);
+        self::assertSpanEventsCount($mainSpan, 0);
     }
 }

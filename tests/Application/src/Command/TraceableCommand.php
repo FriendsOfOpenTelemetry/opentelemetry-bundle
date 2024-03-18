@@ -10,8 +10,8 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 #[Traceable]
-#[AsCommand('dummy-command')]
-final class TraceableCommand extends Command
+#[AsCommand('traceable-command')]
+class TraceableCommand extends Command
 {
     protected function configure(): void
     {

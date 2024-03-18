@@ -36,17 +36,27 @@ open_telemetry:
       main:
         provider: 'open_telemetry.traces.providers.default'
       fallback:
-        provider: 'open_telemetry.traces.providers.default'
+        provider: 'open_telemetry.traces.providers.fallback'
     providers:
       default:
         type: default
         sampler: always_on
         processors:
           - 'open_telemetry.traces.processors.simple'
+      fallback:
+        type: default
+        sampler: always_on
+        processors:
+          - 'open_telemetry.traces.processors.fallback'
     processors:
       simple:
         type: simple
         exporter: 'open_telemetry.traces.exporters.in_memory'
+      fallback:
+        type: simple
+        exporter: 'open_telemetry.traces.exporters.fallback'
     exporters:
       in_memory:
+        dsn: in-memory://default
+      fallback:
         dsn: in-memory://default

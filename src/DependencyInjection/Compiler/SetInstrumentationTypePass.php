@@ -7,7 +7,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class SetInstrumentationTypePass implements CompilerPassInterface
 {
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         if ($container->hasParameter('open_telemetry.instrumentation.console.type')) {
             $consoleInstrumentationType = $container->getParameter('open_telemetry.instrumentation.console.type');

@@ -155,4 +155,37 @@ class HttpKernelTracingTest extends WebTestCase
 
         self::assertSpansCount(0);
     }
+
+    public function testTraceableFallback(): void
+    {
+        $client = static::createClient();
+        $client->request('GET', '/fallback-traceable');
+
+        static::assertResponseIsSuccessful();
+        static::assertSame('{"status":"ok"}', $client->getResponse()->getContent());
+
+        self::assertSpansCount(0);
+
+        self::assertSpansCount(1, 'open_telemetry.traces.exporters.fallback');
+
+        $mainSpan = self::getSpans('open_telemetry.traces.exporters.fallback')[0];
+        self::assertSpanName($mainSpan, 'friendsofopentelemetry_opentelemetry_tests_application_fallbacktraceable__invoke');
+        self::assertSpanStatus($mainSpan, StatusData::ok());
+        self::assertSpanAttributes($mainSpan, [
+            'url.full' => 'http://localhost/fallback-traceable',
+            'http.request.method' => 'GET',
+            'url.path' => '/fallback-traceable',
+            'symfony.kernel.http.host' => 'localhost',
+            'url.scheme' => 'http',
+            'network.protocol.version' => '1.1',
+            'user_agent.original' => 'Symfony BrowserKit',
+            'network.peer.address' => '127.0.0.1',
+            'symfony.kernel.net.peer_ip' => '127.0.0.1',
+            'server.address' => 'localhost',
+            'server.port' => 80,
+            'http.route' => 'friendsofopentelemetry_opentelemetry_tests_application_fallbacktraceable__invoke',
+            'http.response.status_code' => Response::HTTP_OK,
+        ]);
+        self::assertSpanEventsCount($mainSpan, 0);
+    }
 }
