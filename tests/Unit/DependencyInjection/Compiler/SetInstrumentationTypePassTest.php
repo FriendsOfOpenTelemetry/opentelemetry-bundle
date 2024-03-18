@@ -16,6 +16,7 @@ class SetInstrumentationTypePassTest extends AbstractCompilerPassTestCase
     {
         $container->addCompilerPass(new SetInstrumentationTypePass());
 
+        $container->setDefinition('open_telemetry.instrumentation.console.trace.event_subscriber', new Definition());
         $container->setDefinition('open_telemetry.instrumentation.http_kernel.trace.event_subscriber', new Definition());
     }
 
@@ -23,15 +24,22 @@ class SetInstrumentationTypePassTest extends AbstractCompilerPassTestCase
     {
         $this->compile();
 
+        $console = $this->container->getDefinition('open_telemetry.instrumentation.console.trace.event_subscriber');
+        self::assertEquals([], $console->getMethodCalls());
+
         $httpKernel = $this->container->getDefinition('open_telemetry.instrumentation.http_kernel.trace.event_subscriber');
         self::assertEquals([], $httpKernel->getMethodCalls());
     }
 
     public function testInstrumentationType(): void
     {
+        $this->container->setParameter('open_telemetry.instrumentation.console.type', InstrumentationTypeEnum::Attribute);
         $this->container->setParameter('open_telemetry.instrumentation.http_kernel.type', InstrumentationTypeEnum::Attribute);
 
         $this->compile();
+
+        $console = $this->container->getDefinition('open_telemetry.instrumentation.console.trace.event_subscriber');
+        self::assertEquals([['setInstrumentationType', [InstrumentationTypeEnum::Attribute]]], $console->getMethodCalls());
 
         $httpKernel = $this->container->getDefinition('open_telemetry.instrumentation.http_kernel.trace.event_subscriber');
         self::assertEquals([['setInstrumentationType', [InstrumentationTypeEnum::Attribute]]], $httpKernel->getMethodCalls());

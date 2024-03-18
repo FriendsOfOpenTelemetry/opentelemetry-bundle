@@ -12,6 +12,8 @@ class SetInstrumentationTypePass implements CompilerPassInterface
         if ($container->hasParameter('open_telemetry.instrumentation.console.type')) {
             $consoleInstrumentationType = $container->getParameter('open_telemetry.instrumentation.console.type');
             if ($container->hasDefinition('open_telemetry.instrumentation.console.trace.event_subscriber')) {
+                $container->getDefinition('open_telemetry.instrumentation.console.trace.event_subscriber')
+                    ->addMethodCall('setInstrumentationType', [$consoleInstrumentationType]);
             }
         }
 

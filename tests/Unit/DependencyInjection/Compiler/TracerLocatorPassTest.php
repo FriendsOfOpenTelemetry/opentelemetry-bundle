@@ -2,25 +2,29 @@
 
 namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\Tests\Unit\DependencyInjection\Compiler;
 
-use FriendsOfOpenTelemetry\OpenTelemetryBundle\DependencyInjection\Compiler\HttpKernelTracerLocatorPass;
+use FriendsOfOpenTelemetry\OpenTelemetryBundle\DependencyInjection\Compiler\TracerLocatorPass;
 use Matthias\SymfonyDependencyInjectionTest\PhpUnit\AbstractCompilerPassTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 
-#[CoversClass(HttpKernelTracerLocatorPass::class)]
-class HttpKernelTracerLocatorPassTest extends AbstractCompilerPassTestCase
+#[CoversClass(TracerLocatorPass::class)]
+class TracerLocatorPassTest extends AbstractCompilerPassTestCase
 {
     protected function registerCompilerPass(ContainerBuilder $container): void
     {
-        $container->addCompilerPass(new HttpKernelTracerLocatorPass());
+        $container->addCompilerPass(new TracerLocatorPass());
 
+        $container->setDefinition('open_telemetry.instrumentation.console.trace.event_subscriber', new Definition());
         $container->setDefinition('open_telemetry.instrumentation.http_kernel.trace.event_subscriber', new Definition());
     }
 
     public function testNoTracerLocator(): void
     {
         $this->compile();
+
+        $console = $this->container->getDefinition('open_telemetry.instrumentation.console.trace.event_subscriber');
+        self::assertEquals([], $console->getArguments());
 
         $httpKernel = $this->container->getDefinition('open_telemetry.instrumentation.http_kernel.trace.event_subscriber');
         self::assertEquals([], $httpKernel->getArguments());
@@ -32,6 +36,9 @@ class HttpKernelTracerLocatorPassTest extends AbstractCompilerPassTestCase
         $this->container->setDefinition('tracer2', new Definition())->addTag('open_telemetry.tracer');
 
         $this->compile();
+
+        $console = $this->container->getDefinition('open_telemetry.instrumentation.console.trace.event_subscriber');
+        self::assertArrayHasKey('$tracerLocator', $console->getArguments());
 
         $httpKernel = $this->container->getDefinition('open_telemetry.instrumentation.http_kernel.trace.event_subscriber');
         self::assertArrayHasKey('$tracerLocator', $httpKernel->getArguments());

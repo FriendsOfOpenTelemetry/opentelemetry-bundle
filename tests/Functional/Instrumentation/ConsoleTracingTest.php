@@ -36,7 +36,7 @@ class ConsoleTracingTest extends KernelTestCase
         self::assertSpanStatus($mainSpan, StatusData::ok());
         self::assertSpanAttributes($mainSpan, [
             'code.function' => 'execute',
-            'code.namespace' => 'FriendsOfOpenTelemetry\OpenTelemetryBundle\Tests\Application\Command\DummyCommand',
+            'code.namespace' => 'FriendsOfOpenTelemetry\OpenTelemetryBundle\Tests\Application\Command\TraceableCommand',
             'symfony.console.exit_code' => 0,
         ]);
         self::assertSpanEventsCount($mainSpan, 0);
@@ -64,7 +64,7 @@ class ConsoleTracingTest extends KernelTestCase
         self::assertSpanStatus($mainSpan, StatusData::error());
         self::assertSpanAttributes($mainSpan, [
             'code.function' => 'execute',
-            'code.namespace' => 'FriendsOfOpenTelemetry\OpenTelemetryBundle\Tests\Application\Command\DummyCommand',
+            'code.namespace' => 'FriendsOfOpenTelemetry\OpenTelemetryBundle\Tests\Application\Command\TraceableCommand',
             'symfony.console.exit_code' => 1,
         ]);
         self::assertSpanEventsCount($mainSpan, 0);
@@ -97,7 +97,7 @@ class ConsoleTracingTest extends KernelTestCase
         self::assertSpanStatus($mainSpan, StatusData::error());
         self::assertSpanAttributes($mainSpan, [
             'code.function' => 'execute',
-            'code.namespace' => 'FriendsOfOpenTelemetry\OpenTelemetryBundle\Tests\Application\Command\DummyCommand',
+            'code.namespace' => 'FriendsOfOpenTelemetry\OpenTelemetryBundle\Tests\Application\Command\TraceableCommand',
             'symfony.console.exit_code' => 1,
         ]);
 

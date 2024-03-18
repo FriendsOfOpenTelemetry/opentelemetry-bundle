@@ -5,7 +5,6 @@ namespace FriendsOfOpenTelemetry\OpenTelemetryBundle;
 use Composer\InstalledVersions;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\DependencyInjection\Compiler\CachePoolTracingPass;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\DependencyInjection\Compiler\HttpClientTracingPass;
-use FriendsOfOpenTelemetry\OpenTelemetryBundle\DependencyInjection\Compiler\HttpKernelTracerLocatorPass;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\DependencyInjection\Compiler\RemoveConsoleInstrumentationPass;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\DependencyInjection\Compiler\RemoveDoctrineInstrumentationPass;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\DependencyInjection\Compiler\RemoveHttpKernelInstrumentationPass;
@@ -13,6 +12,7 @@ use FriendsOfOpenTelemetry\OpenTelemetryBundle\DependencyInjection\Compiler\Remo
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\DependencyInjection\Compiler\RemoveMessengerInstrumentationPass;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\DependencyInjection\Compiler\RemoveTwigInstrumentationPass;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\DependencyInjection\Compiler\SetInstrumentationTypePass;
+use FriendsOfOpenTelemetry\OpenTelemetryBundle\DependencyInjection\Compiler\TracerLocatorPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
@@ -35,7 +35,7 @@ final class OpenTelemetryBundle extends Bundle
         $container->addCompilerPass(new SetInstrumentationTypePass());
         $container->addCompilerPass(new CachePoolTracingPass());
         $container->addCompilerPass(new HttpClientTracingPass());
-        $container->addCompilerPass(new HttpKernelTracerLocatorPass());
+        $container->addCompilerPass(new TracerLocatorPass());
         $container->addCompilerPass(new RemoveConsoleInstrumentationPass());
         $container->addCompilerPass(new RemoveDoctrineInstrumentationPass());
         $container->addCompilerPass(new RemoveHttpKernelInstrumentationPass());

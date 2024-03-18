@@ -9,6 +9,7 @@ open_telemetry:
       tracing:
         enabled: true
     console:
+      type: attribute
       tracing:
         enabled: true
     doctrine:
