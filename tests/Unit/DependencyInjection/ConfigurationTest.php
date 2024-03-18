@@ -54,6 +54,7 @@ final class ConfigurationTest extends TestCase
                     ],
                 ],
                 'console' => [
+                    'type' => 'auto',
                     'tracing' => [
                         'enabled' => false,
                     ],
@@ -78,6 +79,7 @@ final class ConfigurationTest extends TestCase
                     ],
                 ],
                 'http_kernel' => [
+                    'type' => 'auto',
                     'tracing' => [
                         'enabled' => false,
                     ],
@@ -94,6 +96,7 @@ final class ConfigurationTest extends TestCase
                     ],
                 ],
                 'messenger' => [
+                    'type' => 'auto',
                     'tracing' => [
                         'enabled' => false,
                     ],
@@ -160,6 +163,7 @@ final class ConfigurationTest extends TestCase
                         # The meter to use, defaults to `metrics.default_meter` or first meter in `metrics.meters`
                         meter:                ~
                 console:
+                    type:                 auto # One of "auto"; "attribute"
                     tracing:
                         enabled:              false
 
@@ -193,6 +197,7 @@ final class ConfigurationTest extends TestCase
                         # The meter to use, defaults to `metrics.default_meter` or first meter in `metrics.meters`
                         meter:                ~
                 http_kernel:
+                    type:                 auto # One of "auto"; "attribute"
                     tracing:
                         enabled:              false
 
@@ -215,6 +220,7 @@ final class ConfigurationTest extends TestCase
                         # The meter to use, defaults to `metrics.default_meter` or first meter in `metrics.meters`
                         meter:                ~
                 messenger:
+                    type:                 auto # One of "auto"; "attribute"
                     tracing:
                         enabled:              false
 

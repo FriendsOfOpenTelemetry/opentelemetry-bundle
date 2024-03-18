@@ -9,6 +9,7 @@ open_telemetry:
       tracing:
         enabled: true
     console:
+      type: attribute
       tracing:
         enabled: true
     doctrine:
@@ -18,6 +19,7 @@ open_telemetry:
       tracing:
         enabled: true
     http_kernel:
+      type: attribute
       tracing:
         enabled: true
     mailer:
@@ -33,16 +35,28 @@ open_telemetry:
     tracers:
       main:
         provider: 'open_telemetry.traces.providers.default'
+      fallback:
+        provider: 'open_telemetry.traces.providers.fallback'
     providers:
       default:
         type: default
         sampler: always_on
         processors:
           - 'open_telemetry.traces.processors.simple'
+      fallback:
+        type: default
+        sampler: always_on
+        processors:
+          - 'open_telemetry.traces.processors.fallback'
     processors:
       simple:
         type: simple
         exporter: 'open_telemetry.traces.exporters.in_memory'
+      fallback:
+        type: simple
+        exporter: 'open_telemetry.traces.exporters.fallback'
     exporters:
       in_memory:
+        dsn: in-memory://default
+      fallback:
         dsn: in-memory://default

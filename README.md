@@ -97,8 +97,8 @@ Here is table list of the available transport and exporter for traces:
 
 | Transport | Exporter  | Description                                                  | Example                                   | Default      |
 |-----------|-----------|--------------------------------------------------------------|-------------------------------------------|--------------|
-| http(s)   | otlp      | OpenTelemetry exporter (OTLP) using HTTP protocol (over TLS) | http+otlp://localhost:4318/v1/traces      | N/A          |
-| grpc(s)   | otlp      | OpenTelemetry exporter (OTLP) using gRPC protocol (over TLS) | grpc+otlp://localhost:4317                | N/A          |
+| http(s)   | otlp      | OpenTelemetry exporter using HTTP protocol (over TLS)        | http+otlp://localhost:4318/v1/traces      | N/A          |
+| grpc(s)   | otlp      | OpenTelemetry exporter using gRPC protocol (over TLS)        | grpc+otlp://localhost:4317                | N/A          |
 | http(s)   | zipkin    | Zipkin exporter using HTTP protocol (over TLS)               | http+zipkin://localhost:9411/api/v2/spans | N/A          |
 | empty     | in-memory | In-memory exporter for testing purpose                       | in-memory://default                       | N/A          |
 | stream    | console   | Console exporter for testing purpose using a stream resource | stream+console://default                  | php://stdout |
@@ -126,6 +126,7 @@ Here is the list of the available Symfony components that can be instrumented:
 - Http Kernel (Alpha)
 - Mailer (Alpha)
 - Messenger (Alpha)
+- Worker (Not yet implemented)
 - Twig (Alpha)
 
 #### Configuration
@@ -143,6 +144,50 @@ open_telemetry:
 ```
 
 Once you enabled an instrumentation, the bundle will automatically send spans to the exporter you defined, based on its tracer, provider and processor.
+
+For `console` and `http_kernel` instrumentation you can also define a `type` configuration block:
+
+```yaml
+open_telemetry:
+  instrumentation:
+    console:
+      type: attribute # Default: auto
+      tracing:
+      # ...
+```
+
+The `type` option allows you to define how the instrumentation is done. The following options are available:
+
+- `auto`: Automatically instrument all registered routes and commands
+- `attribute`: Only instrument routes and commands using the `#[Traceable]` attribute
+
+Here is an example of how to use the `#[Traceable]` attribute:
+
+```php
+use FriendsOfOpenTelemetry\OpenTelemetryBundle\Attribute\Traceable;
+
+#[Traceable]
+#[AsCommand('test')]
+class TestCommand extends Command
+{
+    // ...
+}
+
+#[Traceable]
+class TestController extends AbstractController
+{
+    #[Traceable]
+    #[Route('/test', name: 'test')]
+    public function test(): Response
+    {
+        // ...
+    }
+}
+```
+
+You can define the following options for the `#[Traceable]` attribute:
+- `tracer`: The service id of the tracer to use (e.g. `open_telemetry.traces.tracers.main`)
+  If no tracer is defined, the default tracer will be used.
 
 ## Credits
 

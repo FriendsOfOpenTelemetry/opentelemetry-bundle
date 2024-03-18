@@ -56,6 +56,11 @@ final class OpenTelemetryTracesExtension
 
         if (null !== $defaultTracer) {
             $this->container->setAlias('open_telemetry.traces.default_tracer', new Reference(sprintf('open_telemetry.traces.tracers.%s', $defaultTracer)));
+
+            //            $container->registerAttributeForAutoconfiguration(Traceable::class, static function (ChildDefinition $definition, Traceable $attribute) {
+            //                $tracer = null !== $attribute->tracer ? $attribute->tracer : 'open_telemetry.traces.default_tracer';
+            //                $definition->addTag('open_telemetry.traceable', ['tracer' => new Reference($tracer)]);
+            //            });
         }
     }
 
@@ -144,6 +149,7 @@ final class OpenTelemetryTracesExtension
             ->setArguments([
                 $tracer['name'] ?? $this->container->getParameter('open_telemetry.bundle.name'),
                 $tracer['version'] ?? $this->container->getParameter('open_telemetry.bundle.version'),
-            ]);
+            ])
+            ->addTag('open_telemetry.tracer');
     }
 }

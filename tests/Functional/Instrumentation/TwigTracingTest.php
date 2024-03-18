@@ -81,7 +81,7 @@ class TwigTracingTest extends WebTestCase
         self::assertSpanName($nativeFragmentSpan, 'HTTP GET');
         self::assertSpanStatus($nativeFragmentSpan, StatusData::ok());
         self::assertSpanAttributes($nativeFragmentSpan, [
-            'url.full' => 'http://localhost/_fragment?_path=_format%3Dhtml%26_locale%3Den%26_controller%3DFriendsOfOpenTelemetry%255COpenTelemetryBundle%255CTests%255CApplication%255CController%255CDummyController%253A%253Aview',
+            'url.full' => 'http://localhost/_fragment?_path=_format%3Dhtml%26_locale%3Den%26_controller%3DFriendsOfOpenTelemetry%255COpenTelemetryBundle%255CTests%255CApplication%255CController%255CActionTraceableController%253A%253Aview',
             'http.request.method' => 'GET',
             'url.path' => '/_fragment',
             'symfony.kernel.http.host' => 'localhost',
@@ -103,7 +103,7 @@ class TwigTracingTest extends WebTestCase
         self::assertSpanEventsCount($fragmentSpan, 0);
 
         $mainSpan = self::getSpans()[4];
-        self::assertSpanName($mainSpan, 'friendsofopentelemetry_opentelemetry_tests_application_dummy_segment');
+        self::assertSpanName($mainSpan, 'friendsofopentelemetry_opentelemetry_tests_application_actiontraceable_segment');
         self::assertSpanStatus($mainSpan, StatusData::ok());
         self::assertSpanAttributes($mainSpan, [
             'url.full' => 'http://localhost/fragment',
@@ -117,7 +117,7 @@ class TwigTracingTest extends WebTestCase
             'symfony.kernel.net.peer_ip' => '127.0.0.1',
             'server.address' => 'localhost',
             'server.port' => 80,
-            'http.route' => 'friendsofopentelemetry_opentelemetry_tests_application_dummy_segment',
+            'http.route' => 'friendsofopentelemetry_opentelemetry_tests_application_actiontraceable_segment',
             'http.response.status_code' => 200,
         ]);
         self::assertSpanEventsCount($mainSpan, 0);

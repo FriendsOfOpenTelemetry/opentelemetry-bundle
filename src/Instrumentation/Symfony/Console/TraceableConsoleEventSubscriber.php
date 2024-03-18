@@ -2,6 +2,9 @@
 
 namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\Instrumentation\Symfony\Console;
 
+use FriendsOfOpenTelemetry\OpenTelemetryBundle\Instrumentation\Attribute\Traceable;
+use FriendsOfOpenTelemetry\OpenTelemetryBundle\Instrumentation\InstrumentationTypeEnum;
+use FriendsOfOpenTelemetry\OpenTelemetryBundle\Instrumentation\InstrumentationTypeInterface;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Context\Attribute\ConsoleTraceAttributeEnum;
 use OpenTelemetry\API\Trace\Span;
 use OpenTelemetry\API\Trace\StatusCode;
@@ -15,12 +18,18 @@ use Symfony\Component\Console\Event\ConsoleCommandEvent;
 use Symfony\Component\Console\Event\ConsoleErrorEvent;
 use Symfony\Component\Console\Event\ConsoleSignalEvent;
 use Symfony\Component\Console\Event\ConsoleTerminateEvent;
+use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Contracts\Service\ServiceSubscriberInterface;
 
-final class TraceableConsoleEventSubscriber implements EventSubscriberInterface
+final class TraceableConsoleEventSubscriber implements EventSubscriberInterface, ServiceSubscriberInterface, InstrumentationTypeInterface
 {
+    private InstrumentationTypeEnum $instrumentationType = InstrumentationTypeEnum::Auto;
+
     public function __construct(
         private readonly TracerInterface $tracer,
+        /** @var ServiceLocator<TracerInterface> */
+        private readonly ServiceLocator $tracerLocator,
         private readonly ?LoggerInterface $logger = null,
     ) {
     }
@@ -49,10 +58,16 @@ final class TraceableConsoleEventSubscriber implements EventSubscriberInterface
 
         assert($command instanceof Command);
 
+        if (false === $this->isAutoTraceable($command) && false === $this->isAttributeTraceable($command)) {
+            return;
+        }
+
+        $tracer = $this->getTracer($command);
+
         $name = $command->getName();
         $class = get_class($command);
 
-        $spanBuilder = $this->tracer
+        $spanBuilder = $tracer
             ->spanBuilder($name)
             ->setAttributes([
                 TraceAttributes::CODE_FUNCTION => 'execute',
@@ -110,5 +125,47 @@ final class TraceableConsoleEventSubscriber implements EventSubscriberInterface
     {
         $span = Span::getCurrent();
         $span->setAttribute(ConsoleTraceAttributeEnum::SignalCode->value, $event->getHandlingSignal());
+    }
+
+    private function parseAttribute(Command $command): ?Traceable
+    {
+        $reflection = new \ReflectionClass($command);
+        $attribute = $reflection->getAttributes(Traceable::class)[0] ?? null;
+
+        return $attribute?->newInstance();
+    }
+
+    private function getTracer(Command $command): TracerInterface
+    {
+        $traceable = $this->parseAttribute($command);
+
+        if (null !== $traceable?->tracer) {
+            return $this->tracerLocator->get($traceable->tracer);
+        }
+
+        return $this->tracer;
+    }
+
+    private function isAutoTraceable(Command $command): bool
+    {
+        return InstrumentationTypeEnum::Auto === $this->instrumentationType;
+    }
+
+    private function isAttributeTraceable(Command $command): bool
+    {
+        $traceable = $this->parseAttribute($command);
+
+        return InstrumentationTypeEnum::Attribute === $this->instrumentationType
+            && true === $traceable instanceof Traceable;
+    }
+
+    public static function getSubscribedServices(): array
+    {
+        return [TracerInterface::class];
+    }
+
+    public function setInstrumentationType(InstrumentationTypeEnum $type): void
+    {
+        $this->instrumentationType = $type;
     }
 }

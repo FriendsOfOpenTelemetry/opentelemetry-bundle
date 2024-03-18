@@ -2,14 +2,16 @@
 
 namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\Tests\Application\Command;
 
+use FriendsOfOpenTelemetry\OpenTelemetryBundle\Instrumentation\Attribute\Traceable;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-#[AsCommand('dummy-command')]
-final class DummyCommand extends Command
+#[Traceable]
+#[AsCommand('traceable-command')]
+class TraceableCommand extends Command
 {
     protected function configure(): void
     {

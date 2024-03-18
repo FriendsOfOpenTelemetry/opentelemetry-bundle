@@ -9,22 +9,25 @@ use OpenTelemetry\SDK\Trace\StatusData;
 
 trait TracingTestCaseTrait
 {
-    protected static function getSpanExporter(): InMemoryExporter
+    protected static function getSpanExporter(?string $exporterId = null): InMemoryExporter
     {
-        return self::getContainer()->get('open_telemetry.traces.exporters.in_memory');
+        $exporter = self::getContainer()->get($exporterId ?? 'open_telemetry.traces.exporters.in_memory');
+        self::assertInstanceOf(InMemoryExporter::class, $exporter);
+
+        return $exporter;
     }
 
     /**
      * @return SpanDataInterface[]
      */
-    protected static function getSpans(): array
+    protected static function getSpans(?string $exporterId = null): array
     {
-        return self::getSpanExporter()->getSpans();
+        return self::getSpanExporter($exporterId)->getSpans();
     }
 
-    protected static function assertSpansCount(int $count): void
+    protected static function assertSpansCount(int $count, ?string $exporterId = null): void
     {
-        $exporter = self::getSpanExporter();
+        $exporter = self::getSpanExporter($exporterId);
         self::assertCount($count, $exporter->getSpans());
     }
 

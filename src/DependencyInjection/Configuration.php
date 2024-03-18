@@ -2,6 +2,7 @@
 
 namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\DependencyInjection;
 
+use FriendsOfOpenTelemetry\OpenTelemetryBundle\Instrumentation\InstrumentationTypeEnum;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Exporter\OtlpExporterCompressionEnum;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Exporter\OtlpExporterFormatEnum;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Exporter\OtlpExporterOptions;
@@ -84,6 +85,10 @@ final class Configuration implements ConfigurationInterface
                     ->arrayNode('console')
                         ->addDefaultsIfNotSet()
                         ->children()
+                            ->enumNode('type')
+                                ->defaultValue(InstrumentationTypeEnum::Auto->value)
+                                ->values(array_map(fn (InstrumentationTypeEnum $type) => $type->value, InstrumentationTypeEnum::cases()))
+                            ->end()
                             ->append($this->getTracingInstrumentationNode())
                             ->append($this->getMeteringInstrumentationNode())
                         ->end()
@@ -105,6 +110,10 @@ final class Configuration implements ConfigurationInterface
                     ->arrayNode('http_kernel')
                         ->addDefaultsIfNotSet()
                         ->children()
+                            ->enumNode('type')
+                                ->defaultValue(InstrumentationTypeEnum::Auto->value)
+                                ->values(array_map(fn (InstrumentationTypeEnum $type) => $type->value, InstrumentationTypeEnum::cases()))
+                            ->end()
                             ->append($this->getTracingInstrumentationNode())
                             ->append($this->getMeteringInstrumentationNode())
                         ->end()
@@ -119,6 +128,10 @@ final class Configuration implements ConfigurationInterface
                     ->arrayNode('messenger')
                         ->addDefaultsIfNotSet()
                         ->children()
+                            ->enumNode('type')
+                                ->defaultValue(InstrumentationTypeEnum::Auto->value)
+                                ->values(array_map(fn (InstrumentationTypeEnum $type) => $type->value, InstrumentationTypeEnum::cases()))
+                            ->end()
                             ->append($this->getTracingInstrumentationNode())
                             ->append($this->getMeteringInstrumentationNode())
                         ->end()
@@ -231,6 +244,7 @@ final class Configuration implements ConfigurationInterface
                                 ->isRequired()
                             ->end()
                             ->arrayNode('options')
+                                ->defaultValue([])
                                 ->scalarPrototype()->cannotBeEmpty()->end()
                             ->end()
                         ->end()
