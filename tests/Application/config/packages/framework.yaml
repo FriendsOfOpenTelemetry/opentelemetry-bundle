@@ -1,7 +1,7 @@
 framework:
   secret: ThisIsSecret
   test: true
-  fragments: { path: /_fragment }
+  fragments: {path: /_fragment}
   mailer:
     transports:
       default: null://null

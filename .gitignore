@@ -13,3 +13,5 @@ phpunit.xml
 coverage
 
 var
+
+.pre-commit-config.yaml

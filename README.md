@@ -186,6 +186,7 @@ class TestController extends AbstractController
 ```
 
 You can define the following options for the `#[Traceable]` attribute:
+
 - `tracer`: The service id of the tracer to use (e.g. `open_telemetry.traces.tracers.main`)
   If no tracer is defined, the default tracer will be used.
 
@@ -195,6 +196,7 @@ You can define the following options for the `#[Traceable]` attribute:
 - [Symfony SDK for Sentry](https://github.com/getsentry/sentry-symfony/)
 
 ## License
+
 [![FOSSA Status][fossa-status-badge-large]][fossa-status-page]
 
 ## Repo Activity
