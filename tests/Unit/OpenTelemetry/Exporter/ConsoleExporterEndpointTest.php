@@ -23,8 +23,8 @@ class ConsoleExporterEndpointTest extends TestCase
     public static function dsnProvider(): \Generator
     {
         yield [
-           'stream+console://default',
-           'php://stdout',
+            'stream+console://default',
+            'php://stdout',
         ];
 
         yield [
