@@ -44,6 +44,7 @@
               editorconfig-checker.enable = true;
               markdownlint.enable = true;
               hadolint.enable = true;
+              commitizen.enable = true;
             };
           };
           formatting = treefmtEval.config.build.check self;
@@ -56,6 +57,7 @@
               pkgs.editorconfig-checker
               pkgs.markdownlint-cli
               pkgs.hadolint
+              pkgs.commitizen
 
               php
               php.packages.composer
