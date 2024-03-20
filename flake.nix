@@ -32,10 +32,6 @@
           projectRootFile = "flake.nix";
           programs.nixpkgs-fmt.enable = true;
           programs.yamlfmt.enable = true;
-          programs.php-cs-fixer.enable = true;
-          settings.formatter.php-cs-fixer = {
-            options = [ "--config=.php-cs-fixer.dist.php" ];
-          };
         };
       in
       {

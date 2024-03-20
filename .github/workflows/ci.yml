@@ -8,6 +8,25 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
   cancel-in-progress: true
 jobs:
+  flake-check:
+    name: Flake check
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@v10
+      - name: Setup Cachix
+        uses: cachix/cachix-action@v14
+        with:
+          name: opentelemetry
+          extraPullNames: nix-shell, php-src-nix
+          authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
+      - name: Setup Nix magic cache
+        uses: DeterminateSystems/magic-nix-cache-action@v4
+      - name: Run Nix Flake check
+        run: nix flake check
   php-cs-fixer:
     name: PHP CS Fixer (PHP ${{ matrix.php }})
     runs-on: ubuntu-latest
