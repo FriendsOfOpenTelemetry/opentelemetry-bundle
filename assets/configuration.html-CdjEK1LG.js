@@ -1,37 +1,4 @@
-<!doctype html>
-<html lang="en-US">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <meta name="generator" content="VuePress 2.0.0-rc.8" />
-    <style>
-      :root {
-        --c-bg: #fff;
-      }
-      html.dark {
-        --c-bg: #22272e;
-      }
-      html,
-      body {
-        background-color: var(--c-bg);
-      }
-    </style>
-    <script>
-      const userMode = localStorage.getItem('vuepress-color-scheme')
-      const systemDarkMode =
-        window.matchMedia &&
-        window.matchMedia('(prefers-color-scheme: dark)').matches
-      if (userMode === 'dark' || (userMode !== 'light' && systemDarkMode)) {
-        document.documentElement.classList.toggle('dark', true)
-      }
-    </script>
-    <title>Configuration | OpenTelemetry Bundle</title><meta name="description" content="Traces, metrics, and logs instrumentation within your Symfony application">
-    <link rel="preload" href="/opentelemetry-bundle/assets/style-BZLnFEKr.css" as="style"><link rel="stylesheet" href="/opentelemetry-bundle/assets/style-BZLnFEKr.css">
-    <link rel="modulepreload" href="/opentelemetry-bundle/assets/app-CVA58sE6.js"><link rel="modulepreload" href="/opentelemetry-bundle/assets/configuration.html-CdjEK1LG.js">
-    <link rel="prefetch" href="/opentelemetry-bundle/assets/index.html-COGjg_qE.js" as="script"><link rel="prefetch" href="/opentelemetry-bundle/assets/logs.html-DWGV1z8P.js" as="script"><link rel="prefetch" href="/opentelemetry-bundle/assets/metrics.html-CUfjKPs3.js" as="script"><link rel="prefetch" href="/opentelemetry-bundle/assets/traces.html-IcOEBykR.js" as="script"><link rel="prefetch" href="/opentelemetry-bundle/assets/getting-started.html-B-Xi2Dw0.js" as="script"><link rel="prefetch" href="/opentelemetry-bundle/assets/introduction.html-CqrT8KRp.js" as="script"><link rel="prefetch" href="/opentelemetry-bundle/assets/troubleshooting.html-B8J2KFY6.js" as="script"><link rel="prefetch" href="/opentelemetry-bundle/assets/404.html-CnYqkK1p.js" as="script">
-  </head>
-  <body>
-    <div id="app"><!--[--><div class="theme-container"><!--[--><header class="navbar"><div class="toggle-sidebar-button" title="toggle sidebar" aria-expanded="false" role="button" tabindex="0"><div class="icon" aria-hidden="true"><span></span><span></span><span></span></div></div><span><a class="route-link" href="/opentelemetry-bundle/"><!----><span class="site-name" aria-hidden="true">OpenTelemetry Bundle</span></a></span><div class="navbar-items-wrapper" style=""><!--[--><!--]--><nav class="navbar-items can-hide" aria-label="site navigation"><!--[--><div class="navbar-item"><div class="navbar-dropdown-wrapper"><button class="navbar-dropdown-title" type="button" aria-label="User Guide"><span class="title">User Guide</span><span class="arrow down"></span></button><button class="navbar-dropdown-title-mobile" type="button" aria-label="User Guide"><span class="title">User Guide</span><span class="right arrow"></span></button><ul style="display:none;" class="navbar-dropdown"><!--[--><li class="navbar-dropdown-item"><a class="route-link" href="/opentelemetry-bundle/user-guide/introduction.html" aria-label="Introduction"><!--[--><!--]--> Introduction <!--[--><!--]--></a></li><li class="navbar-dropdown-item"><a class="route-link" href="/opentelemetry-bundle/user-guide/getting-started.html" aria-label="Getting Started"><!--[--><!--]--> Getting Started <!--[--><!--]--></a></li><li class="navbar-dropdown-item"><a class="route-link route-link-active" href="/opentelemetry-bundle/user-guide/configuration.html" aria-label="Configuration"><!--[--><!--]--> Configuration <!--[--><!--]--></a></li><li class="navbar-dropdown-item"><a class="route-link" href="/opentelemetry-bundle/user-guide/troubleshooting.html" aria-label="Troubleshooting"><!--[--><!--]--> Troubleshooting <!--[--><!--]--></a></li><!--]--></ul></div></div><div class="navbar-item"><div class="navbar-dropdown-wrapper"><button class="navbar-dropdown-title" type="button" aria-label="Instrumentation"><span class="title">Instrumentation</span><span class="arrow down"></span></button><button class="navbar-dropdown-title-mobile" type="button" aria-label="Instrumentation"><span class="title">Instrumentation</span><span class="right arrow"></span></button><ul style="display:none;" class="navbar-dropdown"><!--[--><li class="navbar-dropdown-item"><a class="route-link" href="/opentelemetry-bundle/instrumentation/traces.html" aria-label="Traces"><!--[--><!--]--> Traces <!--[--><!--]--></a></li><li class="navbar-dropdown-item"><a class="route-link" href="/opentelemetry-bundle/instrumentation/metrics.html" aria-label="Metrics"><!--[--><!--]--> Metrics <!--[--><!--]--></a></li><li class="navbar-dropdown-item"><a class="route-link" href="/opentelemetry-bundle/instrumentation/logs.html" aria-label="Logs"><!--[--><!--]--> Logs <!--[--><!--]--></a></li><!--]--></ul></div></div><div class="navbar-item"><a class="external-link" href="https://github.com/FriendsOfOpenTelemetry/opentelemetry-bundle" rel="noopener noreferrer" target="_blank" aria-label="GitHub"><!--[--><!--]--> GitHub <span><svg class="external-link-icon" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path><polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg><span class="external-link-icon-sr-only">open in new window</span></span><!--[--><!--]--></a></div><!--]--></nav><!--[--><!--]--><button class="toggle-color-mode-button" title="toggle color mode"><svg style="" class="icon" focusable="false" viewBox="0 0 32 32"><path d="M16 12.005a4 4 0 1 1-4 4a4.005 4.005 0 0 1 4-4m0-2a6 6 0 1 0 6 6a6 6 0 0 0-6-6z" fill="currentColor"></path><path d="M5.394 6.813l1.414-1.415l3.506 3.506L8.9 10.318z" fill="currentColor"></path><path d="M2 15.005h5v2H2z" fill="currentColor"></path><path d="M5.394 25.197L8.9 21.691l1.414 1.415l-3.506 3.505z" fill="currentColor"></path><path d="M15 25.005h2v5h-2z" fill="currentColor"></path><path d="M21.687 23.106l1.414-1.415l3.506 3.506l-1.414 1.414z" fill="currentColor"></path><path d="M25 15.005h5v2h-5z" fill="currentColor"></path><path d="M21.687 8.904l3.506-3.506l1.414 1.415l-3.506 3.505z" fill="currentColor"></path><path d="M15 2.005h2v5h-2z" fill="currentColor"></path></svg><svg style="display:none;" class="icon" focusable="false" viewBox="0 0 32 32"><path d="M13.502 5.414a15.075 15.075 0 0 0 11.594 18.194a11.113 11.113 0 0 1-7.975 3.39c-.138 0-.278.005-.418 0a11.094 11.094 0 0 1-3.2-21.584M14.98 3a1.002 1.002 0 0 0-.175.016a13.096 13.096 0 0 0 1.825 25.981c.164.006.328 0 .49 0a13.072 13.072 0 0 0 10.703-5.555a1.01 1.01 0 0 0-.783-1.565A13.08 13.08 0 0 1 15.89 4.38A1.015 1.015 0 0 0 14.98 3z" fill="currentColor"></path></svg></button><!----></div></header><!--]--><div class="sidebar-mask"></div><!--[--><aside class="sidebar"><nav class="navbar-items" aria-label="site navigation"><!--[--><div class="navbar-item"><div class="navbar-dropdown-wrapper"><button class="navbar-dropdown-title" type="button" aria-label="User Guide"><span class="title">User Guide</span><span class="arrow down"></span></button><button class="navbar-dropdown-title-mobile" type="button" aria-label="User Guide"><span class="title">User Guide</span><span class="right arrow"></span></button><ul style="display:none;" class="navbar-dropdown"><!--[--><li class="navbar-dropdown-item"><a class="route-link" href="/opentelemetry-bundle/user-guide/introduction.html" aria-label="Introduction"><!--[--><!--]--> Introduction <!--[--><!--]--></a></li><li class="navbar-dropdown-item"><a class="route-link" href="/opentelemetry-bundle/user-guide/getting-started.html" aria-label="Getting Started"><!--[--><!--]--> Getting Started <!--[--><!--]--></a></li><li class="navbar-dropdown-item"><a class="route-link route-link-active" href="/opentelemetry-bundle/user-guide/configuration.html" aria-label="Configuration"><!--[--><!--]--> Configuration <!--[--><!--]--></a></li><li class="navbar-dropdown-item"><a class="route-link" href="/opentelemetry-bundle/user-guide/troubleshooting.html" aria-label="Troubleshooting"><!--[--><!--]--> Troubleshooting <!--[--><!--]--></a></li><!--]--></ul></div></div><div class="navbar-item"><div class="navbar-dropdown-wrapper"><button class="navbar-dropdown-title" type="button" aria-label="Instrumentation"><span class="title">Instrumentation</span><span class="arrow down"></span></button><button class="navbar-dropdown-title-mobile" type="button" aria-label="Instrumentation"><span class="title">Instrumentation</span><span class="right arrow"></span></button><ul style="display:none;" class="navbar-dropdown"><!--[--><li class="navbar-dropdown-item"><a class="route-link" href="/opentelemetry-bundle/instrumentation/traces.html" aria-label="Traces"><!--[--><!--]--> Traces <!--[--><!--]--></a></li><li class="navbar-dropdown-item"><a class="route-link" href="/opentelemetry-bundle/instrumentation/metrics.html" aria-label="Metrics"><!--[--><!--]--> Metrics <!--[--><!--]--></a></li><li class="navbar-dropdown-item"><a class="route-link" href="/opentelemetry-bundle/instrumentation/logs.html" aria-label="Logs"><!--[--><!--]--> Logs <!--[--><!--]--></a></li><!--]--></ul></div></div><div class="navbar-item"><a class="external-link" href="https://github.com/FriendsOfOpenTelemetry/opentelemetry-bundle" rel="noopener noreferrer" target="_blank" aria-label="GitHub"><!--[--><!--]--> GitHub <span><svg class="external-link-icon" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path><polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg><span class="external-link-icon-sr-only">open in new window</span></span><!--[--><!--]--></a></div><!--]--></nav><!--[--><!--]--><ul class="sidebar-items"><!--[--><li><p tabindex="0" class="sidebar-item sidebar-heading">Configuration <!----></p><ul style="" class="sidebar-item-children"><!--[--><li><a class="route-link sidebar-item" href="/opentelemetry-bundle/#full-configuration-reference" aria-label="Full configuration reference"><!--[--><!--]--> Full configuration reference <!--[--><!--]--></a><!----></li><!--]--></ul></li><!--]--></ul><!--[--><!--]--></aside><!--]--><!--[--><main class="page"><!--[--><!--]--><div class="theme-default-content"><!--[--><!--]--><div><h1 id="configuration" tabindex="-1"><a class="header-anchor" href="#configuration"><span>Configuration</span></a></h1><p>To get a full list of configuration options, run the following command:</p><div class="language-bash" data-ext="sh" data-title="sh"><pre class="language-bash"><code>bin/console config:dump-reference open_telemetry
+import{_ as n,o as s,c as a,e as t}from"./app-CVA58sE6.js";const e={},p=t(`<h1 id="configuration" tabindex="-1"><a class="header-anchor" href="#configuration"><span>Configuration</span></a></h1><p>To get a full list of configuration options, run the following command:</p><div class="language-bash" data-ext="sh" data-title="sh"><pre class="language-bash"><code>bin/console config:dump-reference open_telemetry
 </code></pre></div><h2 id="full-configuration-reference" tabindex="-1"><a class="header-anchor" href="#full-configuration-reference"><span>Full configuration reference</span></a></h2><div class="language-yaml" data-ext="yml" data-title="yml"><pre class="language-yaml"><code>
 
 <span class="token comment"># Default configuration for extension with alias: &quot;open_telemetry&quot;</span>
@@ -46,92 +13,92 @@
             <span class="token key atrule">tracing</span><span class="token punctuation">:</span>
                 <span class="token key atrule">enabled</span><span class="token punctuation">:</span>              <span class="token boolean important">false</span>
 
-                <span class="token comment"># The tracer to use, defaults to `traces.default_tracer` or first tracer in `traces.tracers`</span>
+                <span class="token comment"># The tracer to use, defaults to \`traces.default_tracer\` or first tracer in \`traces.tracers\`</span>
                 <span class="token key atrule">tracer</span><span class="token punctuation">:</span>               <span class="token null important">~</span>
             <span class="token key atrule">metering</span><span class="token punctuation">:</span>
                 <span class="token key atrule">enabled</span><span class="token punctuation">:</span>              <span class="token boolean important">false</span>
 
-                <span class="token comment"># The meter to use, defaults to `metrics.default_meter` or first meter in `metrics.meters`</span>
+                <span class="token comment"># The meter to use, defaults to \`metrics.default_meter\` or first meter in \`metrics.meters\`</span>
                 <span class="token key atrule">meter</span><span class="token punctuation">:</span>                <span class="token null important">~</span>
         <span class="token key atrule">console</span><span class="token punctuation">:</span>
             <span class="token key atrule">type</span><span class="token punctuation">:</span>                 auto <span class="token comment"># One of &quot;auto&quot;; &quot;attribute&quot;</span>
             <span class="token key atrule">tracing</span><span class="token punctuation">:</span>
                 <span class="token key atrule">enabled</span><span class="token punctuation">:</span>              <span class="token boolean important">false</span>
 
-                <span class="token comment"># The tracer to use, defaults to `traces.default_tracer` or first tracer in `traces.tracers`</span>
+                <span class="token comment"># The tracer to use, defaults to \`traces.default_tracer\` or first tracer in \`traces.tracers\`</span>
                 <span class="token key atrule">tracer</span><span class="token punctuation">:</span>               <span class="token null important">~</span>
             <span class="token key atrule">metering</span><span class="token punctuation">:</span>
                 <span class="token key atrule">enabled</span><span class="token punctuation">:</span>              <span class="token boolean important">false</span>
 
-                <span class="token comment"># The meter to use, defaults to `metrics.default_meter` or first meter in `metrics.meters`</span>
+                <span class="token comment"># The meter to use, defaults to \`metrics.default_meter\` or first meter in \`metrics.meters\`</span>
                 <span class="token key atrule">meter</span><span class="token punctuation">:</span>                <span class="token null important">~</span>
         <span class="token key atrule">doctrine</span><span class="token punctuation">:</span>
             <span class="token key atrule">tracing</span><span class="token punctuation">:</span>
                 <span class="token key atrule">enabled</span><span class="token punctuation">:</span>              <span class="token boolean important">false</span>
 
-                <span class="token comment"># The tracer to use, defaults to `traces.default_tracer` or first tracer in `traces.tracers`</span>
+                <span class="token comment"># The tracer to use, defaults to \`traces.default_tracer\` or first tracer in \`traces.tracers\`</span>
                 <span class="token key atrule">tracer</span><span class="token punctuation">:</span>               <span class="token null important">~</span>
             <span class="token key atrule">metering</span><span class="token punctuation">:</span>
                 <span class="token key atrule">enabled</span><span class="token punctuation">:</span>              <span class="token boolean important">false</span>
 
-                <span class="token comment"># The meter to use, defaults to `metrics.default_meter` or first meter in `metrics.meters`</span>
+                <span class="token comment"># The meter to use, defaults to \`metrics.default_meter\` or first meter in \`metrics.meters\`</span>
                 <span class="token key atrule">meter</span><span class="token punctuation">:</span>                <span class="token null important">~</span>
         <span class="token key atrule">http_client</span><span class="token punctuation">:</span>
             <span class="token key atrule">tracing</span><span class="token punctuation">:</span>
                 <span class="token key atrule">enabled</span><span class="token punctuation">:</span>              <span class="token boolean important">false</span>
 
-                <span class="token comment"># The tracer to use, defaults to `traces.default_tracer` or first tracer in `traces.tracers`</span>
+                <span class="token comment"># The tracer to use, defaults to \`traces.default_tracer\` or first tracer in \`traces.tracers\`</span>
                 <span class="token key atrule">tracer</span><span class="token punctuation">:</span>               <span class="token null important">~</span>
             <span class="token key atrule">metering</span><span class="token punctuation">:</span>
                 <span class="token key atrule">enabled</span><span class="token punctuation">:</span>              <span class="token boolean important">false</span>
 
-                <span class="token comment"># The meter to use, defaults to `metrics.default_meter` or first meter in `metrics.meters`</span>
+                <span class="token comment"># The meter to use, defaults to \`metrics.default_meter\` or first meter in \`metrics.meters\`</span>
                 <span class="token key atrule">meter</span><span class="token punctuation">:</span>                <span class="token null important">~</span>
         <span class="token key atrule">http_kernel</span><span class="token punctuation">:</span>
             <span class="token key atrule">type</span><span class="token punctuation">:</span>                 auto <span class="token comment"># One of &quot;auto&quot;; &quot;attribute&quot;</span>
             <span class="token key atrule">tracing</span><span class="token punctuation">:</span>
                 <span class="token key atrule">enabled</span><span class="token punctuation">:</span>              <span class="token boolean important">false</span>
 
-                <span class="token comment"># The tracer to use, defaults to `traces.default_tracer` or first tracer in `traces.tracers`</span>
+                <span class="token comment"># The tracer to use, defaults to \`traces.default_tracer\` or first tracer in \`traces.tracers\`</span>
                 <span class="token key atrule">tracer</span><span class="token punctuation">:</span>               <span class="token null important">~</span>
             <span class="token key atrule">metering</span><span class="token punctuation">:</span>
                 <span class="token key atrule">enabled</span><span class="token punctuation">:</span>              <span class="token boolean important">false</span>
 
-                <span class="token comment"># The meter to use, defaults to `metrics.default_meter` or first meter in `metrics.meters`</span>
+                <span class="token comment"># The meter to use, defaults to \`metrics.default_meter\` or first meter in \`metrics.meters\`</span>
                 <span class="token key atrule">meter</span><span class="token punctuation">:</span>                <span class="token null important">~</span>
         <span class="token key atrule">mailer</span><span class="token punctuation">:</span>
             <span class="token key atrule">tracing</span><span class="token punctuation">:</span>
                 <span class="token key atrule">enabled</span><span class="token punctuation">:</span>              <span class="token boolean important">false</span>
 
-                <span class="token comment"># The tracer to use, defaults to `traces.default_tracer` or first tracer in `traces.tracers`</span>
+                <span class="token comment"># The tracer to use, defaults to \`traces.default_tracer\` or first tracer in \`traces.tracers\`</span>
                 <span class="token key atrule">tracer</span><span class="token punctuation">:</span>               <span class="token null important">~</span>
             <span class="token key atrule">metering</span><span class="token punctuation">:</span>
                 <span class="token key atrule">enabled</span><span class="token punctuation">:</span>              <span class="token boolean important">false</span>
 
-                <span class="token comment"># The meter to use, defaults to `metrics.default_meter` or first meter in `metrics.meters`</span>
+                <span class="token comment"># The meter to use, defaults to \`metrics.default_meter\` or first meter in \`metrics.meters\`</span>
                 <span class="token key atrule">meter</span><span class="token punctuation">:</span>                <span class="token null important">~</span>
         <span class="token key atrule">messenger</span><span class="token punctuation">:</span>
             <span class="token key atrule">type</span><span class="token punctuation">:</span>                 auto <span class="token comment"># One of &quot;auto&quot;; &quot;attribute&quot;</span>
             <span class="token key atrule">tracing</span><span class="token punctuation">:</span>
                 <span class="token key atrule">enabled</span><span class="token punctuation">:</span>              <span class="token boolean important">false</span>
 
-                <span class="token comment"># The tracer to use, defaults to `traces.default_tracer` or first tracer in `traces.tracers`</span>
+                <span class="token comment"># The tracer to use, defaults to \`traces.default_tracer\` or first tracer in \`traces.tracers\`</span>
                 <span class="token key atrule">tracer</span><span class="token punctuation">:</span>               <span class="token null important">~</span>
             <span class="token key atrule">metering</span><span class="token punctuation">:</span>
                 <span class="token key atrule">enabled</span><span class="token punctuation">:</span>              <span class="token boolean important">false</span>
 
-                <span class="token comment"># The meter to use, defaults to `metrics.default_meter` or first meter in `metrics.meters`</span>
+                <span class="token comment"># The meter to use, defaults to \`metrics.default_meter\` or first meter in \`metrics.meters\`</span>
                 <span class="token key atrule">meter</span><span class="token punctuation">:</span>                <span class="token null important">~</span>
         <span class="token key atrule">twig</span><span class="token punctuation">:</span>
             <span class="token key atrule">tracing</span><span class="token punctuation">:</span>
                 <span class="token key atrule">enabled</span><span class="token punctuation">:</span>              <span class="token boolean important">false</span>
 
-                <span class="token comment"># The tracer to use, defaults to `traces.default_tracer` or first tracer in `traces.tracers`</span>
+                <span class="token comment"># The tracer to use, defaults to \`traces.default_tracer\` or first tracer in \`traces.tracers\`</span>
                 <span class="token key atrule">tracer</span><span class="token punctuation">:</span>               <span class="token null important">~</span>
             <span class="token key atrule">metering</span><span class="token punctuation">:</span>
                 <span class="token key atrule">enabled</span><span class="token punctuation">:</span>              <span class="token boolean important">false</span>
 
-                <span class="token comment"># The meter to use, defaults to `metrics.default_meter` or first meter in `metrics.meters`</span>
+                <span class="token comment"># The meter to use, defaults to \`metrics.default_meter\` or first meter in \`metrics.meters\`</span>
                 <span class="token key atrule">meter</span><span class="token punctuation">:</span>                <span class="token null important">~</span>
     <span class="token key atrule">traces</span><span class="token punctuation">:</span>
         <span class="token key atrule">tracers</span><span class="token punctuation">:</span>
@@ -271,7 +238,4 @@
                     <span class="token key atrule">cert</span><span class="token punctuation">:</span>                 <span class="token null important">~</span>
                     <span class="token key atrule">key</span><span class="token punctuation">:</span>                  <span class="token null important">~</span>
 
-</code></pre></div></div><!--[--><!--]--></div><footer class="page-meta"><div class="meta-item edit-link"><a class="external-link meta-item-label" href="https://github.com/FriendsOfOpenTelemetry/opentelemetry-bundle/edit/main/docs/src/user-guide/configuration.md" rel="noopener noreferrer" target="_blank" aria-label="Edit this page"><!--[--><!--]--> Edit this page <span><svg class="external-link-icon" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path><polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg><span class="external-link-icon-sr-only">open in new window</span></span><!--[--><!--]--></a></div><div class="meta-item last-updated"><span class="meta-item-label">Last Updated: </span><!----></div><div class="meta-item contributors"><span class="meta-item-label">Contributors: </span><span class="meta-item-info"><!--[--><!--[--><span class="contributor" title="email: me@gaelreyrol.dev">Gaël Reyrol</span><!----><!--]--><!--]--></span></div></footer><!----><!--[--><!--]--></main><!--]--></div><!--[--><!----><!--]--><!--]--></div>
-    <script type="module" src="/opentelemetry-bundle/assets/app-CVA58sE6.js" defer></script>
-  </body>
-</html>
+</code></pre></div>`,5),o=[p];function l(c,u){return s(),a("div",null,o)}const k=n(e,[["render",l],["__file","configuration.html.vue"]]),i=JSON.parse('{"path":"/user-guide/configuration.html","title":"Configuration","lang":"en-US","frontmatter":{},"headers":[{"level":2,"title":"Full configuration reference","slug":"full-configuration-reference","link":"#full-configuration-reference","children":[]}],"filePathRelative":"user-guide/configuration.md","git":{"createdTime":1711212302000,"updatedTime":1711216728000,"contributors":[{"name":"Gaël Reyrol","email":"me@gaelreyrol.dev","commits":3}]}}');export{k as comp,i as data};
