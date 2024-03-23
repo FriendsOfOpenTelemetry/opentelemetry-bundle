@@ -11,7 +11,7 @@
 
 ## Documentation
 
-Explore the documentation on [https://friendsofopentelemetry.github.io/opentelemetry-bundle](https://friendsofopentelemetry.github.io/opentelemetry-bundle/).
+Explore the documentation [here](https://friendsofopentelemetry.github.io/opentelemetry-bundle/).
 
 ## Contributing
 

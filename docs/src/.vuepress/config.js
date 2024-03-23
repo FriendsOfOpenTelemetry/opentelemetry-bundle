@@ -4,11 +4,11 @@ import {viteBundler} from '@vuepress/bundler-vite'
 import {copyCodePlugin} from '@vuepress/plugin-copy-code'
 import {gitPlugin} from '@vuepress/plugin-git'
 
-// const isProd = process.env.NODE_ENV === 'production'
+const isProd = process.env.NODE_ENV === 'production'
 
 export default defineUserConfig({
     lang: 'en-US',
-    base: '/opentelemetry-bundle/',
+    base: isProd ? '/opentelemetry-bundle/' : '/',
 
     title: 'OpenTelemetry Bundle',
     description: 'Traces, metrics, and logs instrumentation within your Symfony application',
