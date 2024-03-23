@@ -8,6 +8,7 @@ import {gitPlugin} from '@vuepress/plugin-git'
 
 export default defineUserConfig({
     lang: 'en-US',
+    base: '/opentelemetry-bundle/',
 
     title: 'OpenTelemetry Bundle',
     description: 'Traces, metrics, and logs instrumentation within your Symfony application',
@@ -36,7 +37,6 @@ export default defineUserConfig({
             {
                 text: 'Instrumentation',
                 children: [
-                    '/instrumentation/introduction.md',
                     '/instrumentation/traces.md',
                     '/instrumentation/metrics.md',
                     '/instrumentation/logs.md',
