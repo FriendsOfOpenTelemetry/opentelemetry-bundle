@@ -13,3 +13,9 @@ actions:
 #    details: Minimal setup with markdown-centered project structure helps you focus on writing.
 footer: MIT Licensed | Copyright © 2023-present Gaël Reyrol
 ---
+
+# Notes
+
+::: warning
+This documentation is a work in progress. If you can't find what you're looking for, please open an issue or a pull request.
+:::
