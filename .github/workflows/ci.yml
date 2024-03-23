@@ -165,7 +165,7 @@ jobs:
       - name: Run PHPUnit tests
         run: vendor/bin/phpunit --log-junit build/logs/phpunit/junit.xml ${{ matrix.coverage && '--coverage-clover build/logs/phpunit/clover.xml' || '' }}
         env:
-            XDEBUG_MODE: coverage
+          XDEBUG_MODE: coverage
       - name: Upload test artifacts
         if: always()
         uses: actions/upload-artifact@v4

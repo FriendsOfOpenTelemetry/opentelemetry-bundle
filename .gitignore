@@ -15,3 +15,7 @@ coverage
 var
 
 .pre-commit-config.yaml
+
+docs/node_modules
+docs/src/.vuepress/dist
+docs/src/reference.yaml

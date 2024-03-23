@@ -1,6 +1,6 @@
 {
     "name": "friendsofopentelemetry/opentelemetry-bundle",
-    "description": "Symfony Bundle for OpenTelemetry PHP",
+    "description": "Traces, metrics, and logs instrumentation within your Symfony application",
     "license": "MIT",
     "type": "symfony-bundle",
     "keywords": [
