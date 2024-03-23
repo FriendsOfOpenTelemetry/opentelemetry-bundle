@@ -7,7 +7,11 @@
 [![Built with Nix][build-with-nix-badge]][build-with-nix-page]
 [![FOSSA Status][fossa-status-badge]][fossa-status-page]
 
-> Traces, metrics, and logs instrumentation for Symfony applications using OpenTelemetry PHP SDK.
+> Traces, metrics, and logs instrumentation within your Symfony application.
+
+## Documentation
+
+Explore the documentation on [https://friendsofopentelemetry.github.io/opentelemetry-bundle](https://friendsofopentelemetry.github.io/opentelemetry-bundle/).
 
 ## Should you use this bundle in production?
 
@@ -196,12 +200,18 @@ You can define the following options for the `#[Traceable]` attribute:
 - `tracer`: The service id of the tracer to use (e.g. `open_telemetry.traces.tracers.main`)
   If no tracer is defined, the default tracer will be used.
 
+## Contributing
+
+Found a bug, have a suggestion for a new feature? Please read the contribution guideline and submit an issue.
+
 ## Credits
 
 - [OpenTelemetry PHP](https://opentelemetry.io/docs/languages/php/)
 - [Symfony SDK for Sentry](https://github.com/getsentry/sentry-symfony/)
 
 ## License
+
+All the code in this repository is released under the MIT License, for more information take a look at the [LICENSE](LICENSE) file.
 
 [![FOSSA Status][fossa-status-badge-large]][fossa-status-page]
 

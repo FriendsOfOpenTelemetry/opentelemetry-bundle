@@ -59,6 +59,9 @@
               pkgs.hadolint
               pkgs.commitizen
 
+              pkgs.nodePackages.nodejs
+              pkgs.nodePackages.npm
+
               php
               php.packages.composer
             ];
