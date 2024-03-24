@@ -1,6 +1,7 @@
 # friendsofopentelemetry/opentelemetry-bundle
 
 [![GitHub Actions: CI][github-actions-ci-badge]][github-actions-ci-page]
+[![GitHub Actions: Docs][github-actions-docs-badge]][github-actions-docs-page]
 [![Codecov: Coverage][codecov-badge]][codecov-page]
 [![Coveralls: Coverage][coveralls-badge]][coveralls-page]
 [![Project stage: Development][project-stage-badge]][project-stage-page]
@@ -34,6 +35,8 @@ All the code in this repository is released under the MIT License, for more info
 
 [github-actions-ci-badge]: https://github.com/FriendsOfOpenTelemetry/opentelemetry-bundle/actions/workflows/ci.yml/badge.svg
 [github-actions-ci-page]: https://github.com/FriendsOfOpenTelemetry/opentelemetry-bundle/actions/workflows/ci.yml
+[github-actions-docs-badge]: https://github.com/FriendsOfOpenTelemetry/opentelemetry-bundle/actions/workflows/docs.yml/badge.svg
+[github-actions-docs-page]: https://github.com/FriendsOfOpenTelemetry/opentelemetry-bundle/actions/workflows/docs.yml
 [codecov-badge]: https://codecov.io/gh/FriendsOfOpenTelemetry/opentelemetry-bundle/graph/badge.svg?token=XkThYaxqli
 [codecov-page]: https://codecov.io/gh/FriendsOfOpenTelemetry/opentelemetry-bundle
 [coveralls-badge]: https://img.shields.io/coverallsCoverage/github/FriendsOfOpenTelemetry/opentelemetry-bundle?logo=coveralls&label=coveralls
