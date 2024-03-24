@@ -42,6 +42,13 @@ export default defineUserConfig({
                     '/instrumentation/logs.md',
                 ],
             },
+            {
+                text: 'How To',
+                children: [
+                    '/how-to/otel-docker-setup.md',
+                    '/how-to/trace-code.md',
+                ],
+            },
         ],
     }),
 
