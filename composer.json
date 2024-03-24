@@ -42,7 +42,6 @@
         "zenstruck/uri": "^2.3"
     },
     "require-dev": {
-        "ext-ffi": "*",
         "ext-grpc": "*",
         "ext-mbstring": "*",
         "ext-opentelemetry": "*",
