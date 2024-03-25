@@ -17,3 +17,4 @@ jobs:
           pr-title: Update flake.lock
           commit-msg: 'chore(flake): update lock'
           pr-assignees: GaelReyrol
+          token: ${{ secrets.GH_TOKEN_FOR_UPDATES }}
