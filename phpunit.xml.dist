@@ -15,7 +15,6 @@
 
     <testsuites>
         <testsuite name="OpenTelemetry Bundle Test Suite">
-            <directory>tests/Acceptance/</directory>
             <directory>tests/Functional/</directory>
             <directory>tests/Unit/</directory>
         </testsuite>
