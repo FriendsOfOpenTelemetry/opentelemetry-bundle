@@ -37,6 +37,7 @@ export default defineUserConfig({
             {
                 text: 'Instrumentation',
                 children: [
+                    '/instrumentation/introduction.md',
                     '/instrumentation/traces.md',
                     '/instrumentation/metrics.md',
                     '/instrumentation/logs.md',
@@ -45,8 +46,7 @@ export default defineUserConfig({
             {
                 text: 'How To',
                 children: [
-                    '/how-to/otel-docker-setup.md',
-                    '/how-to/trace-code.md',
+                    '/how-to/docker-env-setup.md',
                 ],
             },
         ],

@@ -1,5 +1,7 @@
 # Traces
 
+TBD
+
 ## Configuration
 
 To configure traces, you need to define a `tracer`, a `provider`, a `processor` and an `exporter`.
@@ -51,9 +53,9 @@ Note: The `stream+console` DSN is the only DSN than can refer to a stream resour
 
 To trace a specific part of your application, please refer to the documentation of the OpenTelemetry PHP SDK Traces section, [here](https://opentelemetry.io/docs/languages/php/instrumentation/#traces).
 
-## Instrumentation
+## Components
 
-Here is the list of the available Symfony components that can be instrumented:
+Here is the list of the available Symfony components that can be traced:
 
 - Cache (Alpha)
 - Console (Alpha)
@@ -62,7 +64,6 @@ Here is the list of the available Symfony components that can be instrumented:
 - Http Kernel (Alpha)
 - Mailer (Alpha)
 - Messenger (Alpha)
-- Worker (Not yet implemented)
 - Twig (Alpha)
 
 Each component can be configured using the following configuration block:
@@ -77,9 +78,9 @@ open_telemetry:
       # ...
 ```
 
-Once you enabled an instrumentation, the bundle will automatically send spans to the exporter you defined, based on its tracer, provider and processor.
+Once you enabled an instrumentation, it will automatically create spans, based on its tracer, provider, processor and exporter.
 
-For `console` and `http_kernel` instrumentation you can also define a `type` configuration block:
+With the `Console` and `HttpKernel` entrypoint components,  you can also define a `type` configuration block:
 
 ```yaml
 open_telemetry:
@@ -92,8 +93,8 @@ open_telemetry:
 
 The `type` option allows you to define how the instrumentation is done. The following options are available:
 
-- `auto`: Automatically instrument all registered routes and commands
-- `attribute`: Only instrument routes and commands using the `#[Traceable]` attribute
+- `auto`: Automatically instrument all registered routes and commands.
+- `attribute`: Only instrument routes and commands using the `#[Traceable]` attribute.
 
 Here is an example of how to use the `#[Traceable]` attribute:
 
