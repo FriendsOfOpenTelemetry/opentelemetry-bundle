@@ -1,0 +1,19 @@
+services:
+  _defaults:
+    autowire: true
+    autoconfigure: true
+  FriendsOfOpenTelemetry\OpenTelemetryBundle\Tests\Functional\Application\:
+    resource: '../src/'
+    exclude:
+      - '../src/Entity/'
+      - '../src/Kernel.php'
+  mailer.mailer:
+    class: Symfony\Component\Mailer\Mailer
+    public: true
+  cache.app.taggable:
+    class: Symfony\Component\Cache\Adapter\TagAwareAdapter
+    public: true
+    arguments:
+      - '@cache.app'
+    tags:
+      - {name: cache.taggable, pool: cache.app}

@@ -42,7 +42,6 @@
         "zenstruck/uri": "^2.3"
     },
     "require-dev": {
-        "ext-ffi": "*",
         "ext-grpc": "*",
         "ext-mbstring": "*",
         "ext-opentelemetry": "*",
@@ -114,8 +113,8 @@
     "autoload-dev": {
         "psr-4": {
             "FriendsOfOpenTelemetry\\OpenTelemetryBundle\\Tests\\": "tests/",
-            "FriendsOfOpenTelemetry\\OpenTelemetryBundle\\Tests\\Application\\": "tests/Application/src",
-            "FriendsOfOpenTelemetry\\OpenTelemetryBundle\\Tests\\Application\\Migrations\\": "tests/Application/migrations"
+            "FriendsOfOpenTelemetry\\OpenTelemetryBundle\\Tests\\Functional\\Application\\": "tests/Functional/Application/src",
+            "FriendsOfOpenTelemetry\\OpenTelemetryBundle\\Tests\\Functional\\Application\\Migrations\\": "tests/Functional/Application/migrations"
         }
     },
     "config": {
@@ -153,7 +152,7 @@
             "@phpunit"
         ],
         "test:console": [
-            "@php ./tests/Application/bin/console"
+            "@php ./tests/Functional/Application/bin/console"
         ]
     }
 }
