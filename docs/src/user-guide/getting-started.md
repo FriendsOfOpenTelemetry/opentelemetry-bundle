@@ -2,17 +2,19 @@
 
 ## Installation
 
-The bundle requires PHP 8.2 or higher, Symfony 7 or higher. Run the following command to install it in your application:
+Run the following command to install it in your application:
 
 ```bash
 composer require friendsofopentelemetry/opentelemetry-bundle
 ```
 
-### Versions
+### Supported Versions
 
-| Version | Branch | PHP     | Symfony |
-|---------|--------|---------|---------|
-| dev     | `main` | `>=8.2` | `^7.0`  |
+There is no stable version yet, so you can use the `dev` version to install the bundle.
+
+| Version | Branch | PHP    | OpenTelemetry | Symfony |
+|---------|--------|--------|---------------|---------|
+| dev     | `main` | `^8.2` | `^1.0`        | `^7.0`  |
 
 ## Usage
 
@@ -27,7 +29,7 @@ return [
 ];
 ```
 
-Then, create a new file `config/packages/open_telemetry.yaml` and add the following configuration:
+Then, create a new file `config/packages/open_telemetry.yaml` and add the following minimal configuration:
 
 ```yaml
 open_telemetry:
@@ -37,3 +39,7 @@ open_telemetry:
     version: '1.0.0'
     environment: '%kernel.environment%'
 ```
+
+For further details on the configuration, please refer to the [Configuration page](/user-guide/configuration.md).
+
+Next: [Instrumentation - Introduction](/instrumentation/introduction.md).

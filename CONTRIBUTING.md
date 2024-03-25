@@ -7,9 +7,10 @@ If you encounter a bug or have a feature request, please [open an issue](https:/
 ## Writing documentation
 
 If you want to contribute to the documentation, you can find the source files in the `docs/` directory. The documentation is written in Markdown and generated using [VuePress](https://v2.vuepress.vuejs.org/).
-If you find something is missing or unclear please open a pull request or an issue there.
 
 ## Submitting a pull request
+
+### Labeling
 
 ### Prerequisites
 

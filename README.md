@@ -10,13 +10,25 @@
 
 > Traces, metrics, and logs instrumentation within your Symfony application.
 
+## Overview
+
+OpenTelemetry is an observability framework – an API, SDK, and tools that are designed to aid in the generation and collection of application telemetry data such as metrics, logs, and traces.
+
+For more information, visit the [OpenTelemetry PHP SDK documentation](https://opentelemetry.io/docs/languages/php/).
+
+This bundle provides a seamless integration of the OpenTelemetry PHP SDK within your Symfony application.
+
 ## Documentation
 
-Explore the documentation [here](https://friendsofopentelemetry.github.io/opentelemetry-bundle/).
+Please read the documentation: <https://friendsofopentelemetry.github.io/opentelemetry-bundle/>
 
 ## Contributing
 
 Found a bug, have a suggestion for a new feature? Please read the [contribution guide](CONTRIBUTING.md) and submit an issue.
+
+## Versioning
+
+TBD
 
 ## Credits
 
