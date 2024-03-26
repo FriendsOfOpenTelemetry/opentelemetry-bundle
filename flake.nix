@@ -16,10 +16,10 @@
       url = "github:loophp/nix-shell";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-      opentelemetry-nix = {
-        url = "github:FriendsOfOpenTelemetry/opentelemetry-nix";
-        inputs.nixpkgs.follows = "nixpkgs";
-      };
+    opentelemetry-nix = {
+      url = "github:FriendsOfOpenTelemetry/opentelemetry-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs = { self, nixpkgs, flake-utils, opentelemetry-nix, nix-php-shell, pre-commit-hooks, treefmt-nix, ... }:
@@ -63,8 +63,6 @@
               pkgs.markdownlint-cli
               pkgs.hadolint
               pkgs.commitizen
-
-              pkgs.tracetest
 
               pkgs.nodePackages.nodejs
               pkgs.nodePackages.npm

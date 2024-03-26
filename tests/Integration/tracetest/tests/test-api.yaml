@@ -6,7 +6,7 @@ spec:
   trigger:
     type: http
     httpRequest:
-      url: http://app:8080/books
+      url: http://app:8000/books
       method: GET
       headers:
         - key: Content-Type

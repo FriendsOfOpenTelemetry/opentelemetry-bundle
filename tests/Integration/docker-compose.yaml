@@ -16,3 +16,11 @@ services:
       POSTGRES_USER: postgres
     ports:
       - "5432"
+  app:
+    build:
+      context: .
+      dockerfile: application/Dockerfile
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./application:/app
