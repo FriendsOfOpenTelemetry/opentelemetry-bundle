@@ -1,15 +1,10 @@
-version: "3"
 services:
   tracetest:
     image: kubeshop/tracetest
     platform: linux/amd64
     volumes:
-      - type: bind
-        source: ./tracetest/tracetest-config.yaml
-        target: /app/tracetest.yaml
-      - type: bind
-        source: ./tracetest/tracetest-provision.yaml
-        target: /app/provisioning.yaml
+      - ./tracetest/tracetest-config.yaml:/app/tracetest.yaml
+      - ./tracetest/tracetest-provision.yaml:/app/provisioning.yaml
     ports:
       - "11633:11633"
     command: --provisioning-file /app/provisioning.yaml
@@ -33,13 +28,41 @@ services:
       interval: 1s
       timeout: 5s
       retries: 60
+    ports:
+        - "5432"
   otel-collector:
     image: otel/opentelemetry-collector-contrib
     command:
       - "--config"
       - "/otel-local-config.yaml"
     ports:
-      - "4317"
-      - "4318"
+      - "4317" # otlp grpc
+      - "4318" # otlp http
     volumes:
       - ./tracetest/otel-collector.yaml:/otel-local-config.yaml
+  tempo:
+    image: grafana/tempo
+    command: ["-config.file=/etc/tempo.yaml"]
+    volumes:
+      - ./tracetest/tempo.yaml:/etc/tempo.yaml
+    ports:
+      - "3200" # tempo http
+      - "9095" # tempo grpc
+      - "4317" # otlp grpc
+      - "4318" # otlp http
+  grafana:
+    image: grafana/grafana
+    volumes:
+      - ./tracetest/grafana-datasources.yaml:/etc/grafana/provisioning/datasources/datasources.yaml
+    environment:
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+      - GF_AUTH_DISABLE_LOGIN_FORM=true
+      - GF_FEATURE_TOGGLES_ENABLE=traceqlEditor
+    ports:
+      - "3000:3000" # http://localhost:3000/explore
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:3000/api/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5

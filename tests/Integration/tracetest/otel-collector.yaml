@@ -9,8 +9,9 @@ processors:
 exporters:
   logging:
     loglevel: debug
-  otlp/1:
-    endpoint: tracetest:4317
+  debug:
+  otlp/tempo:
+    endpoint: tempo:4317
     tls:
       insecure: true
 service:
@@ -18,4 +19,4 @@ service:
     traces/1:
       receivers: [otlp]
       processors: [batch]
-      exporters: [otlp/1]
+      exporters: [otlp/tempo, debug]

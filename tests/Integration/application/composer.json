@@ -6,6 +6,7 @@
     "require": {
         "php": ">=8.2",
         "ext-ctype": "*",
+        "ext-grpc": "*",
         "ext-iconv": "*",
         "ext-opentelemetry": "*",
         "doctrine/dbal": "^3",
@@ -14,6 +15,7 @@
         "doctrine/orm": "^3.1",
         "friendsofopentelemetry/opentelemetry-bundle": "@dev",
         "guzzlehttp/promises": "*",
+        "open-telemetry/transport-grpc": "^1.0",
         "php-http/httplug": "*",
         "phpdocumentor/reflection-docblock": "^5.3",
         "phpstan/phpdoc-parser": "^1.27",

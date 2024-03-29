@@ -48,4 +48,4 @@ open_telemetry:
         exporter: 'open_telemetry.traces.exporters.console'
     exporters:
       otlp:
-        dsn: http+otlp://localhost:4317
+        dsn: http+otlp://otel-collector:4318

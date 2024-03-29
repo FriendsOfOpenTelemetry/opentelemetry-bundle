@@ -9,6 +9,12 @@ spec:
 ---
 type: DataStore
 spec:
-  name: OpenTelemetry Collector
-  type: otlp
-  isdefault: true
+  name: Grafana Tempo
+  type: tempo
+  default: true
+  tempo:
+    type: grpc
+    grpc:
+      endpoint: tempo:9095
+      tls:
+        insecure: true

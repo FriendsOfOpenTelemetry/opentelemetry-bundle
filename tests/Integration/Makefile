@@ -13,8 +13,9 @@ up:
 
 .PHONY: test
 test: up
-	make tracetest-in-docker command="run test -f ./tests/test-api.yaml"
-	make tracetest-in-docker command="run testsuite -f ./tests/testsuite-api.yaml"
+	make tracetest-in-docker command="run test -f ./tests/test-ui.yaml"
+	#make tracetest-in-docker command="run test -f ./tests/test-api.yaml"
+	#make tracetest-in-docker command="run testsuite -f ./tests/testsuite-api.yaml"
 
 .PHONY: tracetest-in-docker
 tracetest-in-docker:

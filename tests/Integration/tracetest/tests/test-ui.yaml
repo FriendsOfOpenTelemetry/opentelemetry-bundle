@@ -1,0 +1,17 @@
+type: Test
+spec:
+  id: tEUb8SxSR
+  name: Homepage
+  description: View homepage
+  trigger:
+    type: http
+    httpRequest:
+      url: http://app:8000
+      method: GET
+      headers:
+        - key: Content-Type
+          value: application/html
+  specs:
+    - selector: span[tracetest.span.type="http" name="GET /" http.target="/" http.method="GET"]
+      assertions:
+        - attr:http.status_code = 200
