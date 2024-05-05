@@ -132,11 +132,11 @@
         "systems": "systems_4"
       },
       "locked": {
-        "lastModified": 1712560396,
-        "narHash": "sha256-XsONDFnob8boa1h9zHZXKkoZ9DkxVFH4mbHoAb6n7ts=",
+        "lastModified": 1714424365,
+        "narHash": "sha256-pWve9epk4dcbZwrMWkrZeNGL6R+XOmhyl9rLm7AJNdQ=",
         "owner": "loophp",
         "repo": "nix-shell",
-        "rev": "0999bd09d639f3b8cfc6f6567c000bb8f0aedef4",
+        "rev": "3e2cb1947cc76800fadfab5a817dc8f0c4d4003b",
         "type": "github"
       },
       "original": {
@@ -251,11 +251,11 @@
     },
     "nixpkgs_3": {
       "locked": {
-        "lastModified": 1714213793,
-        "narHash": "sha256-Yg5D5LhyAZvd3DZrQQfJAVK8K3TkUYKooFtH1ulM0mw=",
+        "lastModified": 1714809261,
+        "narHash": "sha256-hfBmnYFyz9I1mdrC3tX1A+dF9cOUcds5PIMPxrT+cRk=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "d6f6eb2a984f2ba9a366c31e4d36d65465683450",
+        "rev": "d32560238207b8e26d88b265207b216ee46b8450",
         "type": "github"
       },
       "original": {
@@ -370,11 +370,11 @@
         "nixpkgs-stable": "nixpkgs-stable"
       },
       "locked": {
-        "lastModified": 1713954846,
-        "narHash": "sha256-RWFafuSb5nkWGu8dDbW7gVb8FOQOPqmX/9MlxUUDguw=",
+        "lastModified": 1714478972,
+        "narHash": "sha256-q//cgb52vv81uOuwz1LaXElp3XAe1TqrABXODAEF6Sk=",
         "owner": "cachix",
         "repo": "pre-commit-hooks.nix",
-        "rev": "6fb82e44254d6a0ece014ec423cb62d92435336f",
+        "rev": "2849da033884f54822af194400f8dff435ada242",
         "type": "github"
       },
       "original": {
