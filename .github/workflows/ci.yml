@@ -24,7 +24,7 @@ jobs:
           extraPullNames: nix-shell, php-src-nix
           authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
       - name: Setup Nix magic cache
-        uses: DeterminateSystems/magic-nix-cache-action@v4
+        uses: DeterminateSystems/magic-nix-cache-action@v6
       - name: Run Nix Flake check
         run: nix flake check
   php-cs-fixer:
@@ -48,7 +48,7 @@ jobs:
           extraPullNames: nix-shell, php-src-nix
           authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
       - name: Setup Nix magic cache
-        uses: DeterminateSystems/magic-nix-cache-action@v4
+        uses: DeterminateSystems/magic-nix-cache-action@v6
       - name: Instantiate Nix develop
         uses: nicknovitski/nix-develop@v1
       - name: Get composer cache directory
@@ -88,7 +88,7 @@ jobs:
           extraPullNames: nix-shell, php-src-nix
           authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
       - name: Setup Nix magic cache
-        uses: DeterminateSystems/magic-nix-cache-action@v4
+        uses: DeterminateSystems/magic-nix-cache-action@v6
       - name: Instantiate Nix develop
         uses: nicknovitski/nix-develop@v1
       - name: Get composer cache directory
@@ -146,7 +146,7 @@ jobs:
           extraPullNames: nix-shell, php-src-nix
           authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
       - name: Setup Nix magic cache
-        uses: DeterminateSystems/magic-nix-cache-action@v4
+        uses: DeterminateSystems/magic-nix-cache-action@v6
       - name: Instantiate Nix develop
         uses: nicknovitski/nix-develop@v1
       - name: Get composer cache directory
