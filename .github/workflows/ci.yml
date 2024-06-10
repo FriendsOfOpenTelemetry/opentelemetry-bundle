@@ -16,7 +16,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Install Nix
-        uses: DeterminateSystems/nix-installer-action@v11
+        uses: DeterminateSystems/nix-installer-action@v12
       - name: Setup Cachix
         uses: cachix/cachix-action@v15
         with:
@@ -24,7 +24,7 @@ jobs:
           extraPullNames: nix-shell, php-src-nix
           authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
       - name: Setup Nix magic cache
-        uses: DeterminateSystems/magic-nix-cache-action@v6
+        uses: DeterminateSystems/magic-nix-cache-action@v7
       - name: Run Nix Flake check
         run: nix flake check
   php-cs-fixer:
@@ -40,7 +40,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Install Nix
-        uses: DeterminateSystems/nix-installer-action@v11
+        uses: DeterminateSystems/nix-installer-action@v12
       - name: Setup Cachix
         uses: cachix/cachix-action@v15
         with:
@@ -48,7 +48,7 @@ jobs:
           extraPullNames: nix-shell, php-src-nix
           authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
       - name: Setup Nix magic cache
-        uses: DeterminateSystems/magic-nix-cache-action@v6
+        uses: DeterminateSystems/magic-nix-cache-action@v7
       - name: Instantiate Nix develop
         uses: nicknovitski/nix-develop@v1
       - name: Get composer cache directory
@@ -80,7 +80,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Install Nix
-        uses: DeterminateSystems/nix-installer-action@v11
+        uses: DeterminateSystems/nix-installer-action@v12
       - name: Setup Cachix
         uses: cachix/cachix-action@v15
         with:
@@ -88,7 +88,7 @@ jobs:
           extraPullNames: nix-shell, php-src-nix
           authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
       - name: Setup Nix magic cache
-        uses: DeterminateSystems/magic-nix-cache-action@v6
+        uses: DeterminateSystems/magic-nix-cache-action@v7
       - name: Instantiate Nix develop
         uses: nicknovitski/nix-develop@v1
       - name: Get composer cache directory
@@ -138,7 +138,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Install Nix
-        uses: DeterminateSystems/nix-installer-action@v11
+        uses: DeterminateSystems/nix-installer-action@v12
       - name: Setup Cachix
         uses: cachix/cachix-action@v15
         with:
@@ -146,7 +146,7 @@ jobs:
           extraPullNames: nix-shell, php-src-nix
           authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
       - name: Setup Nix magic cache
-        uses: DeterminateSystems/magic-nix-cache-action@v6
+        uses: DeterminateSystems/magic-nix-cache-action@v7
       - name: Instantiate Nix develop
         uses: nicknovitski/nix-develop@v1
       - name: Get composer cache directory
