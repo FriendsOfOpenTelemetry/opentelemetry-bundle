@@ -9,7 +9,7 @@ abstract class AbstractMetricExporterFactory implements MetricExporterFactoryInt
 {
     public function __construct(
         protected TransportFactoryInterface $transportFactory,
-        protected ?LoggerInterface $logger = null
+        protected ?LoggerInterface $logger = null,
     ) {
     }
 }

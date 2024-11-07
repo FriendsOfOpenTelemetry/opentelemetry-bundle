@@ -1,0 +1,44 @@
+parameters:
+    ignoreErrors:
+        -
+            message: "#^Method FriendsOfOpenTelemetry\\\\OpenTelemetryBundle\\\\DependencyInjection\\\\OpenTelemetryExtension\\:\\:loadInternal\\(\\) has parameter \\$mergedConfig with no value type specified in iterable type array\\.$#"
+            count: 1
+            path: src/DependencyInjection/OpenTelemetryExtension.php
+
+        -
+            message: "#^Property FriendsOfOpenTelemetry\\\\OpenTelemetryBundle\\\\Instrumentation\\\\Doctrine\\\\Middleware\\\\TraceableConnectionV4\\:\\:\\$logger is never read, only written\\.$#"
+            count: 1
+            path: src/Instrumentation/Doctrine/Middleware/TraceableConnectionV4.php
+
+        -
+            message: """
+                #^Fetching deprecated class constant DB_USER of interface OpenTelemetry\\\\SemConv\\\\TraceAttributes\\:
+                No replacement at this time\\.$#
+            """
+            count: 1
+            path: src/Instrumentation/Doctrine/Middleware/TraceableDriverV4.php
+
+        -
+            message: "#^Property FriendsOfOpenTelemetry\\\\OpenTelemetryBundle\\\\Instrumentation\\\\Doctrine\\\\Middleware\\\\TraceableStatementV4\\:\\:\\$logger is never read, only written\\.$#"
+            count: 1
+            path: src/Instrumentation/Doctrine/Middleware/TraceableStatementV4.php
+
+        -
+            message: "#^Property FriendsOfOpenTelemetry\\\\OpenTelemetryBundle\\\\OpenTelemetry\\\\Log\\\\LogProcessor\\\\AbstractLogProcessorFactory\\:\\:\\$logger is never read, only written\\.$#"
+            count: 1
+            path: src/OpenTelemetry/Log/LogProcessor/AbstractLogProcessorFactory.php
+
+        -
+            message: "#^Property FriendsOfOpenTelemetry\\\\OpenTelemetryBundle\\\\OpenTelemetry\\\\Trace\\\\SpanProcessor\\\\AbstractSpanProcessorFactory\\:\\:\\$logger is never read, only written\\.$#"
+            count: 1
+            path: src/OpenTelemetry/Trace/SpanProcessor/AbstractSpanProcessorFactory.php
+
+        -
+            message: "#^Property FriendsOfOpenTelemetry\\\\OpenTelemetryBundle\\\\OpenTelemetry\\\\Transport\\\\AbstractTransportFactory\\:\\:\\$logger is never read, only written\\.$#"
+            count: 1
+            path: src/OpenTelemetry/Transport/AbstractTransportFactory.php
+
+        -
+            message: "#^Call to deprecated method discover\\(\\) of class OpenTelemetry\\\\SDK\\\\Common\\\\Export\\\\Http\\\\PsrTransportFactory\\.$#"
+            count: 1
+            path: src/OpenTelemetry/Transport/PsrHttpTransportFactory.php

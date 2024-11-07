@@ -41,7 +41,7 @@ final class TraceableDriverV4 extends AbstractDriverMiddleware
      */
     public function connect(
         #[\SensitiveParameter]
-        array $params
+        array $params,
     ): Connection {
         $scope = Context::storage()->scope();
         if (null !== $scope) {
@@ -56,7 +56,7 @@ final class TraceableDriverV4 extends AbstractDriverMiddleware
                 ->spanBuilder('doctrine.dbal.connection')
                 ->setSpanKind(SpanKind::KIND_CLIENT)
                 ->setParent($scope?->context())
-                ->setAttribute(TraceAttributes::DB_NAME, $params['dbname'] ?? 'default')
+                ->setAttribute(TraceAttributes::DB_NAMESPACE, $params['dbname'] ?? 'default')
                 ->setAttribute(TraceAttributes::DB_USER, $params['user'])
             ;
 

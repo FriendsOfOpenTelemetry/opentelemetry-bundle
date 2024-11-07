@@ -36,7 +36,7 @@ class TransportFactoryTest extends TestCase
         ExporterDsn $dsn,
         ExporterOptionsInterface $options,
         array $supportedEndpoints,
-        ?string $expectedTransportClass
+        ?string $expectedTransportClass,
     ): void {
         $factory = new TransportFactory([
             new GrpcTransportFactory(),
