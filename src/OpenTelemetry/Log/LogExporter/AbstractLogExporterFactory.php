@@ -9,7 +9,7 @@ abstract class AbstractLogExporterFactory implements LogExporterFactoryInterface
 {
     public function __construct(
         protected TransportFactoryInterface $transportFactory,
-        protected ?LoggerInterface $logger = null
+        protected ?LoggerInterface $logger = null,
     ) {
     }
 }

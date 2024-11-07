@@ -40,7 +40,7 @@ final class TraceableDriverV3 extends AbstractDriverMiddleware
      */
     public function connect(
         #[\SensitiveParameter]
-        array $params
+        array $params,
     ): Connection {
         $scope = Context::storage()->scope();
         if (null !== $scope) {

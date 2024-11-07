@@ -10,7 +10,7 @@ final class MultiSpanProcessorFactory extends AbstractSpanProcessorFactory
 {
     public function createProcessor(
         array $processors = [],
-        ?SpanExporterInterface $exporter = null
+        ?SpanExporterInterface $exporter = null,
     ): SpanProcessorInterface {
         if (0 >= count($processors)) {
             throw new \InvalidArgumentException('Processors should not be empty');

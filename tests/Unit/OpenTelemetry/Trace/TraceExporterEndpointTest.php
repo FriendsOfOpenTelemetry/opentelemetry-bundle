@@ -17,7 +17,7 @@ class TraceExporterEndpointTest extends TestCase
         string $exporter,
         ?string $transport,
         ?string $endpoint,
-        ?\Exception $exception
+        ?\Exception $exception,
     ): void {
         if (null !== $exception) {
             self::expectExceptionObject($exception);

@@ -10,7 +10,7 @@ final class NoopSpanProcessorFactory extends AbstractSpanProcessorFactory
 {
     public function createProcessor(
         array $processors = [],
-        ?SpanExporterInterface $exporter = null
+        ?SpanExporterInterface $exporter = null,
     ): SpanProcessorInterface {
         return new NoopSpanProcessor();
     }

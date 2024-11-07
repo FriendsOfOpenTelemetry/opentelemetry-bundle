@@ -15,7 +15,6 @@ class TraceableConnectionV3 extends AbstractConnectionMiddleware
     public function __construct(
         ConnectionInterface $connection,
         private Tracer $tracer,
-        /** @phpstan-ignore-next-line */
         private ?LoggerInterface $logger = null,
     ) {
         parent::__construct($connection);

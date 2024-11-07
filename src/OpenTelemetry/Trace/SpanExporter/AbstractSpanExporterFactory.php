@@ -9,7 +9,7 @@ abstract readonly class AbstractSpanExporterFactory implements SpanExporterFacto
 {
     public function __construct(
         protected TransportFactoryInterface $transportFactory,
-        protected ?LoggerInterface $logger = null
+        protected ?LoggerInterface $logger = null,
     ) {
     }
 }

@@ -16,7 +16,7 @@ final readonly class TransportParams
         public int $maxRetries = 3,
         public ?string $caCert = null,
         public ?string $cert = null,
-        public ?string $key = null
+        public ?string $key = null,
     ) {
     }
 }

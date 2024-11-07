@@ -10,7 +10,7 @@ final class SimpleSpanProcessorFactory extends AbstractSpanProcessorFactory
 {
     public function createProcessor(
         array $processors = [],
-        ?SpanExporterInterface $exporter = null
+        ?SpanExporterInterface $exporter = null,
     ): SpanProcessorInterface {
         if (null === $exporter) {
             throw new \InvalidArgumentException('Exporter is null');

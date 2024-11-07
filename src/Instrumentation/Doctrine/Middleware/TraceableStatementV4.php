@@ -13,7 +13,6 @@ final class TraceableStatementV4 extends AbstractStatementMiddleware
     public function __construct(
         StatementInterface $statement,
         private Tracer $tracer,
-        /** @phpstan-ignore-next-line */
         private ?LoggerInterface $logger = null,
     ) {
         parent::__construct($statement);
