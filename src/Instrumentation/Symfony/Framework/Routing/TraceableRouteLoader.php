@@ -68,9 +68,11 @@ class TraceableRouteLoader implements LoaderInterface
 
                 $attribute = $reflection->getAttributes(Traceable::class)[0] ?? null;
 
-                if ($attribute === null) {
-                    $reflection = $reflection->getDeclaringClass();
+                if ($attribute !== null) {
+                    return $attribute;
                 }
+
+                $reflection = $reflection->getDeclaringClass();
             } else {
                 $reflection = new \ReflectionClass($controller);
             }
