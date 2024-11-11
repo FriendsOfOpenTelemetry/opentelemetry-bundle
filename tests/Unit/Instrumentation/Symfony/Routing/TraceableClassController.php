@@ -8,8 +8,8 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Traceable('test')]
 class TraceableClassController
 {
-    #[Route('/path', name: 'action')]
-    public function __invoke(): void
+    #[Route('/traceable-class', name: 'action')]
+    public function index(): void
     {
     }
 }

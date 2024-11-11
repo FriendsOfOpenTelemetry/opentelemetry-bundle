@@ -23,7 +23,7 @@ class TraceableRouteLoaderTest extends TestCase
     {
         $routes = $this->loader->load(TraceableActionController::class);
         self::assertCount(1, $routes);
-        self::assertEquals('/path', $routes->get('action')->getPath());
+        self::assertEquals('/traceable-action', $routes->get('action')->getPath());
         self::assertEquals([
             '_traceable' => true,
             '_controller' => 'FriendsOfOpenTelemetry\OpenTelemetryBundle\Tests\Unit\Instrumentation\Symfony\Routing\TraceableActionController::action',
@@ -35,11 +35,33 @@ class TraceableRouteLoaderTest extends TestCase
     {
         $routes = $this->loader->load(TraceableClassController::class);
         self::assertCount(1, $routes);
-        self::assertEquals('/path', $routes->get('action')->getPath());
+        self::assertEquals('/traceable-class', $routes->get('action')->getPath());
         self::assertEquals([
             '_traceable' => true,
-            '_controller' => 'FriendsOfOpenTelemetry\OpenTelemetryBundle\Tests\Unit\Instrumentation\Symfony\Routing\TraceableClassController',
+            '_controller' => 'FriendsOfOpenTelemetry\OpenTelemetryBundle\Tests\Unit\Instrumentation\Symfony\Routing\TraceableClassController::index',
             '_tracer' => 'test',
+        ], $routes->get('action')->getDefaults());
+    }
+
+    public function testTraceableClassInvoke(): void
+    {
+        $routes = $this->loader->load(TraceableClassInvokeController::class);
+        self::assertCount(1, $routes);
+        self::assertEquals('/traceable-class-invoke', $routes->get('action')->getPath());
+        self::assertEquals([
+            '_traceable' => true,
+            '_controller' => 'FriendsOfOpenTelemetry\OpenTelemetryBundle\Tests\Unit\Instrumentation\Symfony\Routing\TraceableClassInvokeController',
+            '_tracer' => 'test',
+        ], $routes->get('action')->getDefaults());
+    }
+
+    public function testNotTraceableTraceableClassInvoke(): void
+    {
+        $routes = $this->loader->load(NotTraceableClassInvokeController::class);
+        self::assertCount(1, $routes);
+        self::assertEquals('/not-traceable-class-invoke', $routes->get('action')->getPath());
+        self::assertEquals([
+            '_controller' => 'FriendsOfOpenTelemetry\OpenTelemetryBundle\Tests\Unit\Instrumentation\Symfony\Routing\NotTraceableClassInvokeController',
         ], $routes->get('action')->getDefaults());
     }
 }
