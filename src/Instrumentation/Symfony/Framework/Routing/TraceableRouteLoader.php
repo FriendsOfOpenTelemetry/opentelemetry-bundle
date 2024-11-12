@@ -3,7 +3,6 @@
 namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\Instrumentation\Symfony\Framework\Routing;
 
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\Instrumentation\Attribute\Traceable;
-use ReflectionAttribute;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\Config\Loader\LoaderResolverInterface;
 use Symfony\Component\Routing\Route;
@@ -59,7 +58,10 @@ class TraceableRouteLoader implements LoaderInterface
         $this->loader->setResolver($resolver);
     }
 
-    private function parseAttribute(Route $route): ?ReflectionAttribute
+    /**
+     * @return \ReflectionAttribute<Traceable>|null
+     */
+    private function parseAttribute(Route $route): ?\ReflectionAttribute
     {
         try {
             $controller = $route->getDefault('_controller');
@@ -68,7 +70,7 @@ class TraceableRouteLoader implements LoaderInterface
 
                 $attribute = $reflection->getAttributes(Traceable::class)[0] ?? null;
 
-                if ($attribute !== null) {
+                if (null !== $attribute) {
                     return $attribute;
                 }
 
