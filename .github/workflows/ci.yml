@@ -16,7 +16,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Install Nix
-        uses: DeterminateSystems/nix-installer-action@v15
+        uses: DeterminateSystems/nix-installer-action@v16
       - name: Setup Cachix
         uses: cachix/cachix-action@v15
         with:
@@ -40,7 +40,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Install Nix
-        uses: DeterminateSystems/nix-installer-action@v15
+        uses: DeterminateSystems/nix-installer-action@v16
       - name: Setup Cachix
         uses: cachix/cachix-action@v15
         with:
@@ -80,7 +80,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Install Nix
-        uses: DeterminateSystems/nix-installer-action@v15
+        uses: DeterminateSystems/nix-installer-action@v16
       - name: Setup Cachix
         uses: cachix/cachix-action@v15
         with:
@@ -138,7 +138,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Install Nix
-        uses: DeterminateSystems/nix-installer-action@v15
+        uses: DeterminateSystems/nix-installer-action@v16
       - name: Setup Cachix
         uses: cachix/cachix-action@v15
         with:
