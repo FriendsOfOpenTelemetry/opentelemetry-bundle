@@ -1,5 +1,6 @@
 <?php
 
+use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Trace\Resource\ResourceInfoFactoryInterface;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Trace\SamplerFactory;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Trace\SpanExporter\AbstractSpanExporterFactory;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Trace\SpanExporter\ConsoleSpanExporterFactory;
@@ -83,11 +84,14 @@ return static function (ContainerConfigurator $container): void {
 
         ->set('open_telemetry.traces.processor_interface', SpanProcessorInterface::class)
 
+        ->set('open_telemetry.traces.default_resource')->factory([ResourceInfoFactoryInterface::class, 'create'])
+
         // Providers
         ->set('open_telemetry.traces.provider_factory.abstract', AbstractTracerProviderFactory::class)
             ->abstract()
             ->args([
                 service('logger')->ignoreOnInvalid(),
+                service('open_telemetry.traces.default_resource'),
             ])
             ->tag('monolog.logger', ['channel' => 'open_telemetry'])
 

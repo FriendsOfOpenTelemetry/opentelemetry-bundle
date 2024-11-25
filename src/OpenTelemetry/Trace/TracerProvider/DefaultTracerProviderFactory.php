@@ -14,6 +14,6 @@ final readonly class DefaultTracerProviderFactory extends AbstractTracerProvider
             throw new \InvalidArgumentException('Processors should not be empty');
         }
 
-        return new TracerProvider($processors, $sampler);
+        return new TracerProvider($processors, $sampler, $this->defaultResource);
     }
 }
