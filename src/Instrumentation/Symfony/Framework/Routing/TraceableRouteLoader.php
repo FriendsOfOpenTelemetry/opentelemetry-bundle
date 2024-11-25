@@ -24,12 +24,17 @@ class TraceableRouteLoader implements LoaderInterface
 
         /** @var Route $route */
         foreach ($routes as $route) {
-            self::parseAttribute($route);
+            $attribute = $this->parseAttribute($route);
 
-            $traceable = $route->getOption(self::OPTION_KEY);
-            if (null !== $traceable) {
+            if (null !== $attribute) {
+                $traceable = $attribute->newInstance();
+                $route->addOptions([
+                    self::OPTION_KEY => true,
+                    self::TRACER_KEY => $traceable->tracer ?? null,
+                ]);
+
                 $route->addDefaults([
-                    self::DEFAULT_KEY => $traceable,
+                    self::DEFAULT_KEY => true,
                     self::TRACER_KEY => $route->getOption(self::TRACER_KEY),
                 ]);
             }
@@ -53,27 +58,30 @@ class TraceableRouteLoader implements LoaderInterface
         $this->loader->setResolver($resolver);
     }
 
-    private static function parseAttribute(Route $route): void
+    /**
+     * @return \ReflectionAttribute<Traceable>|null
+     */
+    private function parseAttribute(Route $route): ?\ReflectionAttribute
     {
         try {
             $controller = $route->getDefault('_controller');
             if (true === str_contains($controller, '::')) {
                 $reflection = new \ReflectionMethod($controller);
+
+                $attribute = $reflection->getAttributes(Traceable::class)[0] ?? null;
+
+                if (null !== $attribute) {
+                    return $attribute;
+                }
+
+                $reflection = $reflection->getDeclaringClass();
             } else {
                 $reflection = new \ReflectionClass($controller);
             }
         } catch (\ReflectionException) {
-            return;
+            return null;
         }
 
-        $attribute = $reflection->getAttributes(Traceable::class)[0] ?? $reflection->getDeclaringClass()->getAttributes(Traceable::class)[0] ?? null;
-
-        if (null !== $attribute) {
-            $traceable = $attribute->newInstance();
-            $route->addOptions([
-                self::OPTION_KEY => true,
-                self::TRACER_KEY => $traceable->tracer ?? null,
-            ]);
-        }
+        return $reflection->getAttributes(Traceable::class)[0] ?? null;
     }
 }
