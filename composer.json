@@ -1,5 +1,5 @@
 {
-    "name": "friendsofopentelemetry/opentelemetry-bundle",
+    "name": "kaspiman/opentelemetry-bundle",
     "description": "Traces, metrics, and logs instrumentation within your Symfony application",
     "license": "MIT",
     "type": "symfony-bundle",
