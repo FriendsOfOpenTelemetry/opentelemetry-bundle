@@ -37,7 +37,7 @@
         "symfony/config": "^7.1",
         "symfony/dependency-injection": "^7.1",
         "symfony/event-dispatcher": "^7.1",
-        "symfony/http-client": "^7.1",
+        "symfony/http-client": "^7.1.8",
         "zenstruck/dsn": "^0.2",
         "zenstruck/uri": "^2.3"
     },
@@ -64,7 +64,7 @@
         "open-telemetry/transport-grpc": "^1.1",
         "php-http/httplug": "^2.4",
         "phpstan/extension-installer": "^1",
-        "phpstan/phpstan": "^1",
+        "phpstan/phpstan": "^1.12",
         "phpstan/phpstan-deprecation-rules": "^1.2",
         "phpstan/phpstan-phpunit": "^1.4",
         "phpstan/phpstan-strict-rules": "^1.6",
