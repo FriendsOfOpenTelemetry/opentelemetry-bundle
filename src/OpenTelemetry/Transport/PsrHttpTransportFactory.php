@@ -20,12 +20,12 @@ final readonly class PsrHttpTransportFactory implements TransportFactoryInterfac
     public function createTransport(#[\SensitiveParameter] ExporterEndpointInterface $endpoint, ExporterOptionsInterface $options): TransportInterface
     {
         $params = $options->toTransportParams();
-        $format = OtlpExporterFormatEnum::tryFrom($params->contentType) ?? OtlpExporterFormatEnum::Json;
+        $format = $params->contentType ?? OtlpExporterFormatEnum::Json->toContentType();
         $compression = OtlpExporterCompressionEnum::tryFrom($params->compression) ?? OtlpExporterCompressionEnum::None;
 
         return PsrTransportFactory::discover()->create(
             (string) $endpoint,
-            $format->toContentType(),
+            $format,
             $params->headers,
             $compression->toKnownValue(),
             $params->timeout,

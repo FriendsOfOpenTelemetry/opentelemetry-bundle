@@ -26,12 +26,12 @@ final readonly class OtlpHttpTransportFactory implements TransportFactoryInterfa
     public function createTransport(#[\SensitiveParameter] ExporterEndpointInterface $endpoint, ExporterOptionsInterface $options): TransportInterface
     {
         $params = $options->toTransportParams();
-        $format = OtlpExporterFormatEnum::tryFrom($params->contentType) ?? OtlpExporterFormatEnum::Json;
-        $compression = OtlpExporterCompressionEnum::tryFrom($params->contentType) ?? OtlpExporterCompressionEnum::None;
+        $format = $params->contentType ?? OtlpExporterFormatEnum::Json->toContentType();
+        $compression = OtlpExporterCompressionEnum::tryFrom($params->compression) ?? OtlpExporterCompressionEnum::None;
 
         return (new \OpenTelemetry\Contrib\Otlp\OtlpHttpTransportFactory())->create(
             (string) $endpoint,
-            $format->toContentType(),
+            $format,
             $params->headers,
             $compression->toKnownValue(),
             $params->timeout,
