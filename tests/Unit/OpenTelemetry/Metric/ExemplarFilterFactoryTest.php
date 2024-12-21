@@ -28,10 +28,10 @@ class ExemplarFilterFactoryTest extends TestCase
     }
 
     /**
-     * @return \Generator{string, array{
+     * @return \Generator<string, array{
      *     string,
      *     ?class-string<ExemplarFilterInterface>,
-     * }}
+     * }>
      */
     public static function exemplarFilter(): \Generator
     {

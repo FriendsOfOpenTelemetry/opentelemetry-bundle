@@ -58,15 +58,14 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ${{ steps.composercache.outputs.dir }}
-          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
-          restore-keys: ${{ runner.os }}-composer-
+          key: ${{ runner.os }}-composer-tools-php-cs-fixer-${{ hashFiles('**/composer.json') }}
+          restore-keys: ${{ runner.os }}-composer-tools-php-cs-fixer
       - name: List PHP installed extensions
         run: php -m
-      - name: Update project dependencies
-        run: |
-          composer update --no-interaction --no-progress --ansi
+      - name: Install PHP CS Fixer dependencies
+        run: cd tools/php-cs-fixer && composer update --no-interaction --no-progress --ansi
       - name: Run PHP-CS-Fixer fix
-        run: vendor/bin/php-cs-fixer fix --dry-run --diff --ansi
+        run: tools/php-cs-fixer/vendor/bin/php-cs-fixer fix --dry-run --diff --ansi
   phpstan:
     name: PHPStan (PHP ${{ matrix.php }})
     runs-on: ubuntu-latest
@@ -98,13 +97,13 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ${{ steps.composercache.outputs.dir }}
-          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
-          restore-keys: ${{ runner.os }}-composer-
+          key: ${{ runner.os }}-composer-tools-phpstan-${{ hashFiles('**/composer.json') }}
+          restore-keys: ${{ runner.os }}-composer-tools-phpstan
       - name: List PHP installed extensions
         run: php -m
-      - name: Update project dependencies
+      - name: Install PHPStan dependencies
         run: |
-          composer update --no-interaction --no-progress --ansi
+          cd tools/phpstan && composer update --no-interaction --no-progress --ansi
       - name: Cache PHPStan results
         uses: actions/cache@v4
         with:
@@ -116,8 +115,8 @@ jobs:
         continue-on-error: true
       - name: Run PHPStan analysis
         run: |
-          ./vendor/bin/phpstan --version
-          ./vendor/bin/phpstan analyse --no-interaction --no-progress --ansi --error-format=github --memory-limit=256M
+          tools/phpstan/vendor/bin/phpstan --version
+          tools/phpstan/vendor/bin/phpstan analyse --no-interaction --no-progress --ansi --error-format=github --memory-limit=256M
   phpunit:
     name: PHPUnit (PHP ${{ matrix.php }}, ${{ matrix.dependencies }})
     runs-on: ubuntu-latest

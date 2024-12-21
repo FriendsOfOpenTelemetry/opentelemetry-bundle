@@ -13,3 +13,6 @@ insert_final_newline = true
 
 [*.{nix,yml,yaml,yml.dist,md,lock}]
 indent_size = 2
+
+[*.neon]
+indent_style = tab

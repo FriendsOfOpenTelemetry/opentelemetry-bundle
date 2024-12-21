@@ -10,7 +10,7 @@ final class HeadersPropagator implements PropagationGetterInterface
     /**
      * @param mixed|Request $carrier
      *
-     * @return array<int, string>
+     * @return list<string>
      */
     public function keys($carrier): array
     {
