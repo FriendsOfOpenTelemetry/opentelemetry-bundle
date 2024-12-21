@@ -103,6 +103,7 @@ jobs:
         run: php -m
       - name: Install PHPStan dependencies
         run: |
+          composer update --no-interaction --no-progress --ansi
           cd tools/phpstan && composer update --no-interaction --no-progress --ansi
       - name: Cache PHPStan results
         uses: actions/cache@v4
