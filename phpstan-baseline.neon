@@ -1,44 +1,106 @@
 parameters:
-    ignoreErrors:
-        -
-            message: "#^Method FriendsOfOpenTelemetry\\\\OpenTelemetryBundle\\\\DependencyInjection\\\\OpenTelemetryExtension\\:\\:loadInternal\\(\\) has parameter \\$mergedConfig with no value type specified in iterable type array\\.$#"
-            count: 1
-            path: src/DependencyInjection/OpenTelemetryExtension.php
+	ignoreErrors:
+		-
+			message: '#^Method FriendsOfOpenTelemetry\\OpenTelemetryBundle\\DependencyInjection\\OpenTelemetryExtension\:\:loadInternal\(\) has parameter \$mergedConfig with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/DependencyInjection/OpenTelemetryExtension.php
 
-        -
-            message: "#^Property FriendsOfOpenTelemetry\\\\OpenTelemetryBundle\\\\Instrumentation\\\\Doctrine\\\\Middleware\\\\TraceableConnectionV4\\:\\:\\$logger is never read, only written\\.$#"
-            count: 1
-            path: src/Instrumentation/Doctrine/Middleware/TraceableConnectionV4.php
+		-
+			message: '#^Property FriendsOfOpenTelemetry\\OpenTelemetryBundle\\Instrumentation\\Doctrine\\Middleware\\TraceableConnectionV4\:\:\$logger is never read, only written\.$#'
+			identifier: property.onlyWritten
+			count: 1
+			path: src/Instrumentation/Doctrine/Middleware/TraceableConnectionV4.php
 
-        -
-            message: """
-                #^Fetching deprecated class constant DB_USER of interface OpenTelemetry\\\\SemConv\\\\TraceAttributes\\:
-                No replacement at this time\\.$#
-            """
-            count: 1
-            path: src/Instrumentation/Doctrine/Middleware/TraceableDriverV4.php
+		-
+			message: '''
+				#^Fetching deprecated class constant DB_USER of interface OpenTelemetry\\SemConv\\TraceAttributes\:
+				No replacement at this time\.$#
+			'''
+			identifier: classConstant.deprecated
+			count: 1
+			path: src/Instrumentation/Doctrine/Middleware/TraceableDriverV4.php
 
-        -
-            message: "#^Property FriendsOfOpenTelemetry\\\\OpenTelemetryBundle\\\\Instrumentation\\\\Doctrine\\\\Middleware\\\\TraceableStatementV4\\:\\:\\$logger is never read, only written\\.$#"
-            count: 1
-            path: src/Instrumentation/Doctrine/Middleware/TraceableStatementV4.php
+		-
+			message: '#^Property FriendsOfOpenTelemetry\\OpenTelemetryBundle\\Instrumentation\\Doctrine\\Middleware\\TraceableStatementV4\:\:\$logger is never read, only written\.$#'
+			identifier: property.onlyWritten
+			count: 1
+			path: src/Instrumentation/Doctrine/Middleware/TraceableStatementV4.php
 
-        -
-            message: "#^Property FriendsOfOpenTelemetry\\\\OpenTelemetryBundle\\\\OpenTelemetry\\\\Log\\\\LogProcessor\\\\AbstractLogProcessorFactory\\:\\:\\$logger is never read, only written\\.$#"
-            count: 1
-            path: src/OpenTelemetry/Log/LogProcessor/AbstractLogProcessorFactory.php
+		-
+			message: '#^Method FriendsOfOpenTelemetry\\OpenTelemetryBundle\\OpenTelemetry\\Exporter\\OtlpExporterEndpoint\:\:getTransport\(\) never returns null so it can be removed from the return type\.$#'
+			identifier: return.unusedType
+			count: 1
+			path: src/OpenTelemetry/Exporter/OtlpExporterEndpoint.php
 
-        -
-            message: "#^Property FriendsOfOpenTelemetry\\\\OpenTelemetryBundle\\\\OpenTelemetry\\\\Trace\\\\SpanProcessor\\\\AbstractSpanProcessorFactory\\:\\:\\$logger is never read, only written\\.$#"
-            count: 1
-            path: src/OpenTelemetry/Trace/SpanProcessor/AbstractSpanProcessorFactory.php
+		-
+			message: '#^Property FriendsOfOpenTelemetry\\OpenTelemetryBundle\\OpenTelemetry\\Log\\LogProcessor\\AbstractLogProcessorFactory\:\:\$logger is never read, only written\.$#'
+			identifier: property.onlyWritten
+			count: 1
+			path: src/OpenTelemetry/Log/LogProcessor/AbstractLogProcessorFactory.php
 
-        -
-            message: "#^Property FriendsOfOpenTelemetry\\\\OpenTelemetryBundle\\\\OpenTelemetry\\\\Transport\\\\AbstractTransportFactory\\:\\:\\$logger is never read, only written\\.$#"
-            count: 1
-            path: src/OpenTelemetry/Transport/AbstractTransportFactory.php
+		-
+			message: '#^Property FriendsOfOpenTelemetry\\OpenTelemetryBundle\\OpenTelemetry\\Trace\\SpanProcessor\\AbstractSpanProcessorFactory\:\:\$logger is never read, only written\.$#'
+			identifier: property.onlyWritten
+			count: 1
+			path: src/OpenTelemetry/Trace/SpanProcessor/AbstractSpanProcessorFactory.php
 
-        -
-            message: "#^Call to deprecated method discover\\(\\) of class OpenTelemetry\\\\SDK\\\\Common\\\\Export\\\\Http\\\\PsrTransportFactory\\.$#"
-            count: 1
-            path: src/OpenTelemetry/Transport/PsrHttpTransportFactory.php
+		-
+			message: '#^Method FriendsOfOpenTelemetry\\OpenTelemetryBundle\\OpenTelemetry\\Trace\\ZipkinExporterEndpoint\:\:getTransport\(\) never returns null so it can be removed from the return type\.$#'
+			identifier: return.unusedType
+			count: 1
+			path: src/OpenTelemetry/Trace/ZipkinExporterEndpoint.php
+
+		-
+			message: '#^Property FriendsOfOpenTelemetry\\OpenTelemetryBundle\\OpenTelemetry\\Transport\\AbstractTransportFactory\:\:\$logger is never read, only written\.$#'
+			identifier: property.onlyWritten
+			count: 1
+			path: src/OpenTelemetry/Transport/AbstractTransportFactory.php
+
+		-
+			message: '#^Call to deprecated method discover\(\) of class OpenTelemetry\\SDK\\Common\\Export\\Http\\PsrTransportFactory\.$#'
+			identifier: staticMethod.deprecated
+			count: 1
+			path: src/OpenTelemetry/Transport/PsrHttpTransportFactory.php
+
+		-
+			message: '#^Call to method FriendsOfOpenTelemetry\\OpenTelemetryBundle\\OpenTelemetry\\Log\\LogExporter\\NoopLogExporterFactory\:\:createExporter\(\) on a separate line has no effect\.$#'
+			identifier: method.resultUnused
+			count: 1
+			path: tests/Unit/OpenTelemetry/Log/LogExporter/NoopLogExporterFactoryTest.php
+
+		-
+			message: '#^Call to method FriendsOfOpenTelemetry\\OpenTelemetryBundle\\OpenTelemetry\\Log\\LogProcessor\\NoopLogProcessorFactory\:\:createProcessor\(\) on a separate line has no effect\.$#'
+			identifier: method.resultUnused
+			count: 1
+			path: tests/Unit/OpenTelemetry/Log/LogProcessor/NoopLogProcessorFactoryTest.php
+
+		-
+			message: '#^Call to method FriendsOfOpenTelemetry\\OpenTelemetryBundle\\OpenTelemetry\\Log\\LoggerProvider\\NoopLoggerProviderFactory\:\:createProvider\(\) on a separate line has no effect\.$#'
+			identifier: method.resultUnused
+			count: 1
+			path: tests/Unit/OpenTelemetry/Log/LoggerProvider/NoopLoggerProviderFactoryTest.php
+
+		-
+			message: '#^Call to method FriendsOfOpenTelemetry\\OpenTelemetryBundle\\OpenTelemetry\\Metric\\MeterProvider\\NoopMeterProviderFactory\:\:createProvider\(\) on a separate line has no effect\.$#'
+			identifier: method.resultUnused
+			count: 1
+			path: tests/Unit/OpenTelemetry/Metric/MeterProvider/NoopMeterProviderFactoryTest.php
+
+		-
+			message: '#^Call to method FriendsOfOpenTelemetry\\OpenTelemetryBundle\\OpenTelemetry\\Metric\\MetricExporter\\NoopMetricExporterFactory\:\:createExporter\(\) on a separate line has no effect\.$#'
+			identifier: method.resultUnused
+			count: 1
+			path: tests/Unit/OpenTelemetry/Metric/MetricExporter/NoopMetricExporterFactoryTest.php
+
+		-
+			message: '#^Call to method FriendsOfOpenTelemetry\\OpenTelemetryBundle\\OpenTelemetry\\Trace\\SpanProcessor\\NoopSpanProcessorFactory\:\:createProcessor\(\) on a separate line has no effect\.$#'
+			identifier: method.resultUnused
+			count: 1
+			path: tests/Unit/OpenTelemetry/Trace/SpanProcessor/NoopSpanProcessorFactoryTest.php
+
+		-
+			message: '#^Call to method FriendsOfOpenTelemetry\\OpenTelemetryBundle\\OpenTelemetry\\Trace\\TracerProvider\\NoopTracerProviderFactory\:\:createProvider\(\) on a separate line has no effect\.$#'
+			identifier: method.resultUnused
+			count: 1
+			path: tests/Unit/OpenTelemetry/Trace/TracerProvider/NoopTracerProviderFactoryTest.php
