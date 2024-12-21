@@ -1,20 +1,20 @@
 includes:
 	- phpstan-baseline.neon
 
-	parameters:
-		level: 6
-		paths:
-			- src/
-			- tests/
-		bootstrapFiles:
-			- src/aliases.php
-		editorUrl: 'phpstorm://open?file=%%file%%&line=%%line%%'
-		tmpDir: %currentWorkingDirectory%/.phpstan
-		excludePaths:
-			- tests/*/var/*
+parameters:
+	level: 6
+	paths:
+		- src/
+		- tests/
+	bootstrapFiles:
+		- src/aliases.php
+	editorUrl: 'phpstorm://open?file=%%file%%&line=%%line%%'
+	tmpDir: %currentWorkingDirectory%/.phpstan
+	excludePaths:
+		- tests/*/var/*
 
-			# Doctrine ^3.8
-			- src/Instrumentation/Doctrine/Middleware/TraceableConnectionV3.php
-			- src/Instrumentation/Doctrine/Middleware/TraceableDriverV3.php
-			- src/Instrumentation/Doctrine/Middleware/TraceableStatementV3.php
-			- tests/Functional/Instrumentation/Doctrine/DoctrineV3TracingTest.php
+		# Doctrine ^3.8
+		- src/Instrumentation/Doctrine/Middleware/TraceableConnectionV3.php
+		- src/Instrumentation/Doctrine/Middleware/TraceableDriverV3.php
+		- src/Instrumentation/Doctrine/Middleware/TraceableStatementV3.php
+		- tests/Functional/Instrumentation/Doctrine/DoctrineV3TracingTest.php
