@@ -357,6 +357,11 @@ class OpenTelemetryTracesExtensionTest extends AbstractExtensionTestCase
             1,
             null !== $processors ? array_map(fn (string $processor) => new Reference($processor), $processors) : [],
         );
+        self::assertContainerBuilderHasServiceDefinitionWithArgument(
+            'open_telemetry.traces.providers.main',
+            2,
+            new Reference('open_telemetry.resource_info'),
+        );
         $provider = $this->container->getDefinition('open_telemetry.traces.providers.main');
         self::assertEquals([new Reference(sprintf('open_telemetry.traces.provider_factory.%s', $type)), 'createProvider'], $provider->getFactory());
     }

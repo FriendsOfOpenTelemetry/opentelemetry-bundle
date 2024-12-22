@@ -5,8 +5,9 @@ namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Metric\MeterP
 use OpenTelemetry\SDK\Metrics\Exemplar\ExemplarFilterInterface;
 use OpenTelemetry\SDK\Metrics\MeterProviderInterface;
 use OpenTelemetry\SDK\Metrics\MetricExporterInterface;
+use OpenTelemetry\SDK\Resource\ResourceInfo;
 
 interface MeterProviderFactoryInterface
 {
-    public function createProvider(MetricExporterInterface $exporter, ExemplarFilterInterface $filter): MeterProviderInterface;
+    public function createProvider(MetricExporterInterface $exporter, ExemplarFilterInterface $filter, ?ResourceInfo $resource = null): MeterProviderInterface;
 }

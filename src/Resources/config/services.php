@@ -3,6 +3,7 @@
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Context\Propagator\HeadersPropagator as HeadersPropagationGetter;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Exporter\ExporterDsn;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Exporter\OtlpExporterOptions;
+use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Resource\ResourceInfoFactory;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetryBundle;
 use OpenTelemetry\Context\Propagation\ArrayAccessGetterSetter;
 use OpenTelemetry\Context\Propagation\MultiTextMapPropagator;
@@ -10,6 +11,7 @@ use OpenTelemetry\Context\Propagation\NoopTextMapPropagator;
 use OpenTelemetry\Context\Propagation\SanitizeCombinedHeadersPropagationGetter;
 use OpenTelemetry\Contrib\Propagation\ServerTiming\ServerTimingPropagator;
 use OpenTelemetry\Contrib\Propagation\TraceResponse\TraceResponsePropagator;
+use OpenTelemetry\SDK\Resource\ResourceInfo;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 
 return static function (ContainerConfigurator $container): void {
@@ -22,6 +24,9 @@ return static function (ContainerConfigurator $container): void {
     $container->services()
         ->defaults()
         ->private()
+
+        ->set('open_telemetry.resource_info', ResourceInfo::class)
+            ->factory([ResourceInfoFactory::class, 'create'])
 
         ->set('open_telemetry.propagator.server_timing', ServerTimingPropagator::class)
         ->set('open_telemetry.propagator.trace_response', TraceResponsePropagator::class)

@@ -118,6 +118,7 @@ final class OpenTelemetryLogsExtension
             ->setFactory([new Reference(sprintf('open_telemetry.logs.provider_factory.%s', $config['type'])), 'createProvider'])
             ->setArguments([
                 isset($config['processor']) ? new Reference($config['processor']) : null,
+                new Reference('open_telemetry.resource_info'),
             ]);
     }
 

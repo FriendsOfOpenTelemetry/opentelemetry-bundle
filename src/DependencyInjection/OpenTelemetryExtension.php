@@ -57,6 +57,14 @@ final class OpenTelemetryExtension extends ConfigurableExtension
         $container->setParameter('open_telemetry.service.name', $config['name']);
         $container->setParameter('open_telemetry.service.version', $config['version']);
         $container->setParameter('open_telemetry.service.environment', $config['environment']);
+
+        $container->getDefinition('open_telemetry.resource_info')
+            ->setArguments([
+                $config['namespace'],
+                $config['name'],
+                $config['version'],
+                $config['environment'],
+            ]);
     }
 
     /**

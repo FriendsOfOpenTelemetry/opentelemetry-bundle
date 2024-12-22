@@ -127,6 +127,7 @@ final class OpenTelemetryTracesExtension
             ->setArguments([
                 $sampler,
                 isset($config['processors']) ? array_map(fn (string $processor) => new Reference($processor), $config['processors']) : null,
+                new Reference('open_telemetry.resource_info'),
             ]);
     }
 
