@@ -2,19 +2,15 @@
 
 namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\Tests\Functional\Application\Controller;
 
-use FriendsOfOpenTelemetry\OpenTelemetryBundle\Instrumentation\Attribute\Traceable;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-#[Traceable]
-class ClassTraceableController extends AbstractController
+class NotTraceableClassController extends AbstractController
 {
-    #[Route('/class-traceable', methods: ['GET'])]
+    #[Route('/not-traceable-class', methods: ['GET'])]
     public function index(): Response
     {
-        return $this->json([
-            'status' => 'ok',
-        ]);
+        return new Response(null, Response::HTTP_FOUND);
     }
 }
