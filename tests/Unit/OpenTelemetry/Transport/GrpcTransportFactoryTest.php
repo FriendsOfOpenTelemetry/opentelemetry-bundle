@@ -30,7 +30,8 @@ class GrpcTransportFactoryTest extends TestCase
         self::assertSame($shouldSupport, $factory->supports($endpoint, $options));
 
         if ($shouldSupport) {
-            $factory->createTransport($endpoint, $options);
+            $transport = $factory->createTransport($endpoint, $options);
+            self::assertSame('application/x-protobuf', $transport->contentType());
         }
     }
 
