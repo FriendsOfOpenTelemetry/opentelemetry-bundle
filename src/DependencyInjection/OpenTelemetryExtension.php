@@ -53,7 +53,6 @@ final class OpenTelemetryExtension extends ConfigurableExtension
      */
     private function loadServiceParams(array $config, ContainerBuilder $container): void
     {
-        // TODO These values are not passed to the OpenTelemetry SDK
         $container->setParameter('open_telemetry.service.namespace', $config['namespace']);
         $container->setParameter('open_telemetry.service.name', $config['name']);
         $container->setParameter('open_telemetry.service.version', $config['version']);
