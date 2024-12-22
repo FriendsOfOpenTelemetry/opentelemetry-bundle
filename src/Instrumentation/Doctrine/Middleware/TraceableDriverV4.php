@@ -14,6 +14,7 @@ use Doctrine\DBAL\Platforms\OraclePlatform;
 use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Doctrine\DBAL\Platforms\SQLitePlatform;
 use Doctrine\DBAL\Platforms\SQLServerPlatform;
+use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Context\Attribute\DoctrineTraceAttributeEnum;
 use OpenTelemetry\API\Trace\SpanInterface;
 use OpenTelemetry\API\Trace\SpanKind;
 use OpenTelemetry\API\Trace\StatusCode;
@@ -57,7 +58,7 @@ final class TraceableDriverV4 extends AbstractDriverMiddleware
                 ->setSpanKind(SpanKind::KIND_CLIENT)
                 ->setParent($scope?->context())
                 ->setAttribute(TraceAttributes::DB_NAMESPACE, $params['dbname'] ?? 'default')
-                ->setAttribute(TraceAttributes::DB_USER, $params['user'])
+                ->setAttribute(DoctrineTraceAttributeEnum::User->toString(), $params['user'])
             ;
 
             $span = $spanBuilder->startSpan();

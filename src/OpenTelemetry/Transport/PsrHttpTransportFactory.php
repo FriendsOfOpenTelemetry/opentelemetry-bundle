@@ -23,7 +23,7 @@ final readonly class PsrHttpTransportFactory implements TransportFactoryInterfac
         $format = $params->contentType ?? OtlpExporterFormatEnum::Json->toContentType();
         $compression = OtlpExporterCompressionEnum::tryFrom($params->compression) ?? OtlpExporterCompressionEnum::None;
 
-        return PsrTransportFactory::discover()->create(
+        return (new PsrTransportFactory())->create(
             (string) $endpoint,
             $format,
             $params->headers,

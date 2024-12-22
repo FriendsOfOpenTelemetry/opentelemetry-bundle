@@ -90,7 +90,7 @@ final class TraceableConsoleEventSubscriber implements EventSubscriberInterface,
         $span = Span::getCurrent();
         $span->setStatus(StatusCode::STATUS_ERROR);
         $span->recordException($event->getError(), [
-            ConsoleTraceAttributeEnum::ExitCode->value => $event->getExitCode(),
+            ConsoleTraceAttributeEnum::ExitCode->toString() => $event->getExitCode(),
         ]);
     }
 
@@ -124,7 +124,7 @@ final class TraceableConsoleEventSubscriber implements EventSubscriberInterface,
     public function handleSignal(ConsoleSignalEvent $event): void
     {
         $span = Span::getCurrent();
-        $span->setAttribute(ConsoleTraceAttributeEnum::SignalCode->value, $event->getHandlingSignal());
+        $span->setAttribute(ConsoleTraceAttributeEnum::SignalCode->toString(), $event->getHandlingSignal());
     }
 
     private function parseAttribute(Command $command): ?Traceable

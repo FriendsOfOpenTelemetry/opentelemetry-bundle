@@ -2,10 +2,9 @@
 
 namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Context\Attribute;
 
-enum ConsoleTraceAttributeEnum: string
+enum DoctrineTraceAttributeEnum: string
 {
-    case ExitCode = 'symfony.console.exit_code';
-    case SignalCode = 'symfony.console.signal_code';
+    case User = 'doctrine.user';
 
     public function toString(): string
     {

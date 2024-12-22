@@ -13,15 +13,6 @@ parameters:
 			path: src/Instrumentation/Doctrine/Middleware/TraceableConnectionV4.php
 
 		-
-			message: '''
-				#^Fetching deprecated class constant DB_USER of interface OpenTelemetry\\SemConv\\TraceAttributes\:
-				No replacement at this time\.$#
-			'''
-			identifier: classConstant.deprecated
-			count: 1
-			path: src/Instrumentation/Doctrine/Middleware/TraceableDriverV4.php
-
-		-
 			message: '#^Property FriendsOfOpenTelemetry\\OpenTelemetryBundle\\Instrumentation\\Doctrine\\Middleware\\TraceableStatementV4\:\:\$logger is never read, only written\.$#'
 			identifier: property.onlyWritten
 			count: 1
@@ -56,12 +47,6 @@ parameters:
 			identifier: property.onlyWritten
 			count: 1
 			path: src/OpenTelemetry/Transport/AbstractTransportFactory.php
-
-		-
-			message: '#^Call to deprecated method discover\(\) of class OpenTelemetry\\SDK\\Common\\Export\\Http\\PsrTransportFactory\.$#'
-			identifier: staticMethod.deprecated
-			count: 1
-			path: src/OpenTelemetry/Transport/PsrHttpTransportFactory.php
 
 		-
 			message: '#^Call to method FriendsOfOpenTelemetry\\OpenTelemetryBundle\\OpenTelemetry\\Log\\LogExporter\\NoopLogExporterFactory\:\:createExporter\(\) on a separate line has no effect\.$#'
