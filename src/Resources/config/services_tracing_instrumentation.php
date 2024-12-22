@@ -36,12 +36,11 @@ return static function (ContainerConfigurator $container): void {
         // Console
         ->set('open_telemetry.instrumentation.console.trace.event_subscriber', TraceableConsoleEventSubscriber::class)
             ->arg('$tracer', service('open_telemetry.traces.default_tracer'))
-            ->tag('kernel.event_subscriber')
+            ->tag('monolog.logger', ['channel' => 'open_telemetry'])
 
         // Doctrine
         ->set('open_telemetry.instrumentation.doctrine.trace.middleware', TraceableDoctrineMiddleware::class)
             ->arg('$tracer', service('open_telemetry.traces.default_tracer'))
-            ->tag('doctrine.middleware')
             ->tag('monolog.logger', ['channel' => 'open_telemetry'])
 
         // HTTP Client
@@ -54,7 +53,6 @@ return static function (ContainerConfigurator $container): void {
             ->arg('$tracer', service('open_telemetry.traces.default_tracer'))
             ->arg('$propagator', service('open_telemetry.propagator_text_map.noop'))
             ->arg('$propagationGetter', service('open_telemetry.propagation_getter.headers'))
-            ->tag('kernel.event_subscriber')
             ->tag('monolog.logger', ['channel' => 'open_telemetry'])
 
         ->set('open_telemetry.instrumentation.http_kernel.trace.route_loader', TraceableRouteLoader::class)
@@ -89,20 +87,15 @@ return static function (ContainerConfigurator $container): void {
         ->set('open_telemetry.instrumentation.messenger.trace.transport_factory', TraceableMessengerTransportFactory::class)
             ->arg('$tracer', service('open_telemetry.traces.default_tracer'))
             ->arg('$transportFactory', service('messenger.transport_factory'))
-            ->tag('messenger.transport_factory')
-            ->tag('kernel.reset', ['method' => 'reset'])
             ->tag('monolog.logger', ['channel' => 'open_telemetry'])
-        ->alias('messenger.transport.open_telemetry_tracer.factory', 'open_telemetry.instrumentation.messenger.trace.transport_factory')
 
         ->set('open_telemetry.instrumentation.messenger.trace.middleware', TraceableMessengerMiddleware::class)
             ->arg('$tracer', service('open_telemetry.traces.default_tracer'))
             ->tag('monolog.logger', ['channel' => 'open_telemetry'])
-        ->alias('messenger.middleware.open_telemetry_tracer', 'open_telemetry.instrumentation.messenger.trace.middleware')
 
         // Twig
         ->set('open_telemetry.instrumentation.twig.trace.extension', TraceableTwigExtension::class)
             ->arg('$tracer', service('open_telemetry.traces.default_tracer'))
-            ->tag('twig.extension')
             ->tag('monolog.logger', ['channel' => 'open_telemetry'])
     ;
 };
