@@ -3,7 +3,6 @@
 namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\Instrumentation\Symfony\HttpClient;
 
 use Nyholm\Psr7\Uri;
-use OpenTelemetry\API\Trace\SpanInterface;
 use OpenTelemetry\API\Trace\SpanKind;
 use OpenTelemetry\API\Trace\StatusCode;
 use OpenTelemetry\API\Trace\TracerInterface;
@@ -63,12 +62,9 @@ final class TraceableHttpClient implements HttpClientInterface, LoggerAwareInter
         } catch (ExceptionInterface $exception) {
             $span->recordException($exception, [TraceAttributes::EXCEPTION_ESCAPED => true]);
             $span->setStatus(StatusCode::STATUS_ERROR, $exception->getMessage());
+            $this->logger?->debug(sprintf('Ending span "%s"', $span->getContext()->getSpanId()));
+            $span->end();
             throw $exception;
-        } finally {
-            if ($span instanceof SpanInterface) {
-                $this->logger?->debug(sprintf('Ending span "%s"', $span->getContext()->getSpanId()));
-                $span->end();
-            }
         }
     }
 
