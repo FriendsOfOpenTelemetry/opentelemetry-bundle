@@ -51,6 +51,7 @@ final class HttpClientTracingTest extends KernelTestCase
             'url.query' => '',
             'url.fragment' => '',
             'http.request.method' => 'GET',
+            'http.response.status_code' => 200,
         ]);
         self::assertSpanEventsCount($mainSpan, 0);
     }
@@ -82,7 +83,7 @@ final class HttpClientTracingTest extends KernelTestCase
 
         $mainSpan = self::getSpans()[0];
         self::assertSpanName($mainSpan, 'http.client');
-        self::assertSpanStatus($mainSpan, StatusData::unset());
+        self::assertSpanStatus($mainSpan, StatusData::error());
         self::assertSpanAttributes($mainSpan, [
             'url.full' => 'http://localhost/failure',
             'url.scheme' => 'http',
@@ -90,6 +91,7 @@ final class HttpClientTracingTest extends KernelTestCase
             'url.query' => '',
             'url.fragment' => '',
             'http.request.method' => 'GET',
+            'http.response.status_code' => 500,
         ]);
         self::assertSpanEventsCount($mainSpan, 0);
     }
@@ -124,6 +126,7 @@ final class HttpClientTracingTest extends KernelTestCase
             'url.query' => '',
             'url.fragment' => '',
             'http.request.method' => 'GET',
+            'http.response.status_code' => 200,
         ]);
         self::assertSpanEventsCount($mainSpan, 0);
     }
@@ -179,6 +182,7 @@ final class HttpClientTracingTest extends KernelTestCase
             'url.query' => '',
             'url.fragment' => '',
             'http.request.method' => 'GET',
+            'http.response.status_code' => 200,
         ]);
         self::assertSpanEventsCount($mainSpan, 0);
     }
