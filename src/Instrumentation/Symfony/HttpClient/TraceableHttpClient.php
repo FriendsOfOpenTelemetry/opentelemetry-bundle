@@ -4,14 +4,12 @@ namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\Instrumentation\Symfony\Htt
 
 use Nyholm\Psr7\Uri;
 use OpenTelemetry\API\Trace\SpanKind;
-use OpenTelemetry\API\Trace\StatusCode;
 use OpenTelemetry\API\Trace\TracerInterface;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\SemConv\TraceAttributes;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpClient\Response\ResponseStream;
-use Symfony\Contracts\HttpClient\Exception\ExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 use Symfony\Contracts\HttpClient\ResponseStreamInterface;
@@ -37,35 +35,26 @@ final class TraceableHttpClient implements HttpClientInterface, LoggerAwareInter
         } else {
             $this->logger?->debug('No active scope');
         }
-        $span = null;
 
-        try {
-            $uri = new Uri($url);
+        $uri = new Uri($url);
 
-            $spanBuilder = $this->tracer
-                ->spanBuilder('http.client')
-                ->setSpanKind(SpanKind::KIND_CLIENT)
-                ->setParent($scope?->context())
-                ->setAttribute(TraceAttributes::URL_FULL, $url)
-                ->setAttribute(TraceAttributes::URL_SCHEME, $uri->getScheme())
-                ->setAttribute(TraceAttributes::URL_PATH, $uri->getPath())
-                ->setAttribute(TraceAttributes::URL_QUERY, $uri->getQuery())
-                ->setAttribute(TraceAttributes::URL_FRAGMENT, $uri->getFragment())
-                ->setAttribute(TraceAttributes::HTTP_REQUEST_METHOD, $method)
-            ;
+        $spanBuilder = $this->tracer
+            ->spanBuilder('http.client')
+            ->setSpanKind(SpanKind::KIND_CLIENT)
+            ->setParent($scope?->context())
+            ->setAttribute(TraceAttributes::URL_FULL, $url)
+            ->setAttribute(TraceAttributes::URL_SCHEME, $uri->getScheme())
+            ->setAttribute(TraceAttributes::URL_PATH, $uri->getPath())
+            ->setAttribute(TraceAttributes::URL_QUERY, $uri->getQuery())
+            ->setAttribute(TraceAttributes::URL_FRAGMENT, $uri->getFragment())
+            ->setAttribute(TraceAttributes::HTTP_REQUEST_METHOD, $method)
+        ;
 
-            $span = $spanBuilder->startSpan();
+        $span = $spanBuilder->startSpan();
 
-            $this->logger?->debug(sprintf('Starting span "%s"', $span->getContext()->getSpanId()));
+        $this->logger?->debug(sprintf('Starting span "%s"', $span->getContext()->getSpanId()));
 
-            return new TraceableResponse($this->client, $this->client->request($method, $url, $options), $span);
-        } catch (ExceptionInterface $exception) {
-            $span->recordException($exception, [TraceAttributes::EXCEPTION_ESCAPED => true]);
-            $span->setStatus(StatusCode::STATUS_ERROR, $exception->getMessage());
-            $this->logger?->debug(sprintf('Ending span "%s"', $span->getContext()->getSpanId()));
-            $span->end();
-            throw $exception;
-        }
+        return new TraceableResponse($this->client, $this->client->request($method, $url, $options), $span);
     }
 
     public function stream(iterable|ResponseInterface $responses, ?float $timeout = null): ResponseStreamInterface
