@@ -2,7 +2,7 @@
 
 namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\Tests\Unit\DependencyInjection\Compiler;
 
-use FriendsOfOpenTelemetry\OpenTelemetryBundle\DependencyInjection\Compiler\HttpClientTracingPass;
+use FriendsOfOpenTelemetry\OpenTelemetryBundle\DependencyInjection\Compiler\HttpClientInstrumentationPass;
 use Matthias\SymfonyDependencyInjectionTest\PhpUnit\AbstractCompilerPassTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -11,12 +11,12 @@ use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
-#[CoversClass(HttpClientTracingPass::class)]
-class HttpClientTracingPassTest extends AbstractCompilerPassTestCase
+#[CoversClass(HttpClientInstrumentationPass::class)]
+class HttpClientInstrumentationPassTest extends AbstractCompilerPassTestCase
 {
     protected function registerCompilerPass(ContainerBuilder $container): void
     {
-        $container->addCompilerPass(new HttpClientTracingPass());
+        $container->addCompilerPass(new HttpClientInstrumentationPass());
 
         $container->setDefinition('open_telemetry.instrumentation.http_client.trace.client', new Definition());
     }

@@ -5,17 +5,20 @@ namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\DependencyInjection\Compile
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class RemoveHttpKernelInstrumentationPass implements CompilerPassInterface
+class HttpKernelInstrumentationPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container): void
     {
         if (false === $container->hasParameter('open_telemetry.instrumentation.http_kernel.tracing.enabled')
             || false === $container->getParameter('open_telemetry.instrumentation.http_kernel.tracing.enabled')) {
             $container->removeDefinition('open_telemetry.instrumentation.http_kernel.trace.event_subscriber');
+            $container->removeDefinition('open_telemetry.instrumentation.http_kernel.trace.route_loader');
+
+            return;
         }
 
-        if (false === $container->hasParameter('open_telemetry.instrumentation.http_kernel.metering.enabled')
-            || false === $container->getParameter('open_telemetry.instrumentation.http_kernel.metering.enabled')) {
-        }
+        $container
+            ->getDefinition('open_telemetry.instrumentation.http_kernel.trace.event_subscriber')
+            ->addTag('kernel.event_subscriber');
     }
 }
