@@ -251,6 +251,11 @@ class OpenTelemetryMetricsExtensionTest extends AbstractExtensionTestCase
             1,
             (new ChildDefinition('open_telemetry.metrics.exemplar_filter_factory'))->setArguments([$filter]),
         );
+        self::assertContainerBuilderHasServiceDefinitionWithArgument(
+            'open_telemetry.metrics.providers.main',
+            2,
+            new Reference('open_telemetry.resource_info'),
+        );
         $provider = $this->container->getDefinition('open_telemetry.metrics.providers.main');
         self::assertEquals([new Reference(sprintf('open_telemetry.metrics.provider_factory.%s', $type)), 'createProvider'], $provider->getFactory());
     }

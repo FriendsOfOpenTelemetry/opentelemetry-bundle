@@ -346,6 +346,11 @@ class OpenTelemetryLogsExtensionTest extends AbstractExtensionTestCase
             0,
             null !== $processor ? new Reference($processor) : null,
         );
+        self::assertContainerBuilderHasServiceDefinitionWithArgument(
+            'open_telemetry.logs.providers.main',
+            1,
+            new Reference('open_telemetry.resource_info'),
+        );
         $provider = $this->container->getDefinition('open_telemetry.logs.providers.main');
         self::assertEquals([new Reference(sprintf('open_telemetry.logs.provider_factory.%s', $type)), 'createProvider'], $provider->getFactory());
     }

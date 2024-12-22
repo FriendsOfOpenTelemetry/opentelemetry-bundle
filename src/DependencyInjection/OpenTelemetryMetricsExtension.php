@@ -101,6 +101,7 @@ final class OpenTelemetryMetricsExtension
             ->setArguments([
                 isset($config['exporter']) ? new Reference($config['exporter']) : null,
                 $filter,
+                new Reference('open_telemetry.resource_info'),
             ]);
     }
 

@@ -19,6 +19,7 @@ use OpenTelemetry\Context\Propagation\NoopTextMapPropagator;
 use OpenTelemetry\Context\Propagation\SanitizeCombinedHeadersPropagationGetter;
 use OpenTelemetry\Contrib\Propagation\ServerTiming\ServerTimingPropagator;
 use OpenTelemetry\Contrib\Propagation\TraceResponse\TraceResponsePropagator;
+use OpenTelemetry\SDK\Resource\ResourceInfo;
 use PHPUnit\Framework\Attributes\CoversClass;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -66,6 +67,8 @@ class OpenTelemetryExtensionTest extends AbstractExtensionTestCase
     public function testDefaultServices(): void
     {
         $this->load();
+
+        self::assertContainerBuilderHasService('open_telemetry.resource_info', ResourceInfo::class);
 
         self::assertContainerBuilderHasService('open_telemetry.propagator.server_timing', ServerTimingPropagator::class);
         self::assertContainerBuilderHasService('open_telemetry.propagator.trace_response', TraceResponsePropagator::class);
