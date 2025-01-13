@@ -2,18 +2,18 @@
 
 namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\Tests\Unit\DependencyInjection\Compiler;
 
-use FriendsOfOpenTelemetry\OpenTelemetryBundle\DependencyInjection\Compiler\RemoveMailerInstrumentationPass;
+use FriendsOfOpenTelemetry\OpenTelemetryBundle\DependencyInjection\Compiler\MailerInstrumentationPass;
 use Matthias\SymfonyDependencyInjectionTest\PhpUnit\AbstractCompilerPassTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 
-#[CoversClass(RemoveMailerInstrumentationPass::class)]
-class RemoveMailerInstrumentationPassTest extends AbstractCompilerPassTestCase
+#[CoversClass(MailerInstrumentationPass::class)]
+class MailerInstrumentationPassTest extends AbstractCompilerPassTestCase
 {
     protected function registerCompilerPass(ContainerBuilder $container): void
     {
-        $container->addCompilerPass(new RemoveMailerInstrumentationPass());
+        $container->addCompilerPass(new MailerInstrumentationPass());
         $container->setDefinition('open_telemetry.instrumentation.mailer.trace.event_subscriber', new Definition());
         $container->setDefinition('open_telemetry.instrumentation.mailer.trace.transports', new Definition());
         $container->setDefinition('open_telemetry.instrumentation.mailer.trace.default_transport', new Definition());

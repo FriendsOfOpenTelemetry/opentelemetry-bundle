@@ -6,7 +6,7 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
-class HttpClientTracingPass implements CompilerPassInterface
+class HttpClientInstrumentationPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container): void
     {
@@ -24,10 +24,6 @@ class HttpClientTracingPass implements CompilerPassInterface
                 ->setDecoratedService($decoratedService[0], null, $decoratedService[1]);
         } else {
             $container->removeDefinition('open_telemetry.instrumentation.http_client.trace.client');
-        }
-
-        if (true === $container->hasParameter('open_telemetry.instrumentation.http_client.metering.enabled')
-            && true === $container->getParameter('open_telemetry.instrumentation.http_client.metering.enabled')) {
         }
     }
 

@@ -5,17 +5,16 @@ namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\DependencyInjection\Compile
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class RemoveTwigInstrumentationPass implements CompilerPassInterface
+class TwigInstrumentationPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container): void
     {
         if (false === $container->hasParameter('open_telemetry.instrumentation.twig.tracing.enabled')
             || false === $container->getParameter('open_telemetry.instrumentation.twig.tracing.enabled')) {
-            $container->removeDefinition('open_telemetry.instrumentation.twig.trace.extension');
+            return;
         }
 
-        if (false === $container->hasParameter('open_telemetry.instrumentation.twig.metering.enabled')
-            || false === $container->getParameter('open_telemetry.instrumentation.twig.metering.enabled')) {
-        }
+        $container->getDefinition('open_telemetry.instrumentation.twig.trace.extension')
+            ->addTag('twig.extension');
     }
 }

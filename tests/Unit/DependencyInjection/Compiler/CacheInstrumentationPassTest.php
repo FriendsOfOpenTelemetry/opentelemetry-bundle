@@ -2,7 +2,7 @@
 
 namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\Tests\Unit\DependencyInjection\Compiler;
 
-use FriendsOfOpenTelemetry\OpenTelemetryBundle\DependencyInjection\Compiler\CachePoolTracingPass;
+use FriendsOfOpenTelemetry\OpenTelemetryBundle\DependencyInjection\Compiler\CacheInstrumentationPass;
 use Matthias\SymfonyDependencyInjectionTest\PhpUnit\AbstractCompilerPassTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
@@ -11,12 +11,12 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 
-#[CoversClass(CachePoolTracingPass::class)]
-class CachePoolTracingPassTest extends AbstractCompilerPassTestCase
+#[CoversClass(CacheInstrumentationPass::class)]
+class CacheInstrumentationPassTest extends AbstractCompilerPassTestCase
 {
     protected function registerCompilerPass(ContainerBuilder $container): void
     {
-        $container->addCompilerPass(new CachePoolTracingPass());
+        $container->addCompilerPass(new CacheInstrumentationPass());
 
         $container->setDefinition('open_telemetry.instrumentation.cache.trace.tag_aware_adapter', new Definition());
         $container->setDefinition('open_telemetry.instrumentation.cache.trace.adapter', new Definition());

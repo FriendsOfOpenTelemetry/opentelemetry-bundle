@@ -37,11 +37,11 @@ return static function (ContainerConfigurator $container): void {
         ->set('open_telemetry.instrumentation.console.trace.event_subscriber', TraceableConsoleEventSubscriber::class)
             ->arg('$tracer', service('open_telemetry.traces.default_tracer'))
             ->tag('kernel.event_subscriber')
+            ->tag('monolog.logger', ['channel' => 'open_telemetry'])
 
         // Doctrine
         ->set('open_telemetry.instrumentation.doctrine.trace.middleware', TraceableDoctrineMiddleware::class)
             ->arg('$tracer', service('open_telemetry.traces.default_tracer'))
-            ->tag('doctrine.middleware')
             ->tag('monolog.logger', ['channel' => 'open_telemetry'])
 
         // HTTP Client
@@ -89,8 +89,6 @@ return static function (ContainerConfigurator $container): void {
         ->set('open_telemetry.instrumentation.messenger.trace.transport_factory', TraceableMessengerTransportFactory::class)
             ->arg('$tracer', service('open_telemetry.traces.default_tracer'))
             ->arg('$transportFactory', service('messenger.transport_factory'))
-            ->tag('messenger.transport_factory')
-            ->tag('kernel.reset', ['method' => 'reset'])
             ->tag('monolog.logger', ['channel' => 'open_telemetry'])
         ->alias('messenger.transport.open_telemetry_tracer.factory', 'open_telemetry.instrumentation.messenger.trace.transport_factory')
 
@@ -102,7 +100,6 @@ return static function (ContainerConfigurator $container): void {
         // Twig
         ->set('open_telemetry.instrumentation.twig.trace.extension', TraceableTwigExtension::class)
             ->arg('$tracer', service('open_telemetry.traces.default_tracer'))
-            ->tag('twig.extension')
             ->tag('monolog.logger', ['channel' => 'open_telemetry'])
     ;
 };
