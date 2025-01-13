@@ -5,11 +5,23 @@ namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\DependencyInjection\Compile
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\HttpClient\HttpClient;
 
 class HttpClientInstrumentationPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container): void
     {
+        if (false === $container->hasParameter('open_telemetry.instrumentation.http_client.tracing.enabled')
+            || false === $container->getParameter('open_telemetry.instrumentation.http_client.tracing.enabled')) {
+            $container->removeDefinition('open_telemetry.instrumentation.http_client.trace.client');
+
+            return;
+        }
+
+        if (!class_exists(HttpClient::class)) {
+            throw new \LogicException('Http client instrumentation cannot be enabled because the symfony/http-client package is not installed.');
+        }
+
         $decoratedService = $this->getDecoratedService($container);
         if (null === $decoratedService) {
             $container->removeDefinition('open_telemetry.instrumentation.http_client.trace.client');
@@ -17,14 +29,9 @@ class HttpClientInstrumentationPass implements CompilerPassInterface
             return;
         }
 
-        if (true === $container->hasParameter('open_telemetry.instrumentation.http_client.tracing.enabled')
-            && true === $container->getParameter('open_telemetry.instrumentation.http_client.tracing.enabled')) {
-            $container->getDefinition('open_telemetry.instrumentation.http_client.trace.client')
-                ->setArgument('$client', new Reference('.inner'))
-                ->setDecoratedService($decoratedService[0], null, $decoratedService[1]);
-        } else {
-            $container->removeDefinition('open_telemetry.instrumentation.http_client.trace.client');
-        }
+        $container->getDefinition('open_telemetry.instrumentation.http_client.trace.client')
+            ->setArgument('$client', new Reference('.inner'))
+            ->setDecoratedService($decoratedService[0], null, $decoratedService[1]);
     }
 
     /**
