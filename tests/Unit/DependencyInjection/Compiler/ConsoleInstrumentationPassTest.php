@@ -2,18 +2,18 @@
 
 namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\Tests\Unit\DependencyInjection\Compiler;
 
-use FriendsOfOpenTelemetry\OpenTelemetryBundle\DependencyInjection\Compiler\RemoveConsoleInstrumentationPass;
+use FriendsOfOpenTelemetry\OpenTelemetryBundle\DependencyInjection\Compiler\ConsoleInstrumentationPass;
 use Matthias\SymfonyDependencyInjectionTest\PhpUnit\AbstractCompilerPassTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 
-#[CoversClass(RemoveConsoleInstrumentationPass::class)]
-class RemoveConsoleInstrumentationPassTest extends AbstractCompilerPassTestCase
+#[CoversClass(ConsoleInstrumentationPass::class)]
+class ConsoleInstrumentationPassTest extends AbstractCompilerPassTestCase
 {
     protected function registerCompilerPass(ContainerBuilder $container): void
     {
-        $container->addCompilerPass(new RemoveConsoleInstrumentationPass());
+        $container->addCompilerPass(new ConsoleInstrumentationPass());
         $container->setDefinition('open_telemetry.instrumentation.console.trace.event_subscriber', new Definition());
     }
 

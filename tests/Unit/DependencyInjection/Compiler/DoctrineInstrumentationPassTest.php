@@ -2,27 +2,28 @@
 
 namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\Tests\Unit\DependencyInjection\Compiler;
 
-use FriendsOfOpenTelemetry\OpenTelemetryBundle\DependencyInjection\Compiler\RemoveDoctrineInstrumentationPass;
+use FriendsOfOpenTelemetry\OpenTelemetryBundle\DependencyInjection\Compiler\DoctrineInstrumentationPass;
 use Matthias\SymfonyDependencyInjectionTest\PhpUnit\AbstractCompilerPassTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 
-#[CoversClass(RemoveDoctrineInstrumentationPass::class)]
-class RemoveDoctrineInstrumentationPassTest extends AbstractCompilerPassTestCase
+#[CoversClass(DoctrineInstrumentationPass::class)]
+class DoctrineInstrumentationPassTest extends AbstractCompilerPassTestCase
 {
     protected function registerCompilerPass(ContainerBuilder $container): void
     {
-        $container->addCompilerPass(new RemoveDoctrineInstrumentationPass());
+        $container->addCompilerPass(new DoctrineInstrumentationPass());
         $container->setDefinition('open_telemetry.instrumentation.doctrine.trace.middleware', new Definition());
         $container->setDefinition('open_telemetry.instrumentation.doctrine.trace.event_subscriber', new Definition());
     }
 
-    public function testRemoveInstrumentationByDefault(): void
+    public function testRemoveInstrumentation(): void
     {
         $this->compile();
 
-        self::assertContainerBuilderNotHasService('open_telemetry.instrumentation.doctrine.trace.middleware');
+        $definition = $this->container->getDefinition('open_telemetry.instrumentation.doctrine.trace.middleware');
+        self::assertCount(0, $definition->getTags());
     }
 
     public function testDoesNotRemoveInstrumentation(): void
@@ -31,7 +32,9 @@ class RemoveDoctrineInstrumentationPassTest extends AbstractCompilerPassTestCase
 
         $this->compile();
 
-        self::assertContainerBuilderHasService('open_telemetry.instrumentation.doctrine.trace.middleware');
-        self::assertContainerBuilderHasService('open_telemetry.instrumentation.doctrine.trace.event_subscriber');
+        self::assertContainerBuilderHasServiceDefinitionWithTag(
+            'open_telemetry.instrumentation.doctrine.trace.middleware',
+            'doctrine.middleware',
+        );
     }
 }

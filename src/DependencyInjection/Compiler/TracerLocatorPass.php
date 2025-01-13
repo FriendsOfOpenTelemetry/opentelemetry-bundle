@@ -14,7 +14,7 @@ class TracerLocatorPass implements CompilerPassInterface
     {
         $tracers = $container->findTaggedServiceIds('open_telemetry.tracer');
 
-        if (0 !== count($tracers)) {
+        if (0 < count($tracers)) {
             if ($container->has('open_telemetry.instrumentation.console.trace.event_subscriber')) {
                 $traceableConsoleEventSubscriber = $container->getDefinition('open_telemetry.instrumentation.console.trace.event_subscriber');
                 $this->setTracerLocatorArgument($container, $traceableConsoleEventSubscriber, $tracers);
