@@ -1,6 +1,6 @@
 <?php
 
-namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\Tests\Functional\Application\Controller;
+namespace App\Controller;
 
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\Instrumentation\Attribute\Traceable;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;

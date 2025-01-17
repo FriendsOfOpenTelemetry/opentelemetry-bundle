@@ -1,10 +1,10 @@
 <?php
 
-namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\Tests\Functional\Application\Repository;
+namespace App\Repository;
 
+use App\Entity\Dummy;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
-use FriendsOfOpenTelemetry\OpenTelemetryBundle\Tests\Functional\Application\Entity\Dummy;
 
 /**
  * @extends ServiceEntityRepository<Dummy>

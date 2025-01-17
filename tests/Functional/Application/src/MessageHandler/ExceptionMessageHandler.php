@@ -1,8 +1,8 @@
 <?php
 
-namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\Tests\Functional\Application\MessageHandler;
+namespace App\MessageHandler;
 
-use FriendsOfOpenTelemetry\OpenTelemetryBundle\Tests\Functional\Application\Message\ExceptionMessage;
+use App\Message\ExceptionMessage;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
 #[AsMessageHandler]

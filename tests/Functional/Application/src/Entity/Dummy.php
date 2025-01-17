@@ -1,14 +1,14 @@
 <?php
 
-namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\Tests\Functional\Application\Entity;
+namespace App\Entity;
 
+use App\Repository\DummyRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\GeneratedValue;
 use Doctrine\ORM\Mapping\Id;
 use Doctrine\ORM\Mapping\Table;
-use FriendsOfOpenTelemetry\OpenTelemetryBundle\Tests\Functional\Application\Repository\DummyRepository;
 
 #[Entity(repositoryClass: DummyRepository::class)]
 #[Table]

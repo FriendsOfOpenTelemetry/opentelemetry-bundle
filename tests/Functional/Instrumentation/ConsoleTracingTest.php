@@ -2,7 +2,7 @@
 
 namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\Tests\Functional\Instrumentation;
 
-use FriendsOfOpenTelemetry\OpenTelemetryBundle\Tests\Functional\Application\Kernel;
+use App\Kernel;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\Tests\Functional\TracingTestCaseTrait;
 use OpenTelemetry\SDK\Trace\SpanExporter\InMemoryExporter;
 use OpenTelemetry\SDK\Trace\StatusData;
@@ -36,7 +36,7 @@ class ConsoleTracingTest extends KernelTestCase
         self::assertSpanStatus($mainSpan, StatusData::ok());
         self::assertSpanAttributes($mainSpan, [
             'code.function' => 'execute',
-            'code.namespace' => 'FriendsOfOpenTelemetry\OpenTelemetryBundle\Tests\Functional\Application\Command\TraceableCommand',
+            'code.namespace' => 'App\Command\TraceableCommand',
             'symfony.console.exit_code' => 0,
         ]);
         self::assertSpanEventsCount($mainSpan, 0);
@@ -64,7 +64,7 @@ class ConsoleTracingTest extends KernelTestCase
         self::assertSpanStatus($mainSpan, StatusData::error());
         self::assertSpanAttributes($mainSpan, [
             'code.function' => 'execute',
-            'code.namespace' => 'FriendsOfOpenTelemetry\OpenTelemetryBundle\Tests\Functional\Application\Command\TraceableCommand',
+            'code.namespace' => 'App\Command\TraceableCommand',
             'symfony.console.exit_code' => 1,
         ]);
         self::assertSpanEventsCount($mainSpan, 0);
@@ -97,7 +97,7 @@ class ConsoleTracingTest extends KernelTestCase
         self::assertSpanStatus($mainSpan, StatusData::error());
         self::assertSpanAttributes($mainSpan, [
             'code.function' => 'execute',
-            'code.namespace' => 'FriendsOfOpenTelemetry\OpenTelemetryBundle\Tests\Functional\Application\Command\TraceableCommand',
+            'code.namespace' => 'App\Command\TraceableCommand',
             'symfony.console.exit_code' => 1,
         ]);
 
@@ -133,7 +133,7 @@ class ConsoleTracingTest extends KernelTestCase
         self::assertSpanStatus($mainSpan, StatusData::ok());
         self::assertSpanAttributes($mainSpan, [
             'code.function' => 'execute',
-            'code.namespace' => 'FriendsOfOpenTelemetry\OpenTelemetryBundle\Tests\Functional\Application\Command\FallbackCommand',
+            'code.namespace' => 'App\Command\FallbackCommand',
             'symfony.console.exit_code' => 0,
         ]);
         self::assertSpanEventsCount($mainSpan, 0);

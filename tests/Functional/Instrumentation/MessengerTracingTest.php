@@ -2,9 +2,9 @@
 
 namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\Tests\Functional\Instrumentation;
 
-use FriendsOfOpenTelemetry\OpenTelemetryBundle\Tests\Functional\Application\Kernel;
-use FriendsOfOpenTelemetry\OpenTelemetryBundle\Tests\Functional\Application\Message\DummyMessage;
-use FriendsOfOpenTelemetry\OpenTelemetryBundle\Tests\Functional\Application\Message\ExceptionMessage;
+use App\Kernel;
+use App\Message\DummyMessage;
+use App\Message\ExceptionMessage;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\Tests\Functional\TracingTestCaseTrait;
 use OpenTelemetry\SDK\Trace\StatusData;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;

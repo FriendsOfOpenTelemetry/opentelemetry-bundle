@@ -1,6 +1,6 @@
 <?php
 
-namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\Tests\Functional\Application\Message;
+namespace App\Message;
 
 final readonly class ExceptionMessage
 {

@@ -1,6 +1,6 @@
 <?php
 
-namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\Tests\Functional\Application;
+namespace App;
 
 use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
 use Doctrine\Bundle\MigrationsBundle\DoctrineMigrationsBundle;
@@ -29,6 +29,6 @@ class Kernel extends BaseKernel
 
     public function getProjectDir(): string
     {
-        return __DIR__;
+        return __DIR__.'/..';
     }
 }

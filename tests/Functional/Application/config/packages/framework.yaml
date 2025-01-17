@@ -13,7 +13,7 @@ framework:
     transports:
       main: 'trace(in-memory://default)'
     routing:
-      'FriendsOfOpenTelemetry\OpenTelemetryBundle\Tests\Functional\Application\Message\*': main
+      'App\Message\*': main
     buses:
       messenger.bus.default:
         middleware:

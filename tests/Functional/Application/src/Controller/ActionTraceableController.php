@@ -1,10 +1,10 @@
 <?php
 
-namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\Tests\Functional\Application\Controller;
+namespace App\Controller;
 
+use App\Entity\Dummy;
 use Doctrine\ORM\EntityManagerInterface;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\Instrumentation\Attribute\Traceable;
-use FriendsOfOpenTelemetry\OpenTelemetryBundle\Tests\Functional\Application\Entity\Dummy;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;

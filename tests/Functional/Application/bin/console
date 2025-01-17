@@ -2,7 +2,7 @@
 
 <?php
 
-use FriendsOfOpenTelemetry\OpenTelemetryBundle\Tests\Functional\Application\Kernel;
+use App\Kernel;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 
 

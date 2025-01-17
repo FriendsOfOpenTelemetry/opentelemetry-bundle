@@ -1,4 +1,4 @@
 doctrine_migrations:
   migrations_paths:
-    'FriendsOfOpenTelemetry\OpenTelemetryBundle\Tests\Functional\Application\Migrations': '%kernel.project_dir%/migrations'
+    'App\Migrations': '%kernel.project_dir%/migrations'
   enable_profiler: false

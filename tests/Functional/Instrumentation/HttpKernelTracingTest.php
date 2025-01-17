@@ -2,7 +2,7 @@
 
 namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\Tests\Functional\Instrumentation;
 
-use FriendsOfOpenTelemetry\OpenTelemetryBundle\Tests\Functional\Application\Kernel;
+use App\Kernel;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\Tests\Functional\TracingTestCaseTrait;
 use OpenTelemetry\SDK\Trace\StatusData;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -25,7 +25,7 @@ class HttpKernelTracingTest extends WebTestCase
         self::assertSpansCount(1);
 
         $mainSpan = self::getSpans()[0];
-        self::assertSpanName($mainSpan, 'friendsofopentelemetry_opentelemetry_tests_functional_application_actiontraceable_ok');
+        self::assertSpanName($mainSpan, 'app_actiontraceable_ok');
         self::assertSpanStatus($mainSpan, StatusData::ok());
         self::assertSpanAttributes($mainSpan, [
             'url.full' => 'http://localhost/ok',
@@ -39,7 +39,7 @@ class HttpKernelTracingTest extends WebTestCase
             'symfony.kernel.net.peer_ip' => '127.0.0.1',
             'server.address' => 'localhost',
             'server.port' => 80,
-            'http.route' => 'friendsofopentelemetry_opentelemetry_tests_functional_application_actiontraceable_ok',
+            'http.route' => 'app_actiontraceable_ok',
             'http.response.status_code' => Response::HTTP_OK,
         ]);
         self::assertSpanEventsCount($mainSpan, 0);
@@ -56,7 +56,7 @@ class HttpKernelTracingTest extends WebTestCase
         self::assertSpansCount(1);
 
         $mainSpan = self::getSpans()[0];
-        self::assertSpanName($mainSpan, 'friendsofopentelemetry_opentelemetry_tests_functional_application_actiontraceable_failure');
+        self::assertSpanName($mainSpan, 'app_actiontraceable_failure');
         self::assertSpanStatus($mainSpan, StatusData::error());
         self::assertSpanAttributes($mainSpan, [
             'url.full' => 'http://localhost/failure',
@@ -70,7 +70,7 @@ class HttpKernelTracingTest extends WebTestCase
             'symfony.kernel.net.peer_ip' => '127.0.0.1',
             'server.address' => 'localhost',
             'server.port' => 80,
-            'http.route' => 'friendsofopentelemetry_opentelemetry_tests_functional_application_actiontraceable_failure',
+            'http.route' => 'app_actiontraceable_failure',
             'http.response.status_code' => Response::HTTP_SERVICE_UNAVAILABLE,
         ]);
         self::assertSpanEventsCount($mainSpan, 0);
@@ -88,7 +88,7 @@ class HttpKernelTracingTest extends WebTestCase
         $spans = self::getSpans();
 
         $mainSpan = $spans[array_key_last($spans)];
-        self::assertSpanName($mainSpan, 'friendsofopentelemetry_opentelemetry_tests_functional_application_actiontraceable_exception');
+        self::assertSpanName($mainSpan, 'app_actiontraceable_exception');
         self::assertSpanStatus($mainSpan, StatusData::error());
         self::assertSpanAttributes($mainSpan, [
             'url.full' => 'http://localhost/exception',
@@ -102,7 +102,7 @@ class HttpKernelTracingTest extends WebTestCase
             'symfony.kernel.net.peer_ip' => '127.0.0.1',
             'server.address' => 'localhost',
             'server.port' => 80,
-            'http.route' => 'friendsofopentelemetry_opentelemetry_tests_functional_application_actiontraceable_exception',
+            'http.route' => 'app_actiontraceable_exception',
             'http.response.status_code' => Response::HTTP_INTERNAL_SERVER_ERROR,
         ]);
         self::assertSpanEventsCount($mainSpan, 1);
@@ -126,7 +126,7 @@ class HttpKernelTracingTest extends WebTestCase
         self::assertSpansCount(1);
 
         $mainSpan = self::getSpans()[0];
-        self::assertSpanName($mainSpan, 'friendsofopentelemetry_opentelemetry_tests_functional_application_classinvoketraceable__invoke');
+        self::assertSpanName($mainSpan, 'app_classinvoketraceable__invoke');
         self::assertSpanStatus($mainSpan, StatusData::ok());
         self::assertSpanAttributes($mainSpan, [
             'url.full' => 'http://localhost/class-invoke-traceable',
@@ -140,7 +140,7 @@ class HttpKernelTracingTest extends WebTestCase
             'symfony.kernel.net.peer_ip' => '127.0.0.1',
             'server.address' => 'localhost',
             'server.port' => 80,
-            'http.route' => 'friendsofopentelemetry_opentelemetry_tests_functional_application_classinvoketraceable__invoke',
+            'http.route' => 'app_classinvoketraceable__invoke',
             'http.response.status_code' => Response::HTTP_OK,
         ]);
         self::assertSpanEventsCount($mainSpan, 0);
@@ -157,7 +157,7 @@ class HttpKernelTracingTest extends WebTestCase
         self::assertSpansCount(1);
 
         $mainSpan = self::getSpans()[0];
-        self::assertSpanName($mainSpan, 'friendsofopentelemetry_opentelemetry_tests_functional_application_classtraceable_index');
+        self::assertSpanName($mainSpan, 'app_classtraceable_index');
         self::assertSpanStatus($mainSpan, StatusData::ok());
         self::assertSpanAttributes($mainSpan, [
             'url.full' => 'http://localhost/class-traceable',
@@ -171,7 +171,7 @@ class HttpKernelTracingTest extends WebTestCase
             'symfony.kernel.net.peer_ip' => '127.0.0.1',
             'server.address' => 'localhost',
             'server.port' => 80,
-            'http.route' => 'friendsofopentelemetry_opentelemetry_tests_functional_application_classtraceable_index',
+            'http.route' => 'app_classtraceable_index',
             'http.response.status_code' => Response::HTTP_OK,
         ]);
         self::assertSpanEventsCount($mainSpan, 0);
@@ -210,7 +210,7 @@ class HttpKernelTracingTest extends WebTestCase
         self::assertSpansCount(1, 'open_telemetry.traces.exporters.fallback');
 
         $mainSpan = self::getSpans('open_telemetry.traces.exporters.fallback')[0];
-        self::assertSpanName($mainSpan, 'friendsofopentelemetry_opentelemetry_tests_functional_application_fallbacktraceable__invoke');
+        self::assertSpanName($mainSpan, 'app_fallbacktraceable__invoke');
         self::assertSpanStatus($mainSpan, StatusData::ok());
         self::assertSpanAttributes($mainSpan, [
             'url.full' => 'http://localhost/fallback-traceable',
@@ -224,7 +224,7 @@ class HttpKernelTracingTest extends WebTestCase
             'symfony.kernel.net.peer_ip' => '127.0.0.1',
             'server.address' => 'localhost',
             'server.port' => 80,
-            'http.route' => 'friendsofopentelemetry_opentelemetry_tests_functional_application_fallbacktraceable__invoke',
+            'http.route' => 'app_fallbacktraceable__invoke',
             'http.response.status_code' => Response::HTTP_OK,
         ]);
         self::assertSpanEventsCount($mainSpan, 0);

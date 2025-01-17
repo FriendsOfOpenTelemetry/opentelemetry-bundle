@@ -104,9 +104,9 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "FriendsOfOpenTelemetry\\OpenTelemetryBundle\\Tests\\": "tests/",
-            "FriendsOfOpenTelemetry\\OpenTelemetryBundle\\Tests\\Functional\\Application\\": "tests/Functional/Application/src",
-            "FriendsOfOpenTelemetry\\OpenTelemetryBundle\\Tests\\Functional\\Application\\Migrations\\": "tests/Functional/Application/migrations"
+            "App\\": "tests/Functional/Application/src",
+            "App\\Migrations\\": "tests/Functional/Application/migrations",
+            "FriendsOfOpenTelemetry\\OpenTelemetryBundle\\Tests\\": "tests/"
         }
     },
     "config": {

@@ -2,7 +2,7 @@
 
 namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\Tests\Functional\Instrumentation\Cache;
 
-use FriendsOfOpenTelemetry\OpenTelemetryBundle\Tests\Functional\Application\Kernel;
+use App\Kernel;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\Tests\Functional\TracingTestCaseTrait;
 use OpenTelemetry\SDK\Trace\StatusData;
 use Psr\Cache\CacheItemInterface;
