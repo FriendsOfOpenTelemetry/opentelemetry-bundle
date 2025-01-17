@@ -3,35 +3,41 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <meta name="generator" content="VuePress 2.0.0-rc.8" />
+    <meta name="generator" content="VuePress 2.0.0-rc.19" />
     <style>
       :root {
-        --c-bg: #fff;
+        --vp-c-bg: #fff;
       }
-      html.dark {
-        --c-bg: #22272e;
+
+      [data-theme='dark'] {
+        --vp-c-bg: #1b1b1f;
       }
+
       html,
       body {
-        background-color: var(--c-bg);
+        background-color: var(--vp-c-bg);
       }
     </style>
     <script>
       const userMode = localStorage.getItem('vuepress-color-scheme')
       const systemDarkMode =
-        window.matchMedia &&
-        window.matchMedia('(prefers-color-scheme: dark)').matches
-      if (userMode === 'dark' || (userMode !== 'light' && systemDarkMode)) {
-        document.documentElement.classList.toggle('dark', true)
+        'matchMedia' in window
+          ? window.matchMedia('(prefers-color-scheme: dark)').matches
+          : false
+
+      if (userMode === 'light') {
+        document.documentElement.dataset.theme = 'light'
+      } else if (userMode === 'dark' || systemDarkMode) {
+        document.documentElement.dataset.theme = 'dark'
       }
     </script>
     <title>OpenTelemetry Bundle</title><meta name="description" content="Traces, metrics, and logs instrumentation within your Symfony application">
-    <link rel="preload" href="/opentelemetry-bundle/assets/style-BZLnFEKr.css" as="style"><link rel="stylesheet" href="/opentelemetry-bundle/assets/style-BZLnFEKr.css">
-    <link rel="modulepreload" href="/opentelemetry-bundle/assets/app-BgzC8iiR.js"><link rel="modulepreload" href="/opentelemetry-bundle/assets/404.html-ClrCVk3I.js">
-    <link rel="prefetch" href="/opentelemetry-bundle/assets/index.html-D2V1qS8o.js" as="script"><link rel="prefetch" href="/opentelemetry-bundle/assets/docker-env-setup.html-BuObQOX2.js" as="script"><link rel="prefetch" href="/opentelemetry-bundle/assets/introduction.html-C2hHTbRk.js" as="script"><link rel="prefetch" href="/opentelemetry-bundle/assets/logs.html-Cwpga9ih.js" as="script"><link rel="prefetch" href="/opentelemetry-bundle/assets/metrics.html-BfatJDy4.js" as="script"><link rel="prefetch" href="/opentelemetry-bundle/assets/traces.html-BqcZ0d60.js" as="script"><link rel="prefetch" href="/opentelemetry-bundle/assets/configuration.html-wiALUJQG.js" as="script"><link rel="prefetch" href="/opentelemetry-bundle/assets/getting-started.html-47k-kQ_9.js" as="script"><link rel="prefetch" href="/opentelemetry-bundle/assets/introduction.html-Bl1J-gNv.js" as="script"><link rel="prefetch" href="/opentelemetry-bundle/assets/troubleshooting.html-vKq5s7DF.js" as="script">
+    <link rel="preload" href="/opentelemetry-bundle/assets/style-CgTAfvr0.css" as="style"><link rel="stylesheet" href="/opentelemetry-bundle/assets/style-CgTAfvr0.css">
+    <link rel="modulepreload" href="/opentelemetry-bundle/assets/app-DAM_jpli.js"><link rel="modulepreload" href="/opentelemetry-bundle/assets/404.html-Dq9ELxQK.js">
+    <link rel="prefetch" href="/opentelemetry-bundle/assets/index.html-tRr22kJ_.js" as="script"><link rel="prefetch" href="/opentelemetry-bundle/assets/docker-env-setup.html-i8eIloXT.js" as="script"><link rel="prefetch" href="/opentelemetry-bundle/assets/introduction.html-BjV3NWrV.js" as="script"><link rel="prefetch" href="/opentelemetry-bundle/assets/logs.html-Bnw7Zh6e.js" as="script"><link rel="prefetch" href="/opentelemetry-bundle/assets/metrics.html-B-sTRzKx.js" as="script"><link rel="prefetch" href="/opentelemetry-bundle/assets/traces.html-DBNjVbT9.js" as="script"><link rel="prefetch" href="/opentelemetry-bundle/assets/configuration.html-nOPB1aAl.js" as="script"><link rel="prefetch" href="/opentelemetry-bundle/assets/getting-started.html-CYDRUuPP.js" as="script"><link rel="prefetch" href="/opentelemetry-bundle/assets/introduction.html-X-keaZRX.js" as="script"><link rel="prefetch" href="/opentelemetry-bundle/assets/troubleshooting.html-V3gp7Abh.js" as="script"><link rel="prefetch" href="/opentelemetry-bundle/assets/setupDevtools-7MC2TMWH-bL__mj_W.js" as="script">
   </head>
   <body>
-    <div id="app"><!--[--><div class="theme-container"><main class="page"><div class="theme-default-content"><h1>404</h1><blockquote>Looks like we&#39;ve got some broken links.</blockquote><a class="route-link" href="/opentelemetry-bundle/">Take me home</a></div></main></div><!--[--><!----><!--]--><!--]--></div>
-    <script type="module" src="/opentelemetry-bundle/assets/app-BgzC8iiR.js" defer></script>
+    <div id="app"><!--[--><div class="vp-theme-container" vp-container data-v-8636ca9b><main class="page" data-v-8636ca9b><div vp-content data-v-8636ca9b><h1 data-v-8636ca9b>404</h1><blockquote data-v-8636ca9b>How did we get here?</blockquote><a class="route-link" href="/opentelemetry-bundle/" data-v-8636ca9b>Take me home</a></div></main></div><!--[--><!----><!--]--><!--]--></div>
+    <script type="module" src="/opentelemetry-bundle/assets/app-DAM_jpli.js" defer></script>
   </body>
 </html>
