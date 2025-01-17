@@ -1,6 +1,7 @@
 # Traces
 
-TBD
+What OpenTelemetry documentation says about Traces:
+> Traces give us the big picture of what happens when a request is made to an application. Whether your application is a monolith with a single database or a sophisticated mesh of services, traces are essential to understanding the full “path” a request takes in your application.
 
 ## Configuration
 
@@ -57,14 +58,14 @@ To trace a specific part of your application, please refer to the documentation 
 
 Here is the list of the available Symfony components that can be traced:
 
-- Cache (Alpha)
-- Console (Alpha)
-- Doctrine (Alpha)
-- Http Client (Alpha)
-- Http Kernel (Alpha)
-- Mailer (Alpha)
-- Messenger (Alpha)
-- Twig (Alpha)
+- Cache
+- Console
+- Doctrine
+- Http Client
+- Http Kernel
+- Mailer
+- Messenger
+- Twig
 
 Each component can be configured using the following configuration block:
 
@@ -80,7 +81,7 @@ open_telemetry:
 
 Once you enabled an instrumentation, it will automatically create spans, based on its tracer, provider, processor and exporter.
 
-With the `Console` and `HttpKernel` entrypoint components,  you can also define a `type` configuration block:
+With the `Console` and `HttpKernel` entrypoint components, you can also define a `type` configuration block:
 
 ```yaml
 open_telemetry:

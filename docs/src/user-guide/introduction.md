@@ -1,5 +1,9 @@
 # Introduction
 
+::: warning
+This documentation is a work in progress. If you can't find what you're looking for, please open an issue or a pull request.
+:::
+
 OpenTelemetry is an observability framework – an API, SDK, and tools that are designed to aid in the generation and collection of application telemetry data such as metrics, logs, and traces.
 
 For documentation of the underlying SDK, visit the [OpenTelemetry PHP SDK documentation](https://opentelemetry.io/docs/languages/php/).

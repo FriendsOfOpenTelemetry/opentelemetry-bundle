@@ -37,12 +37,11 @@ open_telemetry:
 It is important to understand that the current implementation rely on entrypoint components, which create root spans to allow "secondary" components to attach their spans to it.
 A secondary component that does not have a root span will create orphan traces and mess with your obsa, as they won't be attached to any root span.
 
-In a Symfony application the entrypoint components are the `HttpKernel`, the `Console` and `Workers`.
+In a Symfony application the entrypoint components are the `HttpKernel`, the `Console` and `Messenger`.
 
-- The `HttpKernel` is the entrypoint for HTTP requests.
-- The `Console` is the entrypoint for console commands.
-- The `Workers` are the entrypoint for background tasks.
-  - Workers are not yet implemented.
+- The `HttpKernel` is the entrypoint for requests.
+- The `Console` is the entrypoint for commands.
+- The `Messenger` is the entrypoint for messages.
 
 Those entrypoint components can be configured in two ways:
 
