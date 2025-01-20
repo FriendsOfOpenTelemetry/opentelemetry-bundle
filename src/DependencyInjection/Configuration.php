@@ -15,6 +15,8 @@ use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Trace\SpanProcessor
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Trace\TracerProvider\TraceProviderEnum;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Trace\TraceSamplerEnum;
 use Monolog\Level;
+use OpenTelemetry\API\Common\Time\SystemClock;
+use OpenTelemetry\SDK\Logs\Processor\BatchLogRecordProcessor;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
@@ -500,8 +502,19 @@ final class Configuration implements ConfigurationInterface
                         ->scalarPrototype()
                         ->end()
                     ->end()
+                    ->arrayNode('batch')
+                        ->info('Required if processor type is batch')
+                        ->children()
+                            ->scalarNode('clock')->defaultValue(SystemClock::class)->end()
+                            ->integerNode('max_queue_size')->isRequired()->defaultValue(BatchLogRecordProcessor::DEFAULT_MAX_QUEUE_SIZE)->end()
+                            ->integerNode('schedule_delay')->isRequired()->defaultValue(BatchLogRecordProcessor::DEFAULT_SCHEDULE_DELAY)->end()
+                            ->integerNode('export_timeout')->isRequired()->defaultValue(BatchLogRecordProcessor::DEFAULT_EXPORT_TIMEOUT)->end()
+                            ->integerNode('max_export_batch_size')->isRequired()->defaultValue(BatchLogRecordProcessor::DEFAULT_MAX_EXPORT_BATCH_SIZE)->end()
+                            ->scalarNode('provider')->isRequired()->end()
+                        ->end()
+                    ->end()
                     ->scalarNode('exporter')
-                        ->info('Required if processor type is simple')
+                        ->info('Required if processor type is simple or batch')
                         ->cannotBeEmpty()
                     ->end()
                 ->end()
