@@ -10,6 +10,7 @@ use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Log\LoggerProvider\
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Log\LoggerProvider\DefaultLoggerProviderFactory;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Log\LoggerProvider\NoopLoggerProviderFactory;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Log\LogProcessor\AbstractLogProcessorFactory;
+use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Log\LogProcessor\BatchLogProcessorFactory;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Log\LogProcessor\MultiLogProcessorFactory;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Log\LogProcessor\NoopLogProcessorFactory;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Log\LogProcessor\SimpleLogProcessorFactory;
@@ -70,6 +71,9 @@ return static function (ContainerConfigurator $container): void {
                 service('logger')->ignoreOnInvalid(),
             ])
             ->tag('monolog.logger', ['channel' => 'open_telemetry'])
+
+        ->set('open_telemetry.logs.processor_factory.batch', BatchLogProcessorFactory::class)
+            ->parent('open_telemetry.logs.processor_factory.abstract')
 
         ->set('open_telemetry.logs.processor_factory.multi', MultiLogProcessorFactory::class)
             ->parent('open_telemetry.logs.processor_factory.abstract')
