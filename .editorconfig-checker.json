@@ -4,7 +4,12 @@
     "IgnoreDefaults": false,
     "SpacesAfterTabs": false,
     "NoColor": false,
-    "Exclude": [],
+    "Exclude": [
+        "flake.lock",
+        "package.json",
+        "package-lock.json",
+        "composer.lock"
+    ],
     "AllowedContentTypes": [],
     "PassedFiles": [],
     "Disable": {
