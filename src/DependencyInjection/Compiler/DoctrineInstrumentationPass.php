@@ -2,7 +2,7 @@
 
 namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\DependencyInjection\Compiler;
 
-use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
+use Doctrine\DBAL\Result;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
@@ -15,7 +15,7 @@ class DoctrineInstrumentationPass implements CompilerPassInterface
             return;
         }
 
-        if (!class_exists(DoctrineBundle::class)) {
+        if (!class_exists(Result::class)) {
             throw new \LogicException('Doctrine instrumentation cannot be enabled because the doctrine/doctrine-bundle package is not installed.');
         }
 
