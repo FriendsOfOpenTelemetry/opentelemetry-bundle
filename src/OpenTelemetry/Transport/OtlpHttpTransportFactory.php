@@ -6,6 +6,10 @@ use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Exporter\ExporterEn
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Exporter\ExporterOptionsInterface;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Exporter\OtlpExporterCompressionEnum;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Exporter\OtlpExporterFormatEnum;
+use GuzzleHttp\Client;
+use GuzzleHttp\Psr7\HttpFactory;
+use OpenTelemetry\SDK\Common\Export\Http\PsrTransport;
+use OpenTelemetry\SDK\Common\Export\Http\PsrUtils;
 use OpenTelemetry\SDK\Common\Export\TransportInterface;
 
 final readonly class OtlpHttpTransportFactory implements TransportFactoryInterface
@@ -29,17 +33,16 @@ final readonly class OtlpHttpTransportFactory implements TransportFactoryInterfa
         $format = $params->contentType ?? OtlpExporterFormatEnum::Json->toContentType();
         $compression = OtlpExporterCompressionEnum::tryFrom($params->compression) ?? OtlpExporterCompressionEnum::None;
 
-        return (new \OpenTelemetry\Contrib\Otlp\OtlpHttpTransportFactory())->create(
+        return new PsrTransport(
+            new Client(),
+            new HttpFactory(),
+            new HttpFactory(),
             (string) $endpoint,
             $format,
             $params->headers,
-            $compression->toKnownValue(),
-            $params->timeout,
+            PsrUtils::compression(OtlpExporterCompressionEnum::None === $compression ? null : $compression->toKnownValue()),
             $params->retryDelay,
             $params->maxRetries,
-            $params->caCert,
-            $params->cert,
-            $params->key,
         );
     }
 }
