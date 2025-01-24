@@ -2,7 +2,6 @@
 
 namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\DependencyInjection\Compiler;
 
-use Symfony\Component\Cache\CacheItem;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -13,16 +12,8 @@ class CacheInstrumentationPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container): void
     {
-        if (false === $container->hasParameter('open_telemetry.instrumentation.cache.tracing.enabled')
-            || false === $container->getParameter('open_telemetry.instrumentation.cache.tracing.enabled')) {
-            $container->removeDefinition('open_telemetry.instrumentation.cache.trace.tag_aware_adapter');
-            $container->removeDefinition('open_telemetry.instrumentation.cache.trace.adapter');
-
+        if (!$container->getParameter('open_telemetry.instrumentation.cache.tracing.enabled')) {
             return;
-        }
-
-        if (!class_exists(CacheItem::class)) {
-            throw new \LogicException('Cache instrumentation cannot be enabled because the symfony/cache package is not installed.');
         }
 
         foreach ($container->findTaggedServiceIds('cache.pool') as $serviceId => $tags) {
