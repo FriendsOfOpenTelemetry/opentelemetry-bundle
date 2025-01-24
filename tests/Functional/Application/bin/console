@@ -4,16 +4,12 @@
 
 use App\Kernel;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
+use Symfony\Component\Console\Input\ArgvInput;
 
+require_once __DIR__.'/../../../../vendor/autoload.php';
 
-if (!is_file(dirname(__DIR__).'/../../../vendor/autoload_runtime.php')) {
-    throw new LogicException('Symfony Runtime is missing. Try running "composer require symfony/runtime".');
-}
+$input = new ArgvInput();
 
-require_once dirname(__DIR__).'/../../../vendor/autoload_runtime.php';
-
-return function () {
-    $kernel = new Kernel('test', true);
-
-    return new Application($kernel);
-};
+$kernel = new Kernel('test', true);
+$application = new Application($kernel);
+$application->run($input);
