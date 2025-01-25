@@ -10,10 +10,11 @@ final class MultiLogProcessorFactory extends AbstractLogProcessorFactory
 {
     public function createProcessor(
         array $processors = [],
+        ?array $batch = null,
         ?LogRecordExporterInterface $exporter = null,
     ): LogRecordProcessorInterface {
         if (0 >= count($processors)) {
-            throw new \InvalidArgumentException('Processors should not be empty');
+            throw new \InvalidArgumentException('You must provide at least one processor when using a multi log processor');
         }
 
         return new MultiLogRecordProcessor($processors);

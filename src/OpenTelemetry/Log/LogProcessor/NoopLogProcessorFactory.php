@@ -10,6 +10,7 @@ final class NoopLogProcessorFactory extends AbstractLogProcessorFactory
 {
     public function createProcessor(
         array $processors = [],
+        ?array $batch = null,
         ?LogRecordExporterInterface $exporter = null,
     ): LogRecordProcessorInterface {
         return new NoopLogRecordProcessor();

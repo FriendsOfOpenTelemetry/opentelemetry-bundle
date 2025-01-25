@@ -18,6 +18,7 @@ class SimpleLogProcessorFactoryTest extends TestCase
     {
         (new SimpleLogProcessorFactory())->createProcessor(
             [],
+            null,
             (new NoopLogExporterFactory(new TransportFactory([])))
                 ->createExporter(
                     ExporterDsn::fromString('null://default'),
@@ -25,7 +26,7 @@ class SimpleLogProcessorFactoryTest extends TestCase
                 ),
         );
 
-        self::expectExceptionObject(new \InvalidArgumentException('Exporter is null'));
+        self::expectExceptionObject(new \InvalidArgumentException('You must provide an exporter when using a simple log processor'));
 
         (new SimpleLogProcessorFactory())->createProcessor();
     }

@@ -10,10 +10,11 @@ final class SimpleLogProcessorFactory extends AbstractLogProcessorFactory
 {
     public function createProcessor(
         array $processors = [],
+        ?array $batch = null,
         ?LogRecordExporterInterface $exporter = null,
     ): LogRecordProcessorInterface {
-        if (null === $exporter) {
-            throw new \InvalidArgumentException('Exporter is null');
+        if (false === $exporter instanceof LogRecordExporterInterface) {
+            throw new \InvalidArgumentException('You must provide an exporter when using a simple log processor');
         }
 
         return new SimpleLogRecordProcessor($exporter);
