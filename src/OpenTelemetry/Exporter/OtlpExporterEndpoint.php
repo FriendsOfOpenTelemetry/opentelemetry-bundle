@@ -3,7 +3,7 @@
 namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Exporter;
 
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Transport\TransportEnum;
-use Http\Discovery\Psr17FactoryDiscovery;
+use GuzzleHttp\Psr7\HttpFactory;
 use OpenTelemetry\API\Signals;
 use OpenTelemetry\Contrib\Otlp\HttpEndpointResolverInterface;
 use OpenTelemetry\Contrib\Otlp\OtlpUtil;
@@ -11,24 +11,22 @@ use Psr\Http\Message\UriFactoryInterface;
 
 final class OtlpExporterEndpoint implements ExporterEndpointInterface
 {
-    private UriFactoryInterface $uriFactory;
     private ?string $signal = null;
     private TransportEnum $transport;
 
     private function __construct(
         private readonly ExporterDsn $dsn,
-        ?UriFactoryInterface $uriFactory = null,
+        private readonly UriFactoryInterface $uriFactory,
     ) {
         if ('otlp' !== $this->dsn->getExporter()) {
             throw new \RuntimeException('Provided DSN exporter is not compatible with this endpoint.');
         }
-        $this->uriFactory = $uriFactory ?? Psr17FactoryDiscovery::findUriFactory();
         $this->transport = TransportEnum::from($this->dsn->getTransport());
     }
 
     public static function fromDsn(ExporterDsn $dsn): self
     {
-        return new self($dsn);
+        return new self($dsn, new HttpFactory());
     }
 
     public function withSignal(string $signal): self

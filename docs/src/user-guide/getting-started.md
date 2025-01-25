@@ -8,11 +8,16 @@ Run the following command to install it in your application:
 composer require friendsofopentelemetry/opentelemetry-bundle
 ```
 
-OpenTelemetry SDK uses `tbachert/spi`, a Composer plugin that register services by loading files from autoload files, this provides a way to instance services required by OpenTelemetry to work in any applications.
-The purpose is similar to a container, but this not how it should be handled within a Symfony application.
+### Notes
 
-For a complete and clean installation, when requiring our bundle, you will be asked to choose to enable this plugin. We advise you to say **no**.
-We also advise you to install `mcaskill/composer-exclude-files` Composer plugin and exclude OpenTelemetry files from autoload:
+#### OpenTelemetry SDK and `tbachert/spi`
+
+The OpenTelemetry SDK uses `tbachert/spi`, a Composer plugin that registers services by loading files from the autoload configuration. This acts similarly to a container but is not the recommended approach for managing services in Symfony applications.
+
+To ensure a clean and optimal setup:
+
+- When prompted during installation, do not enable the `tbachert/spi` plugin.
+- Install the `mcaskill/composer-exclude-files` Composer plugin and exclude OpenTelemetry files from the autoload process by adding the following configuration to your composer.json file:
 
 ```json
 {
@@ -23,6 +28,13 @@ We also advise you to install `mcaskill/composer-exclude-files` Composer plugin 
   }
 }
 ```
+
+#### HTTP PSR Discovery and `php-http/discovery`
+
+You may also be prompted to enable the `php-http/discovery` Composer plugin. This plugin allows libraries to discover HTTP PSR implementations dynamically. While this is required by many OpenTelemetry dependencies, our bundle relies directly on Guzzle HTTP for simplicity.
+
+- Recommendation: Enable the plugin if your application requires it, but this is optional.
+- If you believe relying directly on Guzzle HTTP is not ideal, please open an issue to share your feedback. As this package is in active Alpha development, we are open to exploring better solutions.
 
 ### Supported Versions
 
