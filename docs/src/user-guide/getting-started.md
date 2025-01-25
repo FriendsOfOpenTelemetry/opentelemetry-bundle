@@ -8,6 +8,22 @@ Run the following command to install it in your application:
 composer require friendsofopentelemetry/opentelemetry-bundle
 ```
 
+OpenTelemetry SDK uses `tbachert/spi`, a Composer plugin that register services by loading files from autoload files, this provides a way to instance services required by OpenTelemetry to work in any applications.
+The purpose is similar to a container, but this not how it should be handled within a Symfony application.
+
+For a complete and clean installation, when requiring our bundle, you will be asked to choose to enable this plugin. We advise you to say **no**.
+We also advise you to install `mcaskill/composer-exclude-files` Composer plugin and exclude OpenTelemetry files from autoload:
+
+```json
+{
+  "extra": {
+    "exclude-from-files": [
+      "open-telemetry/*"
+    ]
+  }
+}
+```
+
 ### Supported Versions
 
 There is no stable version yet, so you can use the `dev` version to install the bundle.

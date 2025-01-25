@@ -56,6 +56,7 @@
         "guzzlehttp/promises": "^2.0",
         "matthiasnoback/symfony-config-test": "^5.2",
         "matthiasnoback/symfony-dependency-injection-test": "^6.0",
+        "mcaskill/composer-exclude-files": "^4.0",
         "nyholm/symfony-bundle-test": "^3.0",
         "open-telemetry/exporter-otlp": "^1",
         "open-telemetry/exporter-zipkin": "^1",
@@ -112,12 +113,18 @@
     "config": {
         "allow-plugins": {
             "ergebnis/composer-normalize": true,
+            "mcaskill/composer-exclude-files": true,
             "php-http/discovery": true,
             "pyrech/composer-changelogs": true,
-            "symfony/runtime": true,
-            "tbachert/spi": true
+            "symfony/runtime": false,
+            "tbachert/spi": false
         },
         "sort-packages": true
+    },
+    "extra": {
+        "exclude-from-files": [
+            "open-telemetry/*"
+        ]
     },
     "scripts": {
         "check-reqs": "@php tools/composer-require-checker/vendor/bin/composer-require-checker check",
