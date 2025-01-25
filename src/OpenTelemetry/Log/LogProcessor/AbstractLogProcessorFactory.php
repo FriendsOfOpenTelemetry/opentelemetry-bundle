@@ -6,7 +6,7 @@ use Psr\Log\LoggerInterface;
 
 abstract class AbstractLogProcessorFactory implements LogProcessorFactoryInterface
 {
-    public function __construct(private ?LoggerInterface $logger = null)
+    public function __construct(private readonly ?LoggerInterface $logger = null)
     {
     }
 }

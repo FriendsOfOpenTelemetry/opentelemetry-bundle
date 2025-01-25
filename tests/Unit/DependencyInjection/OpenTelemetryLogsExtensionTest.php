@@ -14,6 +14,7 @@ use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Log\LoggerProvider\
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Log\LoggerProvider\DefaultLoggerProviderFactory;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Log\LoggerProvider\NoopLoggerProviderFactory;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Log\LogProcessor\AbstractLogProcessorFactory;
+use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Log\LogProcessor\BatchLogProcessorFactory;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Log\LogProcessor\MultiLogProcessorFactory;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Log\LogProcessor\NoopLogProcessorFactory;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Log\LogProcessor\SimpleLogProcessorFactory;
@@ -106,6 +107,7 @@ class OpenTelemetryLogsExtensionTest extends AbstractExtensionTestCase
             'multi' => MultiLogProcessorFactory::class,
             'noop' => NoopLogProcessorFactory::class,
             'simple' => SimpleLogProcessorFactory::class,
+            'batch' => BatchLogProcessorFactory::class,
         ];
 
         foreach ($processorFactories as $key => $factory) {
@@ -252,15 +254,27 @@ class OpenTelemetryLogsExtensionTest extends AbstractExtensionTestCase
 
     /**
      * @param ?string[] $processors
+     * @param ?array{
+     *     clock?: string,
+     *     max_queue_size?: int,
+     *     schedule_delay?: int,
+     *     export_timeout?: int,
+     *     max_export_batch_size?: int,
+     *     auto_flush?: bool,
+     *     meter_provider?: string,
+     * } $batch
      */
     #[DataProvider('processors')]
-    public function testProcessors(string $type, ?array $processors, ?string $exporter): void
+    public function testProcessors(string $type, ?array $processors, ?array $batch, ?string $exporter): void
     {
         $processorConfig = [
             'type' => $type,
         ];
         if (null !== $processors) {
             $processorConfig['processors'] = $processors;
+        }
+        if (null !== $batch) {
+            $processorConfig['batch'] = $batch;
         }
         if (null !== $exporter) {
             $processorConfig['exporter'] = $exporter;
@@ -281,9 +295,30 @@ class OpenTelemetryLogsExtensionTest extends AbstractExtensionTestCase
             0,
             array_map(fn (string $processor) => new Reference($processor), $processors ?? []),
         );
+        if (null !== $batch) {
+            self::assertContainerBuilderHasServiceDefinitionWithArgument(
+                'open_telemetry.logs.processors.main',
+                1,
+                [
+                    'clock' => 'open_telemetry.clock',
+                    'max_queue_size' => 2048,
+                    'schedule_delay' => 1000,
+                    'export_timeout' => 30000,
+                    'max_export_batch_size' => 512,
+                    'auto_flush' => true,
+                    'meter_provider' => null,
+                ],
+            );
+        } else {
+            self::assertContainerBuilderHasServiceDefinitionWithArgument(
+                'open_telemetry.logs.processors.main',
+                1,
+                null,
+            );
+        }
         self::assertContainerBuilderHasServiceDefinitionWithArgument(
             'open_telemetry.logs.processors.main',
-            1,
+            2,
             null !== $exporter ? new Reference($exporter) : null,
         );
         $processor = $this->container->getDefinition('open_telemetry.logs.processors.main');
@@ -302,12 +337,14 @@ class OpenTelemetryLogsExtensionTest extends AbstractExtensionTestCase
         yield 'simple' => [
             'type' => 'simple',
             'processors' => null,
+            'batch' => null,
             'exporter' => 'open_telemetry.logs.exporters.default',
         ];
 
         yield 'noop' => [
             'type' => 'noop',
             'processors' => null,
+            'batch' => null,
             'exporter' => null,
         ];
 
@@ -317,7 +354,15 @@ class OpenTelemetryLogsExtensionTest extends AbstractExtensionTestCase
                 'open_telemetry.logs.processors.simple',
                 'open_telemetry.logs.processors.batch',
             ],
+            'batch' => null,
             'exporter' => null,
+        ];
+
+        yield 'batch' => [
+            'type' => 'batch',
+            'processors' => null,
+            'batch' => [],
+            'exporter' => 'open_telemetry.logs.exporters.default',
         ];
     }
 

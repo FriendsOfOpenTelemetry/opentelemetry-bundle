@@ -352,12 +352,22 @@ final class ConfigurationTest extends TestCase
 
                     # Prototype
                     processor:
-                        type:                 simple # One of "multi"; "noop"; "simple", Required
+                        type:                 simple # One of "batch"; "multi"; "noop"; "simple", Required
 
                         # Required if processor type is multi
                         processors:           []
 
-                        # Required if processor type is simple
+                        # Required if processor type is batch
+                        batch:
+                            clock:                open_telemetry.clock
+                            max_queue_size:       2048
+                            schedule_delay:       1000
+                            export_timeout:       30000
+                            max_export_batch_size: 512
+                            auto_flush:           true
+                            meter_provider:       ~
+
+                        # Required if processor type is simple or batch
                         exporter:             ~
                 exporters:
 

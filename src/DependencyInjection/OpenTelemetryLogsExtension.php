@@ -3,7 +3,9 @@
 namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\DependencyInjection;
 
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Exporter\ExporterOptionsInterface;
+use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Log\LogProcessor\LogProcessorEnum;
 use Monolog\Level;
+use OpenTelemetry\API\Common\Time\ClockInterface;
 use OpenTelemetry\Contrib\Logs\Monolog\Handler;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -85,6 +87,15 @@ final class OpenTelemetryLogsExtension
      * @param array{
      *      type: string,
      *      processors?: string[],
+     *      batch?: array{
+     *          clock: class-string<ClockInterface>,
+     *          max_queue_size: int,
+     *          schedule_delay: int,
+     *          export_timeout: int,
+     *          max_export_batch_size: int,
+     *          auto_flush: bool,
+     *          meter_provider?: string,
+     *      },
      *      exporter?: string
      *  } $config
      */
@@ -98,6 +109,15 @@ final class OpenTelemetryLogsExtension
             ->setFactory([new Reference(sprintf('open_telemetry.logs.processor_factory.%s', $config['type'])), 'createProcessor'])
             ->setArguments([
                 array_map(fn (string $processor) => new Reference($processor), $config['processors'] ?? []),
+                LogProcessorEnum::Batch->value === $config['type'] && isset($config['batch']) ? [
+                    'clock' => new Reference($config['batch']['clock']),
+                    'max_queue_size' => $config['batch']['max_queue_size'],
+                    'schedule_delay' => $config['batch']['schedule_delay'],
+                    'export_timeout' => $config['batch']['export_timeout'],
+                    'max_export_batch_size' => $config['batch']['max_export_batch_size'],
+                    'auto_flush' => $config['batch']['auto_flush'],
+                    'meter_provider' => isset($config['batch']['meter_provider']) ? new Reference($config['batch']['meter_provider']) : null,
+                ] : null,
                 isset($config['exporter']) ? new Reference($config['exporter']) : null,
             ]);
     }
