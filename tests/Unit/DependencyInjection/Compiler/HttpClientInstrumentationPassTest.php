@@ -16,16 +16,25 @@ class HttpClientInstrumentationPassTest extends AbstractCompilerPassTestCase
 {
     protected function registerCompilerPass(ContainerBuilder $container): void
     {
-        $container->addCompilerPass(new HttpClientInstrumentationPass());
-
+        $container->setParameter('open_telemetry.instrumentation.http_client.tracing.enabled', false);
         $container->setDefinition('open_telemetry.instrumentation.http_client.trace.client', new Definition());
+
+        $container->addCompilerPass(new HttpClientInstrumentationPass());
     }
 
-    public function testRemoveInstrumentationByDefault(): void
+    public function testNoInstrumentationByDefault(): void
     {
+        $this->registerService('http_client', HttpClient::class)
+            ->setPublic(true);
+        $this->registerService('http_client.transport', HttpClientInterface::class)
+            ->setPublic(true);
+
         $this->compile();
 
-        self::assertContainerBuilderNotHasService('open_telemetry.instrumentation.http_client.trace.client');
+        $httpClient = $this->container->getDefinition('http_client');
+        self::assertNull($httpClient->getDecoratedService());
+        $httpClientTransport = $this->container->getDefinition('http_client.transport');
+        self::assertNull($httpClientTransport->getDecoratedService());
     }
 
     public function testDoesNotRemoveInstrumentationWithClient(): void
@@ -42,6 +51,12 @@ class HttpClientInstrumentationPassTest extends AbstractCompilerPassTestCase
             '$client',
             new Reference('.inner'),
         );
+        self::assertContainerBuilderServiceDecoration(
+            'open_telemetry.instrumentation.http_client.trace.client',
+            'http_client',
+            null,
+            15
+        );
     }
 
     public function testDoesNotRemoveInstrumentationWithClientTransport(): void
@@ -57,6 +72,12 @@ class HttpClientInstrumentationPassTest extends AbstractCompilerPassTestCase
             'open_telemetry.instrumentation.http_client.trace.client',
             '$client',
             new Reference('.inner'),
+        );
+        self::assertContainerBuilderServiceDecoration(
+            'open_telemetry.instrumentation.http_client.trace.client',
+            'http_client.transport',
+            null,
+            -15
         );
     }
 }

@@ -16,8 +16,7 @@ class CacheInstrumentationPassTest extends AbstractCompilerPassTestCase
 {
     protected function registerCompilerPass(ContainerBuilder $container): void
     {
-        $container->addCompilerPass(new CacheInstrumentationPass());
-
+        $container->setParameter('open_telemetry.instrumentation.cache.tracing.enabled', false);
         $container->setDefinition('open_telemetry.instrumentation.cache.trace.tag_aware_adapter', new Definition());
         $container->setDefinition('open_telemetry.instrumentation.cache.trace.adapter', new Definition());
 
@@ -29,14 +28,13 @@ class CacheInstrumentationPassTest extends AbstractCompilerPassTestCase
             ->setPublic(true)
             ->setArguments([new Reference('cache.app')])
             ->addTag('cache.pool', ['pool' => 'cache.app']);
+
+        $container->addCompilerPass(new CacheInstrumentationPass());
     }
 
-    public function testRemoveInstrumentationByDefault(): void
+    public function testNoInstrumentationByDefault(): void
     {
         $this->compile();
-
-        self::assertContainerBuilderNotHasService('open_telemetry.instrumentation.cache.trace.tag_aware_adapter');
-        self::assertContainerBuilderNotHasService('open_telemetry.instrumentation.cache.trace.adapter');
 
         self::assertContainerBuilderNotHasService('cache.test.tracer');
         self::assertContainerBuilderNotHasService('cache.test.taggable.tracer');

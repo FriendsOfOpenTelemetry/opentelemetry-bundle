@@ -3,6 +3,7 @@
 namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\Tests\Unit\DependencyInjection;
 
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\DependencyInjection\OpenTelemetryExtension;
+use FriendsOfOpenTelemetry\OpenTelemetryBundle\Instrumentation\InstrumentationTypeEnum;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Context\Propagator\HeadersPropagator as HeadersPropagationGetter;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Exporter\ExporterDsn;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Exporter\OtlpExporterOptions;
@@ -124,17 +125,14 @@ class OpenTelemetryExtensionTest extends AbstractExtensionTestCase
             'tracing' => [
                 'enabled' => true,
             ],
-            'metering' => [
-                'enabled' => true,
-            ],
         ];
 
         $config = [
             'instrumentation' => [
                 'cache' => $instrumentationConfig,
-                'console' => $instrumentationConfig,
+                'console' => ['tracing' => ['enabled' => true], 'type' => 'attribute'],
                 'http_client' => $instrumentationConfig,
-                'http_kernel' => $instrumentationConfig,
+                'http_kernel' => ['tracing' => ['enabled' => true], 'type' => 'attribute'],
                 'mailer' => $instrumentationConfig,
                 'messenger' => $instrumentationConfig,
                 'twig' => $instrumentationConfig,
@@ -146,8 +144,9 @@ class OpenTelemetryExtensionTest extends AbstractExtensionTestCase
         foreach (array_keys($config['instrumentation']) as $name) {
             self::assertContainerBuilderHasParameter(sprintf('open_telemetry.instrumentation.%s.tracing.enabled', $name), true);
             self::assertContainerBuilderHasParameter(sprintf('open_telemetry.instrumentation.%s.tracing.tracer', $name), 'default_tracer');
-            self::assertContainerBuilderHasParameter(sprintf('open_telemetry.instrumentation.%s.metering.enabled', $name), true);
-            self::assertContainerBuilderHasParameter(sprintf('open_telemetry.instrumentation.%s.metering.meter', $name), 'default_meter');
         }
+
+        self::assertContainerBuilderHasParameter('open_telemetry.instrumentation.console.type', InstrumentationTypeEnum::Attribute);
+        self::assertContainerBuilderHasParameter('open_telemetry.instrumentation.http_kernel.type', InstrumentationTypeEnum::Attribute);
     }
 }
