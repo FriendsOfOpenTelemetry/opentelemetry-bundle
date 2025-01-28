@@ -4,11 +4,14 @@ namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\Tests\Unit\OpenTelemetry\Tr
 
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Trace\Sampler\AttributeBasedSampler;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Trace\SamplerFactory;
+use OpenTelemetry\Context\ContextInterface;
+use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
 use OpenTelemetry\SDK\Trace\Sampler\AlwaysOffSampler;
 use OpenTelemetry\SDK\Trace\Sampler\AlwaysOnSampler;
 use OpenTelemetry\SDK\Trace\Sampler\ParentBased;
 use OpenTelemetry\SDK\Trace\Sampler\TraceIdRatioBasedSampler;
 use OpenTelemetry\SDK\Trace\SamplerInterface;
+use OpenTelemetry\SDK\Trace\SamplingResult;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -20,8 +23,12 @@ class SamplerFactoryTest extends TestCase
      * @param array<int, mixed> $params
      */
     #[DataProvider('samplerProvider')]
-    public function testCreateSampler(string $name, string $expectedClass, string $description, array $params = []): void
+    public function testCreateSampler(string $name, string $expectedClass, string $description, array $params = [], ?\Exception $exception = null): void
     {
+        if ($exception instanceof \Exception) {
+            self::expectExceptionObject($exception);
+        }
+
         $sampler = SamplerFactory::create($name, $params);
 
         self::assertInstanceOf($expectedClass, $sampler);
@@ -33,7 +40,8 @@ class SamplerFactoryTest extends TestCase
      *     0: string,
      *     1: class-string<SamplerInterface>,
      *     2: string,
-     *     3?: array<int, mixed>,
+     *     3?: array<int|string, mixed>,
+     *     4?: ?\Exception
      * }>
      */
     public static function samplerProvider(): \Generator
@@ -81,6 +89,44 @@ class SamplerFactoryTest extends TestCase
             AttributeBasedSampler::class,
             'AttributeBasedSampler{traceable, 1}',
             ['traceable', true],
+        ];
+
+        $anonymousSampler = new class implements SamplerInterface {
+            /** @phpstan-ignore-next-line */
+            public function shouldSample(
+                ContextInterface $parentContext,
+                string $traceId,
+                string $spanName,
+                int $spanKind,
+                AttributesInterface $attributes,
+                array $links,
+            ): SamplingResult {
+                return new SamplingResult(SamplingResult::RECORD_AND_SAMPLE);
+            }
+
+            public function getDescription(): string
+            {
+                return 'AnonymousClassSampler';
+            }
+        };
+
+        yield [
+            'service',
+            SamplerInterface::class,
+            'AnonymousClassSampler',
+            [
+                'service_id' => $anonymousSampler,
+            ],
+        ];
+
+        yield [
+            'service',
+            SamplerInterface::class,
+            '',
+            [
+                'service_id' => new \stdClass(),
+            ],
+            new \InvalidArgumentException('Parameter service_id must be an instance of SamplerInterface'),
         ];
     }
 }

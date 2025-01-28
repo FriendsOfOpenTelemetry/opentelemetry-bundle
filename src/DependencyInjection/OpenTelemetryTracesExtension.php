@@ -113,9 +113,18 @@ final class OpenTelemetryTracesExtension
      */
     private function loadTraceProvider(string $name, array $config): void
     {
-        $sampler = (new ChildDefinition('open_telemetry.traces.sampler_factory'))->setArguments([
+        $sampler = (new ChildDefinition('open_telemetry.traces.sampler_factory'));
+
+        $params = $config['sampler']['options'] ?? [];
+        if (isset($config['sampler']['type']) && TraceSamplerEnum::Service->value === $config['sampler']['type']) {
+            if (!array_key_exists('service_id', $config['sampler'])) {
+                throw new \LogicException('To configure a sampler of type service, you must specify the service_id key');
+            }
+            $params['service_id'] = new Reference($config['sampler']['service_id']);
+        }
+        $sampler->setArguments([
             $config['sampler']['type'] ?? TraceSamplerEnum::AlwaysOn->value,
-            $config['sampler']['options'] ?? [],
+            $params,
         ]);
 
         $this->container

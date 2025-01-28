@@ -12,6 +12,7 @@ use OpenTelemetry\Contrib\Otlp\MetricExporter;
 use OpenTelemetry\Contrib\Otlp\SpanExporter;
 use OpenTelemetry\SDK\Logs\LoggerProvider;
 use OpenTelemetry\SDK\Logs\NoopLoggerProvider;
+use OpenTelemetry\SDK\Logs\Processor\BatchLogRecordProcessor;
 use OpenTelemetry\SDK\Logs\Processor\SimpleLogRecordProcessor;
 use OpenTelemetry\SDK\Metrics\MeterProvider;
 use OpenTelemetry\SDK\Metrics\NoopMeterProvider;
@@ -197,6 +198,36 @@ class BundleInitializationTest extends KernelTestCase
         self::assertInstanceOf(LogsExporter::class, $exporter);
     }
 
+    public function testLogsBatchProcessor(): void
+    {
+        $kernel = self::bootKernel(['config' => function (TestKernel $kernel) {
+            $kernel->addTestConfig(__DIR__.'/Fixtures/yml/logs-batch-processor.yml');
+        }]);
+
+        $publicContainer = $kernel->getContainer();
+        $privateContainer = self::getContainer();
+
+        self::assertTrue($publicContainer->has('open_telemetry.logs.loggers.main'));
+        self::assertTrue($privateContainer->has('open_telemetry.logs.loggers.main'));
+        $logger = $privateContainer->get('open_telemetry.logs.loggers.main');
+        self::assertInstanceOf(LoggerInterface::class, $logger);
+
+        self::assertFalse($publicContainer->has('open_telemetry.logs.providers.default'));
+        self::assertTrue($privateContainer->has('open_telemetry.logs.providers.default'));
+        $provider = $privateContainer->get('open_telemetry.logs.providers.default');
+        self::assertInstanceOf(LoggerProvider::class, $provider);
+
+        self::assertFalse($publicContainer->has('open_telemetry.logs.processors.batch'));
+        self::assertTrue($privateContainer->has('open_telemetry.logs.processors.batch'));
+        $processor = $privateContainer->get('open_telemetry.logs.processors.batch');
+        self::assertInstanceOf(BatchLogRecordProcessor::class, $processor);
+
+        self::assertFalse($publicContainer->has('open_telemetry.logs.exporters.otlp'));
+        self::assertTrue($privateContainer->has('open_telemetry.logs.exporters.otlp'));
+        $exporter = $privateContainer->get('open_telemetry.logs.exporters.otlp');
+        self::assertInstanceOf(LogsExporter::class, $exporter);
+    }
+
     public function testMetricsDefaultOtlp(): void
     {
         $kernel = self::bootKernel(['config' => function (TestKernel $kernel) {
@@ -220,5 +251,33 @@ class BundleInitializationTest extends KernelTestCase
         self::assertTrue($privateContainer->has('open_telemetry.metrics.exporters.otlp'));
         $exporter = $privateContainer->get('open_telemetry.metrics.exporters.otlp');
         self::assertInstanceOf(MetricExporter::class, $exporter);
+    }
+
+    public function testTracesServiceSampler(): void
+    {
+        $kernel = self::bootKernel(['config' => function (TestKernel $kernel) {
+            $kernel->addTestConfig(__DIR__.'/Fixtures/yml/traces-service-sampler.yml');
+        }]);
+
+        $publicContainer = $kernel->getContainer();
+        $privateContainer = self::getContainer();
+
+        self::assertTrue($privateContainer->has('MyOffSampler'));
+
+        self::assertFalse($publicContainer->has('open_telemetry.traces.providers.default'));
+        self::assertTrue($privateContainer->has('open_telemetry.traces.providers.default'));
+        $provider = $privateContainer->get('open_telemetry.traces.providers.default');
+        self::assertInstanceOf(TracerProvider::class, $provider);
+
+        self::assertSame($privateContainer->get('MyOffSampler'), $provider->getSampler());
+    }
+
+    public function testTracesServiceSamplerException(): void
+    {
+        self::expectExceptionObject(new \LogicException('To configure a sampler of type service, you must specify the service_id key'));
+
+        self::bootKernel(['config' => function (TestKernel $kernel) {
+            $kernel->addTestConfig(__DIR__.'/Fixtures/yml/traces-service-sampler-exception.yml');
+        }]);
     }
 }

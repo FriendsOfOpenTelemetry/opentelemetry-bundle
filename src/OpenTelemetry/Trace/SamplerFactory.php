@@ -12,11 +12,15 @@ use OpenTelemetry\SDK\Trace\SamplerInterface;
 final class SamplerFactory
 {
     /**
-     * @param array<int, mixed> $params
+     * @param array<int|string, mixed> $params
      */
     public static function create(string $name, array $params = []): SamplerInterface
     {
         $sampler = TraceSamplerEnum::tryFrom($name);
+
+        if (isset($params['service_id']) && false === $params['service_id']instanceof SamplerInterface) {
+            throw new \InvalidArgumentException('Parameter service_id must be an instance of SamplerInterface');
+        }
 
         return match ($sampler) {
             TraceSamplerEnum::AlwaysOn => new AlwaysOnSampler(),
@@ -26,6 +30,7 @@ final class SamplerFactory
             TraceSamplerEnum::ParentBasedTraceIdRatio => new ParentBased(new TraceIdRatioBasedSampler(...$params)),
             TraceSamplerEnum::TraceIdRatio => new TraceIdRatioBasedSampler(...$params),
             TraceSamplerEnum::AttributeBased => new AttributeBasedSampler(...$params),
+            TraceSamplerEnum::Service => $params['service_id'],
             default => throw new \InvalidArgumentException(sprintf('Unknown sampler: %s', $name)),
         };
     }

@@ -3,18 +3,17 @@
 namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\Tests\Unit\OpenTelemetry\Exporter;
 
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Exporter\ExporterDsn;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @coversDefaultClass \FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Exporter\ExporterDsn
- */
+#[CoversClass(ExporterDsn::class)]
 class ExporterDsnTest extends TestCase
 {
     /**
-     * @dataProvider fromStringProvider
-     *
      * @param array{transport?: string, exporter?: string} $expected
      */
+    #[DataProvider('fromStringProvider')]
     public function testFromString(ExporterDsn $dsn, array $expected): void
     {
         self::assertEquals($expected, [
@@ -63,9 +62,7 @@ class ExporterDsnTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider invalidDsnProvider
-     */
+    #[DataProvider('invalidDsnProvider')]
     public function testInvalidDsn(string $dsn, string $exceptionMessage): void
     {
         $this->expectException(\InvalidArgumentException::class);

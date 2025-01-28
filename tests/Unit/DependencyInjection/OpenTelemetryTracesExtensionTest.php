@@ -304,6 +304,7 @@ class OpenTelemetryTracesExtensionTest extends AbstractExtensionTestCase
     /**
      * @param ?array{
      *     type: string,
+     *     service_id?: string,
      *     options?: array<int, mixed>,
      * } $sampler
      * @param ?string[] $processors
@@ -320,6 +321,9 @@ class OpenTelemetryTracesExtensionTest extends AbstractExtensionTestCase
             ];
             if (isset($sampler['options'])) {
                 $providerConfig['sampler']['options'] = $sampler['options'];
+            }
+            if (isset($sampler['service_id'])) {
+                $providerConfig['sampler']['service_id'] = $sampler['service_id'];
             }
         }
         if (null !== $processors) {
@@ -346,6 +350,9 @@ class OpenTelemetryTracesExtensionTest extends AbstractExtensionTestCase
                 $sampler['type'],
                 $sampler['options'] ?? [],
             ];
+            if (array_key_exists('service_id', $sampler)) {
+                $samplerArg[1]['service_id'] = new Reference($sampler['service_id']);
+            }
         }
         self::assertContainerBuilderHasServiceDefinitionWithArgument(
             'open_telemetry.traces.providers.main',
@@ -371,6 +378,7 @@ class OpenTelemetryTracesExtensionTest extends AbstractExtensionTestCase
      *     type: string,
      *     sampler: ?array{
      *         type: string,
+     *         service_id?: string,
      *         options?: array<int, mixed>,
      *     },
      *     processors: ?string[],
@@ -399,6 +407,15 @@ class OpenTelemetryTracesExtensionTest extends AbstractExtensionTestCase
             'type' => 'noop',
             'sampler' => null,
             'processors' => null,
+        ];
+
+        yield 'sampler service' => [
+            'type' => 'default',
+            'sampler' => [
+                'type' => 'service',
+                'service_id' => 'my_sampler',
+            ],
+            'processors' => ['open_telemetry.traces.processors.default'],
         ];
     }
 
