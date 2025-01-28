@@ -58,7 +58,11 @@ class TraceableRouteLoader implements LoaderInterface
         try {
             $controller = $route->getDefault('_controller');
             if (true === str_contains($controller, '::')) {
-                $reflection = new \ReflectionMethod($controller);
+                if (PHP_VERSION_ID < 80300) {
+                    $reflection = new \ReflectionMethod($controller);
+                } else {
+                    $reflection = \ReflectionMethod::createFromMethodName($controller);
+                }
             } else {
                 $reflection = new \ReflectionClass($controller);
             }
