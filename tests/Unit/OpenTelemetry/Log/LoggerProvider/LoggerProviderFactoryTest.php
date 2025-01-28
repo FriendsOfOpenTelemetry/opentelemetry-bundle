@@ -4,11 +4,10 @@ namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\Tests\Unit\OpenTelemetry\Lo
 
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Log\LoggerProvider\DefaultLoggerProviderFactory;
 use OpenTelemetry\SDK\Logs\Processor\NoopLogRecordProcessor;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @coversDefaultClass \FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Log\LoggerProvider\DefaultLoggerProviderFactory
- */
+#[CoversClass(DefaultLoggerProviderFactory::class)]
 class LoggerProviderFactoryTest extends TestCase
 {
     public function testCreateProvider(): void

@@ -1,0 +1,22 @@
+open_telemetry:
+  service:
+    namespace: 'FriendsOfOpenTelemetry/OpenTelemetry'
+    name: 'Test'
+    version: '0.0.0'
+    environment: test
+  logs:
+    loggers:
+      main:
+        provider: 'open_telemetry.logs.providers.default'
+    providers:
+      default:
+        type: default
+        processor: 'open_telemetry.logs.processors.batch'
+    processors:
+      batch:
+        type: batch
+        batch: ~
+        exporter: 'open_telemetry.logs.exporters.otlp'
+    exporters:
+      otlp:
+        dsn: http+otlp://localhost

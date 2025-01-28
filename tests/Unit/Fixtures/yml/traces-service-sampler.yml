@@ -1,0 +1,28 @@
+services:
+  MyOffSampler:
+    class: OpenTelemetry\SDK\Trace\Sampler\AlwaysOffSampler
+open_telemetry:
+  service:
+    namespace: 'FriendsOfOpenTelemetry/OpenTelemetry'
+    name: 'Test'
+    version: '0.0.0'
+    environment: test
+  traces:
+    tracers:
+      main:
+        provider: 'open_telemetry.traces.providers.default'
+    providers:
+      default:
+        type: default
+        sampler:
+          type: service
+          service_id: 'MyOffSampler'
+        processors:
+          - 'open_telemetry.traces.processors.simple'
+    processors:
+      simple:
+        type: simple
+        exporter: 'open_telemetry.traces.exporters.otlp'
+    exporters:
+      otlp:
+        dsn: http+otlp://localhost

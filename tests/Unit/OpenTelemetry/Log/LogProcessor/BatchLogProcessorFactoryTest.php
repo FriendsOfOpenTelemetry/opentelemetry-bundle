@@ -13,12 +13,11 @@ use OpenTelemetry\API\Metrics\MeterProviderInterface;
 use OpenTelemetry\SDK\Logs\LogRecordExporterInterface;
 use OpenTelemetry\SDK\Logs\LogRecordProcessorInterface;
 use OpenTelemetry\SDK\Logs\Processor\BatchLogRecordProcessor;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @coversDefaultClass \FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Log\LogProcessor\BatchLogProcessorFactory
- */
+#[CoversClass(BatchLogProcessorFactory::class)]
 class BatchLogProcessorFactoryTest extends TestCase
 {
     /**
