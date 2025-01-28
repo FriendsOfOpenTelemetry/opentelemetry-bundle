@@ -7,6 +7,8 @@
 [![Project stage: Development][project-stage-badge]][project-stage-page]
 [![Built with Nix][build-with-nix-badge]][build-with-nix-page]
 [![FOSSA Status][fossa-status-badge]][fossa-status-page]
+[![Packagist Version][packagist-version-badge]][packagist-page]
+[![Packagist Downloads][packagist-downloads-badge]][packagist-page]
 
 > Traces, metrics, and logs instrumentation within your Symfony application.
 
@@ -99,4 +101,7 @@ All the code in this repository is released under the MIT License, for more info
 [fossa-status-badge]: https://app.fossa.com/api/projects/custom%2B42279%2Fgithub.com%2FFriendsOfOpenTelemetry%2Fopentelemetry-bundle.svg?type=shield
 [fossa-status-badge-large]: https://app.fossa.com/api/projects/custom%2B42279%2Fgithub.com%2FFriendsOfOpenTelemetry%2Fopentelemetry-bundle.svg?type=large
 [fossa-status-page]: https://app.fossa.com/projects/custom%252B42279%252Fgithub.com%252FFriendsOfOpenTelemetry%252Fopentelemetry-bundle
+[packagist-version-badge]: https://img.shields.io/packagist/v/friendsofopentelemetry/opentelemetry-bundle
+[packagist-downloads-badge]: https://img.shields.io/packagist/dt/friendsofopentelemetry/opentelemetry-bundle
+[packagist-page]: https://packagist.org/packages/friendsofopentelemetry/opentelemetry-bundle
 [repobeats-image]: https://repobeats.axiom.co/api/embed/27664db040411ce770316b3bf7577564ded32e04.svg
