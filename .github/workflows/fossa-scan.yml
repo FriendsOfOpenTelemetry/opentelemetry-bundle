@@ -38,9 +38,9 @@ jobs:
       - name: Run Fossa Scan
         uses: fossas/fossa-action@v1
         with:
-          api-key: '${{ secrets.FOSSA_API_KEY }}'
+          api-key: '384c9e439463ce9d43a4bb7641d6785b'
       - name: Run Fossa Test
         uses: fossas/fossa-action@v1
         with:
-          api-key: '${{ secrets.FOSSA_API_KEY }}'
+          api-key: '384c9e439463ce9d43a4bb7641d6785b'
           run-tests: true
