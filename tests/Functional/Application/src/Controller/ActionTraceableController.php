@@ -5,6 +5,10 @@ namespace App\Controller;
 use App\Entity\Dummy;
 use Doctrine\ORM\EntityManagerInterface;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\Instrumentation\Attribute\Traceable;
+use OpenTelemetry\API\Trace\StatusCode;
+use OpenTelemetry\API\Trace\TracerInterface;
+use OpenTelemetry\Context\Context;
+use OpenTelemetry\SemConv\TraceAttributes;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -79,5 +83,31 @@ class ActionTraceableController extends AbstractController
     public function notTraceable(): Response
     {
         return new Response(null, Response::HTTP_FOUND);
+    }
+
+    #[Traceable]
+    #[Route('/manual-action', methods: ['GET'])]
+    public function manual(TracerInterface $tracer): Response
+    {
+        $spanBuilder = $tracer
+            ->spanBuilder('Manual')
+            ->setAttributes([
+                TraceAttributes::CODE_FUNCTION_NAME => 'manual',
+                TraceAttributes::CODE_NAMESPACE => self::class,
+            ]);
+
+        $parent = Context::getCurrent();
+
+        $span = $spanBuilder->setParent($parent)->startSpan();
+        sleep(1);
+        $span->addEvent('sleep', [
+            'sleep.duration' => '1s',
+        ]);
+        $span->setStatus(StatusCode::STATUS_OK);
+        $span->end();
+
+        return $this->json([
+            'status' => 'ok',
+        ]);
     }
 }

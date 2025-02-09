@@ -177,6 +177,52 @@ class HttpKernelTracingTest extends WebTestCase
         self::assertSpanEventsCount($mainSpan, 0);
     }
 
+    public function testManualClass(): void
+    {
+        $client = static::createClient();
+        $client->request('GET', '/class-manual');
+
+        static::assertResponseIsSuccessful();
+        static::assertSame('{"status":"ok"}', $client->getResponse()->getContent());
+
+        self::assertSpansCount(2);
+
+        $manualSpan = self::getSpans()[0];
+        self::assertSpanName($manualSpan, 'Manual');
+        self::assertSpanStatus($manualSpan, StatusData::ok());
+        self::assertSpanAttributes($manualSpan, [
+            'code.function.name' => 'manual',
+            'code.namespace' => 'App\Controller\ClassTraceableController',
+        ]);
+        self::assertSpanEventsCount($manualSpan, 1);
+        $manualSpanEvent = $manualSpan->getEvents()[0];
+        self::assertSpanEventName($manualSpanEvent, 'sleep');
+        self::assertSpanEventAttributes($manualSpanEvent, [
+            'sleep.duration' => '1s',
+        ]);
+
+        $mainSpan = self::getSpans()[1];
+        self::assertSpanName($mainSpan, 'app_classtraceable_manual');
+        self::assertSpanStatus($mainSpan, StatusData::ok());
+        self::assertSpanAttributes($mainSpan, [
+            'url.full' => 'http://localhost/class-manual',
+            'http.request.method' => 'GET',
+            'url.path' => '/class-manual',
+            'symfony.kernel.http.host' => 'localhost',
+            'url.scheme' => 'http',
+            'network.protocol.version' => '1.1',
+            'user_agent.original' => 'Symfony BrowserKit',
+            'network.peer.address' => '127.0.0.1',
+            'symfony.kernel.net.peer_ip' => '127.0.0.1',
+            'server.address' => 'localhost',
+            'server.port' => 80,
+            'http.route' => 'app_classtraceable_manual',
+            'http.response.status_code' => Response::HTTP_OK,
+        ]);
+
+        self::assertSame($manualSpan->getParentSpanId(), $mainSpan->getSpanId());
+    }
+
     public function testNotTraceable(): void
     {
         $client = static::createClient();
@@ -228,5 +274,172 @@ class HttpKernelTracingTest extends WebTestCase
             'http.response.status_code' => Response::HTTP_OK,
         ]);
         self::assertSpanEventsCount($mainSpan, 0);
+    }
+
+    public function testManualTrace(): void
+    {
+        $client = static::createClient();
+        $client->request('GET', '/manual-action');
+
+        static::assertResponseIsSuccessful();
+        static::assertSame('{"status":"ok"}', $client->getResponse()->getContent());
+
+        self::assertSpansCount(2);
+
+        $manualSpan = self::getSpans()[0];
+        self::assertSpanName($manualSpan, 'Manual');
+        self::assertSpanStatus($manualSpan, StatusData::ok());
+        self::assertSpanAttributes($manualSpan, [
+            'code.function.name' => 'manual',
+            'code.namespace' => 'App\Controller\ActionTraceableController',
+        ]);
+        self::assertSpanEventsCount($manualSpan, 1);
+        $manualSpanEvent = $manualSpan->getEvents()[0];
+        self::assertSpanEventName($manualSpanEvent, 'sleep');
+        self::assertSpanEventAttributes($manualSpanEvent, [
+            'sleep.duration' => '1s',
+        ]);
+
+        $mainSpan = self::getSpans()[1];
+        self::assertSpanName($mainSpan, 'app_actiontraceable_manual');
+        self::assertSpanStatus($mainSpan, StatusData::ok());
+        self::assertSpanAttributes($mainSpan, [
+            'url.full' => 'http://localhost/manual-action',
+            'http.request.method' => 'GET',
+            'url.path' => '/manual-action',
+            'symfony.kernel.http.host' => 'localhost',
+            'url.scheme' => 'http',
+            'network.protocol.version' => '1.1',
+            'user_agent.original' => 'Symfony BrowserKit',
+            'network.peer.address' => '127.0.0.1',
+            'symfony.kernel.net.peer_ip' => '127.0.0.1',
+            'server.address' => 'localhost',
+            'server.port' => 80,
+            'http.route' => 'app_actiontraceable_manual',
+            'http.response.status_code' => Response::HTTP_OK,
+        ]);
+
+        self::assertSame($manualSpan->getParentSpanId(), $mainSpan->getSpanId());
+    }
+
+    public function testAutowireTracer(): void
+    {
+        $client = static::createClient();
+        $client->request('GET', '/autowire-tracer');
+
+        static::assertResponseIsSuccessful();
+        static::assertSame('{"status":"ok"}', $client->getResponse()->getContent());
+
+        self::assertSpansCount(0);
+
+        self::assertSpansCount(1, 'open_telemetry.traces.exporters.fallback');
+
+        $manualSpan = self::getSpans('open_telemetry.traces.exporters.fallback')[0];
+        self::assertSpanName($manualSpan, 'Manual');
+        self::assertSpanStatus($manualSpan, StatusData::ok());
+        self::assertSpanAttributes($manualSpan, [
+            'code.function.name' => 'manual',
+            'code.namespace' => 'App\Controller\AutowireTracerController',
+        ]);
+        self::assertSpanEventsCount($manualSpan, 1);
+        $manualSpanEvent = $manualSpan->getEvents()[0];
+        self::assertSpanEventName($manualSpanEvent, 'sleep');
+        self::assertSpanEventAttributes($manualSpanEvent, [
+            'sleep.duration' => '1s',
+        ]);
+    }
+
+    public function testFallbackDualTracer(): void
+    {
+        $client = static::createClient();
+        $client->request('GET', '/fallback-dual-tracer');
+
+        static::assertResponseIsSuccessful();
+        static::assertSame('{"status":"ok"}', $client->getResponse()->getContent());
+
+        self::assertSpansCount(1);
+
+        $mainSpan = self::getSpans()[0];
+        self::assertSpanName($mainSpan, 'app_dualtracer_fallback');
+        self::assertSpanStatus($mainSpan, StatusData::ok());
+        self::assertSpanAttributes($mainSpan, [
+            'url.full' => 'http://localhost/fallback-dual-tracer',
+            'http.request.method' => 'GET',
+            'url.path' => '/fallback-dual-tracer',
+            'symfony.kernel.http.host' => 'localhost',
+            'url.scheme' => 'http',
+            'network.protocol.version' => '1.1',
+            'user_agent.original' => 'Symfony BrowserKit',
+            'network.peer.address' => '127.0.0.1',
+            'symfony.kernel.net.peer_ip' => '127.0.0.1',
+            'server.address' => 'localhost',
+            'server.port' => 80,
+            'http.route' => 'app_dualtracer_fallback',
+            'http.response.status_code' => 200,
+        ]);
+
+        self::assertSpansCount(1, 'open_telemetry.traces.exporters.fallback');
+
+        $manualSpan = self::getSpans('open_telemetry.traces.exporters.fallback')[0];
+        self::assertSpanName($manualSpan, 'Manual');
+        self::assertSpanStatus($manualSpan, StatusData::ok());
+        self::assertSpanAttributes($manualSpan, [
+            'code.function.name' => 'manual',
+            'code.namespace' => 'App\Controller\DualTracerController',
+        ]);
+        self::assertSpanEventsCount($manualSpan, 1);
+        $manualSpanEvent = $manualSpan->getEvents()[0];
+        self::assertSpanEventName($manualSpanEvent, 'sleep');
+        self::assertSpanEventAttributes($manualSpanEvent, [
+            'sleep.duration' => '1s',
+        ]);
+
+        self::assertSame($manualSpan->getParentSpanId(), $mainSpan->getSpanId());
+    }
+
+    public function testMainDualTracer(): void
+    {
+        $client = static::createClient();
+        $client->request('GET', '/main-dual-tracer');
+
+        static::assertResponseIsSuccessful();
+        static::assertSame('{"status":"ok"}', $client->getResponse()->getContent());
+
+        self::assertSpansCount(2);
+
+        $manualSpan = self::getSpans()[0];
+        self::assertSpanName($manualSpan, 'Manual');
+        self::assertSpanStatus($manualSpan, StatusData::ok());
+        self::assertSpanAttributes($manualSpan, [
+            'code.function.name' => 'manual',
+            'code.namespace' => 'App\Controller\DualTracerController',
+        ]);
+        self::assertSpanEventsCount($manualSpan, 1);
+        $manualSpanEvent = $manualSpan->getEvents()[0];
+        self::assertSpanEventName($manualSpanEvent, 'sleep');
+        self::assertSpanEventAttributes($manualSpanEvent, [
+            'sleep.duration' => '1s',
+        ]);
+
+        $mainSpan = self::getSpans()[1];
+        self::assertSpanName($mainSpan, 'app_dualtracer_main');
+        self::assertSpanStatus($mainSpan, StatusData::ok());
+        self::assertSpanAttributes($mainSpan, [
+            'url.full' => 'http://localhost/main-dual-tracer',
+            'http.request.method' => 'GET',
+            'url.path' => '/main-dual-tracer',
+            'symfony.kernel.http.host' => 'localhost',
+            'url.scheme' => 'http',
+            'network.protocol.version' => '1.1',
+            'user_agent.original' => 'Symfony BrowserKit',
+            'network.peer.address' => '127.0.0.1',
+            'symfony.kernel.net.peer_ip' => '127.0.0.1',
+            'server.address' => 'localhost',
+            'server.port' => 80,
+            'http.route' => 'app_dualtracer_main',
+            'http.response.status_code' => 200,
+        ]);
+
+        self::assertSame($manualSpan->getParentSpanId(), $mainSpan->getSpanId());
     }
 }

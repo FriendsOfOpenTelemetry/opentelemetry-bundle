@@ -2,32 +2,25 @@
 
 namespace App\Controller;
 
-use FriendsOfOpenTelemetry\OpenTelemetryBundle\Instrumentation\Attribute\Traceable;
 use OpenTelemetry\API\Trace\StatusCode;
 use OpenTelemetry\API\Trace\TracerInterface;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\SemConv\TraceAttributes;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-#[Traceable]
-class ClassTraceableController extends AbstractController
+class AutowireTracerController extends AbstractController
 {
-    public function __construct(private readonly TracerInterface $tracer)
-    {
+    public function __construct(
+        #[Autowire('@open_telemetry.traces.tracers.fallback')]
+        private readonly TracerInterface $tracer,
+    ) {
     }
 
-    #[Route('/class-traceable', methods: ['GET'])]
+    #[Route('/autowire-tracer', methods: ['GET'])]
     public function index(): Response
-    {
-        return $this->json([
-            'status' => 'ok',
-        ]);
-    }
-
-    #[Route('/class-manual', methods: ['GET'])]
-    public function manual(): Response
     {
         $spanBuilder = $this->tracer
             ->spanBuilder('Manual')
