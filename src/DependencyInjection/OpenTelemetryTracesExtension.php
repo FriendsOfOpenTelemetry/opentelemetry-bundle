@@ -4,6 +4,7 @@ namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\DependencyInjection;
 
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Exporter\ExporterOptionsInterface;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Trace\TraceSamplerEnum;
+use OpenTelemetry\API\Trace\TracerInterface;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
@@ -56,11 +57,7 @@ final class OpenTelemetryTracesExtension
 
         if (null !== $defaultTracer) {
             $this->container->setAlias('open_telemetry.traces.default_tracer', new Reference(sprintf('open_telemetry.traces.tracers.%s', $defaultTracer)));
-
-            //            $container->registerAttributeForAutoconfiguration(Traceable::class, static function (ChildDefinition $definition, Traceable $attribute) {
-            //                $tracer = null !== $attribute->tracer ? $attribute->tracer : 'open_telemetry.traces.default_tracer';
-            //                $definition->addTag('open_telemetry.traceable', ['tracer' => new Reference($tracer)]);
-            //            });
+            $this->container->setAlias(TracerInterface::class, new Reference(sprintf('open_telemetry.traces.tracers.%s', $defaultTracer)));
         }
     }
 

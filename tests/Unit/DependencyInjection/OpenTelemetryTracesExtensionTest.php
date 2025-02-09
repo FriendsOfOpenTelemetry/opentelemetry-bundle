@@ -494,6 +494,7 @@ class OpenTelemetryTracesExtensionTest extends AbstractExtensionTestCase
         ]);
 
         self::assertContainerBuilderHasAlias('open_telemetry.traces.default_tracer', 'open_telemetry.traces.tracers.main');
+        self::assertContainerBuilderHasAlias(TracerInterface::class, 'open_telemetry.traces.tracers.main');
     }
 
     public function testNoDefaultTracer(): void
@@ -503,5 +504,6 @@ class OpenTelemetryTracesExtensionTest extends AbstractExtensionTestCase
         ]);
 
         self::assertFalse($this->container->hasAlias('open_telemetry.traces.default_tracer'));
+        self::assertFalse($this->container->hasAlias(TracerInterface::class));
     }
 }

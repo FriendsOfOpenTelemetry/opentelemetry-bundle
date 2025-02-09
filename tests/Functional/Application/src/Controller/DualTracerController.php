@@ -8,28 +8,46 @@ use OpenTelemetry\API\Trace\TracerInterface;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\SemConv\TraceAttributes;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
 #[Traceable]
-class ClassTraceableController extends AbstractController
+class DualTracerController extends AbstractController
 {
-    public function __construct(private readonly TracerInterface $tracer)
-    {
-    }
+    #[Route('/fallback-dual-tracer', methods: ['GET'])]
+    public function fallback(
+        #[Autowire('@open_telemetry.traces.tracers.fallback')]
+        TracerInterface $tracer,
+    ): Response {
+        $spanBuilder = $tracer
+            ->spanBuilder('Manual')
+            ->setAttributes([
+                TraceAttributes::CODE_FUNCTION_NAME => 'manual',
+                TraceAttributes::CODE_NAMESPACE => self::class,
+            ]);
 
-    #[Route('/class-traceable', methods: ['GET'])]
-    public function index(): Response
-    {
+        $parent = Context::getCurrent();
+
+        $span = $spanBuilder->setParent($parent)->startSpan();
+        sleep(1);
+        $span->addEvent('sleep', [
+            'sleep.duration' => '1s',
+        ]);
+        $span->setStatus(StatusCode::STATUS_OK);
+        $span->end();
+
         return $this->json([
             'status' => 'ok',
         ]);
     }
 
-    #[Route('/class-manual', methods: ['GET'])]
-    public function manual(): Response
-    {
-        $spanBuilder = $this->tracer
+    #[Route('/main-dual-tracer', methods: ['GET'])]
+    public function main(
+        #[Autowire('@open_telemetry.traces.tracers.main')]
+        TracerInterface $tracer,
+    ): Response {
+        $spanBuilder = $tracer
             ->spanBuilder('Manual')
             ->setAttributes([
                 TraceAttributes::CODE_FUNCTION_NAME => 'manual',
