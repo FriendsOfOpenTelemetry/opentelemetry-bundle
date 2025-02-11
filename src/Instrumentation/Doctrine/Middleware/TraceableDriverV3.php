@@ -55,10 +55,8 @@ final class TraceableDriverV3 extends AbstractDriverMiddleware
                 ->spanBuilder('doctrine.dbal.connection')
                 ->setSpanKind(SpanKind::KIND_CLIENT)
                 ->setParent($scope?->context())
-                ->setAttribute(TraceAttributes::DB_SYSTEM, $this->getSemanticDbSystem())
-                ->setAttribute(TraceAttributes::DB_CONNECTION_STRING, $params['url'] ?? $params['path'] ?? '')
-                ->setAttribute(TraceAttributes::DB_NAME, $params['dbname'] ?? 'default')
-                ->setAttribute(TraceAttributes::DB_USER, $params['user'])
+                ->setAttribute(TraceAttributes::DB_SYSTEM_NAME, $this->getSemanticDbSystem())
+                ->setAttribute(TraceAttributes::DB_NAMESPACE, $params['dbname'] ?? 'default')
             ;
 
             $span = $spanBuilder->startSpan();
@@ -71,7 +69,7 @@ final class TraceableDriverV3 extends AbstractDriverMiddleware
 
             return new TraceableConnection($connection, new Tracer($this->tracer, $this->logger));
         } catch (Exception $exception) {
-            $span->recordException($exception, [TraceAttributes::EXCEPTION_ESCAPED => true]);
+            $span->recordException($exception);
             $span->setStatus(StatusCode::STATUS_ERROR, $exception->getMessage());
 
             throw $exception;

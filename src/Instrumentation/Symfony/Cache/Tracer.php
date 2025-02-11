@@ -7,7 +7,6 @@ use OpenTelemetry\API\Trace\SpanKind;
 use OpenTelemetry\API\Trace\StatusCode;
 use OpenTelemetry\API\Trace\TracerInterface;
 use OpenTelemetry\Context\Context;
-use OpenTelemetry\SemConv\TraceAttributes;
 use Psr\Cache\CacheException;
 use Psr\Log\LoggerInterface;
 
@@ -49,7 +48,7 @@ class Tracer
             return $callback($span);
         } catch (CacheException $exception) {
             if ($span instanceof SpanInterface) {
-                $span->recordException($exception, [TraceAttributes::EXCEPTION_ESCAPED => true]);
+                $span->recordException($exception);
                 $span->setStatus(StatusCode::STATUS_ERROR, $exception->getMessage());
             }
             throw $exception;

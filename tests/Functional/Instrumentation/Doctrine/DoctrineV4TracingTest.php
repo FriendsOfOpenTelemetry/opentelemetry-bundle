@@ -46,6 +46,7 @@ final class DoctrineV4TracingTest extends KernelTestCase
         self::assertSpanStatus($mainSpan, StatusData::ok());
         self::assertSpanAttributesSubSet($mainSpan, [
             'db.namespace' => 'default',
+            'db.system.name' => 'sqlite',
             'doctrine.user' => 'root',
         ]);
         self::assertSpanEventsCount($mainSpan, 0);
