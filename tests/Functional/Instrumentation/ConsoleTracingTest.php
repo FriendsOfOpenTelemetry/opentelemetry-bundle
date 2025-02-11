@@ -35,7 +35,7 @@ class ConsoleTracingTest extends KernelTestCase
         self::assertSpanName($mainSpan, 'traceable-command');
         self::assertSpanStatus($mainSpan, StatusData::ok());
         self::assertSpanAttributes($mainSpan, [
-            'code.function' => 'execute',
+            'code.function.name' => 'execute',
             'code.namespace' => 'App\Command\TraceableCommand',
             'symfony.console.exit_code' => 0,
         ]);
@@ -63,7 +63,7 @@ class ConsoleTracingTest extends KernelTestCase
         self::assertSpanName($mainSpan, 'traceable-command');
         self::assertSpanStatus($mainSpan, StatusData::error());
         self::assertSpanAttributes($mainSpan, [
-            'code.function' => 'execute',
+            'code.function.name' => 'execute',
             'code.namespace' => 'App\Command\TraceableCommand',
             'symfony.console.exit_code' => 1,
         ]);
@@ -96,7 +96,7 @@ class ConsoleTracingTest extends KernelTestCase
         self::assertSpanName($mainSpan, 'traceable-command');
         self::assertSpanStatus($mainSpan, StatusData::error());
         self::assertSpanAttributes($mainSpan, [
-            'code.function' => 'execute',
+            'code.function.name' => 'execute',
             'code.namespace' => 'App\Command\TraceableCommand',
             'symfony.console.exit_code' => 1,
         ]);
@@ -132,7 +132,7 @@ class ConsoleTracingTest extends KernelTestCase
         self::assertSpanName($mainSpan, 'fallback-command');
         self::assertSpanStatus($mainSpan, StatusData::ok());
         self::assertSpanAttributes($mainSpan, [
-            'code.function' => 'execute',
+            'code.function.name' => 'execute',
             'code.namespace' => 'App\Command\FallbackCommand',
             'symfony.console.exit_code' => 0,
         ]);
