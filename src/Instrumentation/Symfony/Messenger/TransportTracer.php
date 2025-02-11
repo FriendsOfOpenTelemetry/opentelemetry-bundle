@@ -7,7 +7,6 @@ use OpenTelemetry\API\Trace\SpanKind;
 use OpenTelemetry\API\Trace\StatusCode;
 use OpenTelemetry\API\Trace\TracerInterface;
 use OpenTelemetry\Context\Context;
-use OpenTelemetry\SemConv\TraceAttributes;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\Exception\TransportException;
 
@@ -50,7 +49,7 @@ class TransportTracer
             return $callback($span);
         } catch (TransportException $exception) {
             if (null !== $span) {
-                $span->recordException($exception, [TraceAttributes::EXCEPTION_ESCAPED => true]);
+                $span->recordException($exception);
                 $span->setStatus(StatusCode::STATUS_ERROR, $exception->getMessage());
             }
             throw $exception;
