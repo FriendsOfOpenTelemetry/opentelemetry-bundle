@@ -104,7 +104,7 @@ final class OpenTelemetryTracesExtension
     /**
      * @param array{
      *     type: string,
-     *     sampler?: array{type: string, options?: array<int, mixed>},
+     *     sampler?: array{type: string, service_id?: string, options?: array<int, mixed>},
      *     processors?: string[]
      * } $config
      */

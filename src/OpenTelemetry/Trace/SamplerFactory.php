@@ -18,7 +18,7 @@ final class SamplerFactory
     {
         $sampler = TraceSamplerEnum::tryFrom($name);
 
-        if (isset($params['service_id']) && false === $params['service_id']instanceof SamplerInterface) {
+        if (isset($params['service_id']) && false === $params['service_id'] instanceof SamplerInterface) {
             throw new \InvalidArgumentException('Parameter service_id must be an instance of SamplerInterface');
         }
 

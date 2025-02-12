@@ -280,4 +280,30 @@ class BundleInitializationTest extends KernelTestCase
             $kernel->addTestConfig(__DIR__.'/Fixtures/yml/traces-service-sampler-exception.yml');
         }]);
     }
+
+    public function testMetricsServiceExemplarFilter(): void
+    {
+        $kernel = self::bootKernel(['config' => function (TestKernel $kernel) {
+            $kernel->addTestConfig(__DIR__.'/Fixtures/yml/metrics-service-exemplar-filter.yml');
+        }]);
+
+        $publicContainer = $kernel->getContainer();
+        $privateContainer = self::getContainer();
+
+        self::assertTrue($privateContainer->has('MyAllExemplarFilter'));
+
+        self::assertFalse($publicContainer->has('open_telemetry.metrics.providers.default'));
+        self::assertTrue($privateContainer->has('open_telemetry.metrics.providers.default'));
+        $provider = $privateContainer->get('open_telemetry.metrics.providers.default');
+        self::assertInstanceOf(MeterProvider::class, $provider);
+    }
+
+    public function testMetricsServiceExemplarFilterException(): void
+    {
+        self::expectExceptionObject(new \LogicException('To configure an exemplar filter of type service, you must specify the service_id key'));
+
+        self::bootKernel(['config' => function (TestKernel $kernel) {
+            $kernel->addTestConfig(__DIR__.'/Fixtures/yml/metrics-service-exemplar-filter-exception.yml');
+        }]);
+    }
 }

@@ -67,6 +67,7 @@ open_telemetry:
     providers:
       default:
         type: default
+        filter: 'none'
         exporter: 'open_telemetry.metrics.exporters.in_memory'
     exporters:
       in_memory:

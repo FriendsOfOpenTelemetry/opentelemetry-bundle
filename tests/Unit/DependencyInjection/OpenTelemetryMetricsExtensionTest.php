@@ -220,8 +220,14 @@ class OpenTelemetryMetricsExtensionTest extends AbstractExtensionTestCase
         ];
     }
 
+    /**
+     * @param array{
+     *     type: string,
+     *     service_id?: string
+     * } $filter
+     */
     #[DataProvider('providers')]
-    public function testProviders(string $type, ?string $exporter, string $filter): void
+    public function testProviders(string $type, ?string $exporter, array $filter): void
     {
         $providerConfig = [
             'type' => $type,
@@ -246,10 +252,18 @@ class OpenTelemetryMetricsExtensionTest extends AbstractExtensionTestCase
             0,
             null !== $exporter ? new Reference($exporter) : null,
         );
+
+        $filterArg = [
+            $filter['type'],
+            [],
+        ];
+        if (array_key_exists('service_id', $filter)) {
+            $filterArg[1]['service_id'] = new Reference($filter['service_id']);
+        }
         self::assertContainerBuilderHasServiceDefinitionWithArgument(
             'open_telemetry.metrics.providers.main',
             1,
-            (new ChildDefinition('open_telemetry.metrics.exemplar_filter_factory'))->setArguments([$filter]),
+            (new ChildDefinition('open_telemetry.metrics.exemplar_filter_factory'))->setArguments($filterArg),
         );
         self::assertContainerBuilderHasServiceDefinitionWithArgument(
             'open_telemetry.metrics.providers.main',
@@ -264,7 +278,7 @@ class OpenTelemetryMetricsExtensionTest extends AbstractExtensionTestCase
      * @return \Generator<string, array{
      *     type: string,
      *     exporter: ?string,
-     *     filter: string,
+     *     filter: array{type: string, service_id?: string},
      * }>
      */
     public static function providers(): \Generator
@@ -272,13 +286,26 @@ class OpenTelemetryMetricsExtensionTest extends AbstractExtensionTestCase
         yield 'default' => [
             'type' => 'default',
             'exporter' => 'open_telemetry.metrics.exporters.default',
-            'filter' => 'all',
+            'filter' => [
+                'type' => 'all',
+            ],
         ];
 
         yield 'noop' => [
             'type' => 'noop',
             'exporter' => null,
-            'filter' => 'none',
+            'filter' => [
+                'type' => 'none',
+            ],
+        ];
+
+        yield 'filter service' => [
+            'type' => 'default',
+            'exporter' => 'open_telemetry.metrics.exporters.default',
+            'filter' => [
+                'type' => 'service',
+                'service_id' => 'my_filter',
+            ],
         ];
     }
 

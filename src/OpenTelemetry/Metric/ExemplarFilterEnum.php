@@ -7,4 +7,5 @@ enum ExemplarFilterEnum: string
     case All = 'all';
     case None = 'none';
     case WithSampledTrace = 'with_sampled_trace';
+    case Service = 'service';
 }
