@@ -306,7 +306,11 @@ final class ConfigurationTest extends TestCase
                     provider:
                         type:                 default # One of "noop"; "default", Required
                         exporter:             ~
-                        filter:               none # One of "all"; "none"; "with_sampled_trace"
+                        filter:
+                            type:                 none # One of "all"; "none"; "with_sampled_trace"; "service"
+
+                            # Required if exemplar filter type is service
+                            service_id:           ~
                 exporters:
 
                     # Prototype

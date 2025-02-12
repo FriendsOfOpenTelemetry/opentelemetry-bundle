@@ -86,13 +86,24 @@ final class OpenTelemetryMetricsExtension
      * @param array{
      *     type: string,
      *     exporter?: string,
-     *     filter?: string
+     *     filter?: array{type: string, service_id?: string, options?: array<int, mixed>}
      * } $config
      */
     private function loadMetricProvider(string $name, array $config): void
     {
-        $filter = (new ChildDefinition('open_telemetry.metrics.exemplar_filter_factory'))
-            ->setArguments([$config['filter'] ?? ExemplarFilterEnum::All->value]);
+        $filter = (new ChildDefinition('open_telemetry.metrics.exemplar_filter_factory'));
+
+        $params = [];
+        if (isset($config['filter']['type']) && ExemplarFilterEnum::Service->value === $config['filter']['type']) {
+            if (!array_key_exists('service_id', $config['filter'])) {
+                throw new \LogicException('To configure an exemplar filter of type service, you must specify the service_id key');
+            }
+            $params['service_id'] = new Reference($config['filter']['service_id']);
+        }
+        $filter->setArguments([
+            $config['filter']['type'] ?? ExemplarFilterEnum::All->value,
+            $params,
+        ]);
 
         $this->container
             ->setDefinition(

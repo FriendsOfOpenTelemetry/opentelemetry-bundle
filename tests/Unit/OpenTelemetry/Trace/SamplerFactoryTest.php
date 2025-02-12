@@ -128,5 +128,13 @@ class SamplerFactoryTest extends TestCase
             ],
             new \InvalidArgumentException('Parameter service_id must be an instance of SamplerInterface'),
         ];
+
+        yield [
+            'unknown',
+            SamplerInterface::class,
+            '',
+            [],
+            new \InvalidArgumentException('Unknown sampler: unknown'),
+        ];
     }
 }

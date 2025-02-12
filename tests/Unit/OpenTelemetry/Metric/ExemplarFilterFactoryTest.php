@@ -4,6 +4,8 @@ namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\Tests\Unit\OpenTelemetry\Me
 
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Metric\ExemplarFilterEnum;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Metric\ExemplarFilterFactory;
+use OpenTelemetry\Context\ContextInterface;
+use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
 use OpenTelemetry\SDK\Metrics\Exemplar\ExemplarFilter\AllExemplarFilter;
 use OpenTelemetry\SDK\Metrics\Exemplar\ExemplarFilter\NoneExemplarFilter;
 use OpenTelemetry\SDK\Metrics\Exemplar\ExemplarFilter\WithSampledTraceExemplarFilter;
@@ -15,22 +17,25 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(ExemplarFilterFactory::class)]
 class ExemplarFilterFactoryTest extends TestCase
 {
+    /**
+     * @param ?array<int, mixed> $params
+     */
     #[DataProvider('exemplarFilter')]
-    public function testCreate(string $name, ?string $class): void
+    public function testCreate(string $name, ?string $expectedClass, ?array $params = [], ?\Exception $exception = null): void
     {
-        if (null === $class) {
-            self::expectExceptionObject(
-                new \InvalidArgumentException(sprintf('Unknown exemplar filter: %s', $name)),
-            );
+        if ($exception instanceof \Exception) {
+            self::expectExceptionObject($exception);
         }
 
-        self::assertInstanceOf($class, ExemplarFilterFactory::create($name));
+        self::assertInstanceOf($expectedClass, ExemplarFilterFactory::create($name, $params));
     }
 
     /**
      * @return \Generator<string, array{
-     *     string,
-     *     ?class-string<ExemplarFilterInterface>,
+     *     0: string,
+     *     1: ?class-string<ExemplarFilterInterface>,
+     *     2?: array<int|string, mixed>,
+     *     3?: ?\Exception
      * }>
      */
     public static function exemplarFilter(): \Generator
@@ -50,9 +55,36 @@ class ExemplarFilterFactoryTest extends TestCase
             WithSampledTraceExemplarFilter::class,
         ];
 
+        $anonymousFilter = new class implements ExemplarFilterInterface {
+            /** @phpstan-ignore-next-line */
+            public function accepts(float|int $value, AttributesInterface $attributes, ContextInterface $context, int $timestamp): bool
+            {
+                return true;
+            }
+        };
+
+        yield 'service' => [
+            ExemplarFilterEnum::Service->value,
+            ExemplarFilterInterface::class,
+            [
+                'service_id' => $anonymousFilter,
+            ],
+        ];
+
+        yield 'service with stdClass' => [
+            ExemplarFilterEnum::Service->value,
+            ExemplarFilterInterface::class,
+            [
+                'service_id' => new \stdClass(),
+            ],
+            new \InvalidArgumentException('Parameter service_id must be an instance of ExemplarFilterInterface'),
+        ];
+
         yield 'unknown' => [
             'unknown',
             null,
+            [],
+            new \InvalidArgumentException('Unknown exemplar filter: unknown'),
         ];
     }
 }
