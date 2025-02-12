@@ -335,6 +335,7 @@ final class Configuration implements ConfigurationInterface
         $node = $treeBuilder->getRootNode()
             ->requiresAtLeastOneElement()
             ->useAttributeAsKey('meter')
+            ->requiresAtLeastOneElement()
             ->arrayPrototype()
                 ->children()
                     ->scalarNode('name')

@@ -4,6 +4,7 @@ namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\DependencyInjection;
 
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Exporter\ExporterOptionsInterface;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Metric\ExemplarFilterEnum;
+use OpenTelemetry\API\Metrics\MeterInterface;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
@@ -52,6 +53,7 @@ final class OpenTelemetryMetricsExtension
 
         if (null !== $defaultMeter) {
             $this->container->setAlias('open_telemetry.metrics.default_meter', new Reference(sprintf('open_telemetry.metrics.meters.%s', $defaultMeter)));
+            $this->container->setAlias(MeterInterface::class, new Reference(sprintf('open_telemetry.metrics.meters.%s', $defaultMeter)));
         }
     }
 

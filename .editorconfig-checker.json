@@ -8,7 +8,8 @@
         "flake.lock",
         "package.json",
         "package-lock.json",
-        "composer.lock"
+        "composer.lock",
+        "tests/Functional/Instrumentation/DummyMeterServiceTest.php"
     ],
     "AllowedContentTypes": [],
     "PassedFiles": [],
