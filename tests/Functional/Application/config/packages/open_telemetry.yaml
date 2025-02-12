@@ -60,3 +60,14 @@ open_telemetry:
         dsn: in-memory://default
       fallback:
         dsn: in-memory://default
+  metrics:
+    meters:
+      default:
+        provider: 'open_telemetry.metrics.providers.default'
+    providers:
+      default:
+        type: default
+        exporter: 'open_telemetry.metrics.exporters.in_memory'
+    exporters:
+      in_memory:
+        dsn: in-memory://default

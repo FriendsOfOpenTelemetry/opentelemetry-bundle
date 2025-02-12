@@ -17,3 +17,5 @@ services:
       - '@cache.app'
     tags:
       - {name: cache.taggable, pool: cache.app}
+  App\Service\DummyMeterService:
+    public: true

@@ -346,6 +346,7 @@ class OpenTelemetryMetricsExtensionTest extends AbstractExtensionTestCase
         ]);
 
         self::assertContainerBuilderHasAlias('open_telemetry.metrics.default_meter', 'open_telemetry.metrics.meters.main');
+        self::assertContainerBuilderHasAlias(MeterInterface::class, 'open_telemetry.metrics.meters.main');
     }
 
     public function testNoDefaultMeter(): void
@@ -355,5 +356,6 @@ class OpenTelemetryMetricsExtensionTest extends AbstractExtensionTestCase
         ]);
 
         self::assertFalse($this->container->hasAlias('open_telemetry.metrics.default_logger'));
+        self::assertFalse($this->container->hasAlias(MeterInterface::class));
     }
 }
