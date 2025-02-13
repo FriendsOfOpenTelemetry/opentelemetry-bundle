@@ -17,7 +17,6 @@ use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Log\LogProcessor\Si
 use OpenTelemetry\API\Common\Time\ClockInterface;
 use OpenTelemetry\API\Common\Time\SystemClock;
 use OpenTelemetry\API\Logs\LoggerInterface;
-use OpenTelemetry\Contrib\Logs\Monolog\Handler as MonologHandler;
 use OpenTelemetry\SDK\Logs\LoggerProviderInterface;
 use OpenTelemetry\SDK\Logs\LogRecordExporterInterface;
 use OpenTelemetry\SDK\Logs\LogRecordProcessorInterface;
@@ -30,8 +29,6 @@ return static function (ContainerConfigurator $container): void {
     $container->services()
         ->defaults()
         ->private()
-
-        ->set('open_telemetry.logs.monolog.handler', MonologHandler::class)
 
         // Exporters
         ->set('open_telemetry.logs.exporter_factory.abstract', AbstractLogExporterFactory::class)

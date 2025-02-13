@@ -7,6 +7,7 @@ use Nyholm\BundleTest\TestKernel;
 use OpenTelemetry\API\Logs\LoggerInterface;
 use OpenTelemetry\API\Metrics\MeterInterface;
 use OpenTelemetry\API\Trace\TracerInterface;
+use OpenTelemetry\Contrib\Logs\Monolog\Handler as MonologHandler;
 use OpenTelemetry\Contrib\Otlp\LogsExporter;
 use OpenTelemetry\Contrib\Otlp\MetricExporter;
 use OpenTelemetry\Contrib\Otlp\SpanExporter;
@@ -305,5 +306,18 @@ class BundleInitializationTest extends KernelTestCase
         self::bootKernel(['config' => function (TestKernel $kernel) {
             $kernel->addTestConfig(__DIR__.'/Fixtures/yml/metrics-service-exemplar-filter-exception.yml');
         }]);
+    }
+
+    public function testLogsMonologHandlerWithProvider(): void
+    {
+        $kernel = self::bootKernel(['config' => function (TestKernel $kernel) {
+            $kernel->addTestConfig(__DIR__.'/Fixtures/yml/logs-monolog.yml');
+        }]);
+
+        $publicContainer = $kernel->getContainer();
+        self::assertTrue($publicContainer->has('open_telemetry.logs.monolog.handlers.main'));
+
+        $provider = $publicContainer->get('open_telemetry.logs.monolog.handlers.main');
+        self::assertInstanceOf(MonologHandler::class, $provider);
     }
 }

@@ -1,3 +1,7 @@
 monolog:
   channels:
     - deprecation
+  handlers:
+    open_telemetry:
+      type: service
+      id: 'open_telemetry.logs.monolog.handlers.main'

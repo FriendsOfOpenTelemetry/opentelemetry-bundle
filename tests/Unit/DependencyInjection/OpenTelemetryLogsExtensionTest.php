@@ -494,6 +494,7 @@ class OpenTelemetryLogsExtensionTest extends AbstractExtensionTestCase
         ]);
 
         self::assertContainerBuilderHasAlias('open_telemetry.logs.default_logger', 'open_telemetry.logs.loggers.main');
+        self::assertContainerBuilderHasAlias(LoggerInterface::class, 'open_telemetry.logs.loggers.main');
     }
 
     public function testNoDefaultLogger(): void
@@ -503,5 +504,6 @@ class OpenTelemetryLogsExtensionTest extends AbstractExtensionTestCase
         ]);
 
         self::assertFalse($this->container->hasAlias('open_telemetry.logs.default_logger'));
+        self::assertFalse($this->container->hasAlias(LoggerInterface::class));
     }
 }
