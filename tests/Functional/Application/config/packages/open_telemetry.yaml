@@ -72,3 +72,23 @@ open_telemetry:
     exporters:
       in_memory:
         dsn: in-memory://default
+  logs:
+    monolog:
+      enabled: true
+      handlers:
+        main:
+          provider: 'open_telemetry.logs.providers.default'
+    loggers:
+      main:
+        provider: 'open_telemetry.logs.providers.default'
+    providers:
+      default:
+        type: default
+        processor: 'open_telemetry.logs.processors.simple'
+    processors:
+      simple:
+        type: simple
+        exporter: 'open_telemetry.logs.exporters.in_memory'
+    exporters:
+      in_memory:
+        dsn: in-memory://default

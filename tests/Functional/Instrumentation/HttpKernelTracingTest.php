@@ -3,7 +3,9 @@
 namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\Tests\Functional\Instrumentation;
 
 use App\Kernel;
+use FriendsOfOpenTelemetry\OpenTelemetryBundle\Tests\Functional\LoggingTestCaseTrait;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\Tests\Functional\TracingTestCaseTrait;
+use Monolog\Level;
 use OpenTelemetry\SDK\Trace\StatusData;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Response;
@@ -13,6 +15,7 @@ use Zalas\PHPUnit\Globals\Attribute\Env;
 class HttpKernelTracingTest extends WebTestCase
 {
     use TracingTestCaseTrait;
+    use LoggingTestCaseTrait;
 
     public function testSuccess(): void
     {
@@ -441,5 +444,24 @@ class HttpKernelTracingTest extends WebTestCase
         ]);
 
         self::assertSame($manualSpan->getParentSpanId(), $mainSpan->getSpanId());
+    }
+
+    public function testLogWithSpanContext(): void
+    {
+        $client = static::createClient();
+        $client->request('GET', '/log-span-context');
+
+        static::assertResponseIsSuccessful();
+        static::assertSame('{"status":"ok"}', $client->getResponse()->getContent());
+
+        self::assertSpansCount(1);
+
+        $mainSpan = self::getSpans()[0];
+        self::assertSpanName($mainSpan, 'app_actiontraceable_logspancontext');
+
+        $log = self::getLog('A detailed log message.', Level::Debug->getName());
+        self::assertNotNull($log);
+
+        self::assertLogHasSpanContext($log, $mainSpan);
     }
 }

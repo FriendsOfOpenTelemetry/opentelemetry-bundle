@@ -6,9 +6,11 @@ use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Exporter\ExporterOp
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Log\LogProcessor\LogProcessorEnum;
 use Monolog\Level;
 use OpenTelemetry\API\Common\Time\ClockInterface;
-use OpenTelemetry\Contrib\Logs\Monolog\Handler;
+use OpenTelemetry\API\Logs\LoggerInterface;
+use OpenTelemetry\Contrib\Logs\Monolog\Handler as MonologHandler;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
@@ -59,6 +61,7 @@ final class OpenTelemetryLogsExtension
 
         if (null !== $defaultLogger) {
             $this->container->setAlias('open_telemetry.logs.default_logger', new Reference(sprintf('open_telemetry.logs.loggers.%s', $defaultLogger)));
+            $this->container->setAlias(LoggerInterface::class, new Reference(sprintf('open_telemetry.logs.loggers.%s', $defaultLogger)));
         }
 
         $this->loadMonologHandlers();
@@ -170,9 +173,11 @@ final class OpenTelemetryLogsExtension
             return;
         }
 
-        if (!class_exists(Handler::class)) {
+        if (!class_exists(MonologHandler::class)) {
             throw new \LogicException('To configure the Monolog handler, you must first install the open-telemetry/opentelemetry-logger-monolog package.');
         }
+
+        $this->container->setDefinition('open_telemetry.logs.monolog.handler', new Definition(MonologHandler::class));
 
         foreach ($this->config['monolog']['handlers'] as $name => $handler) {
             $handlerId = sprintf('open_telemetry.logs.monolog.handlers.%s', $name);

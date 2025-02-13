@@ -9,6 +9,7 @@ use OpenTelemetry\API\Trace\StatusCode;
 use OpenTelemetry\API\Trace\TracerInterface;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\SemConv\TraceAttributes;
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -105,6 +106,17 @@ class ActionTraceableController extends AbstractController
         ]);
         $span->setStatus(StatusCode::STATUS_OK);
         $span->end();
+
+        return $this->json([
+            'status' => 'ok',
+        ]);
+    }
+
+    #[Traceable]
+    #[Route('/log-span-context', methods: ['GET'])]
+    public function logSpanContext(LoggerInterface $logger): Response
+    {
+        $logger->debug('A detailed log message.');
 
         return $this->json([
             'status' => 'ok',

@@ -1,10 +1,9 @@
 <?php
 
-namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\Tests\Functional\Instrumentation;
+namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\Tests\Functional;
 
 use App\Kernel;
 use App\Service\DummyMeterService;
-use FriendsOfOpenTelemetry\OpenTelemetryBundle\Tests\Functional\MeterTestCaseTrait;
 use OpenTelemetry\SDK\Metrics\Data\HistogramDataPoint;
 use OpenTelemetry\SDK\Metrics\Data\NumberDataPoint;
 use PHPUnit\Framework\Attributes\CoversClass;
