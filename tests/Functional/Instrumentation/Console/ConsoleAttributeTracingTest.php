@@ -1,6 +1,6 @@
 <?php
 
-namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\Tests\Functional\Instrumentation;
+namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\Tests\Functional\Instrumentation\Console;
 
 use App\Kernel;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\Tests\Functional\TracingTestCaseTrait;
@@ -13,7 +13,7 @@ use Symfony\Component\Console\Tester\ApplicationTester;
 use Zalas\PHPUnit\Globals\Attribute\Env;
 
 #[Env('KERNEL_CLASS', Kernel::class)]
-class ConsoleTracingTest extends KernelTestCase
+class ConsoleAttributeTracingTest extends KernelTestCase
 {
     use TracingTestCaseTrait;
 

@@ -43,6 +43,7 @@ final class ConfigurationFormatTest extends AbstractExtensionConfigurationTestCa
                     'type' => 'auto',
                     'tracing' => [
                         'enabled' => false,
+                        'exclude_commands' => [],
                     ],
                     'metering' => [
                         'enabled' => false,

@@ -26,7 +26,7 @@ class SetHttpKernelTracingExcludePathsPassTest extends AbstractCompilerPassTestC
         self::assertEquals([], $httpKernel->getMethodCalls());
     }
 
-    public function testInstrumentationType(): void
+    public function testExcludePaths(): void
     {
         $this->container->setParameter('open_telemetry.instrumentation.http_kernel.tracing.exclude_paths', ['/test']);
 

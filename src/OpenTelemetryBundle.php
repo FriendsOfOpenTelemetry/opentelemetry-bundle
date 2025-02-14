@@ -5,6 +5,7 @@ namespace FriendsOfOpenTelemetry\OpenTelemetryBundle;
 use Composer\InstalledVersions;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\DependencyInjection\Compiler\CacheInstrumentationPass;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\DependencyInjection\Compiler\HttpClientInstrumentationPass;
+use FriendsOfOpenTelemetry\OpenTelemetryBundle\DependencyInjection\Compiler\SetConsoleTracingExcludeCommandsPass;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\DependencyInjection\Compiler\SetHttpKernelTracingExcludePathsPass;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\DependencyInjection\Compiler\SetInstrumentationTypePass;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\DependencyInjection\Compiler\TracerLocatorPass;
@@ -32,6 +33,7 @@ final class OpenTelemetryBundle extends Bundle
         $container->addCompilerPass(new CacheInstrumentationPass());
         $container->addCompilerPass(new HttpClientInstrumentationPass());
         $container->addCompilerPass(new SetHttpKernelTracingExcludePathsPass());
+        $container->addCompilerPass(new SetConsoleTracingExcludeCommandsPass());
 
         $container->addCompilerPass(new TracerLocatorPass());
     }

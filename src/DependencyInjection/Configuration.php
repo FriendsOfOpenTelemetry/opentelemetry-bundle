@@ -91,7 +91,11 @@ final class Configuration implements ConfigurationInterface
                                 ->defaultValue(InstrumentationTypeEnum::Auto->value)
                                 ->values(array_map(fn (InstrumentationTypeEnum $type) => $type->value, InstrumentationTypeEnum::cases()))
                             ->end()
-                            ->append($this->getTracingInstrumentationNode())
+                            ->append($this->getTracingInstrumentationNode(
+                                (new ArrayNodeDefinition('exclude_commands'))
+                                    ->info('Exclude commands from auto instrumentation')
+                                    ->scalarPrototype()->cannotBeEmpty()->end()
+                            ))
                             ->append($this->getMeteringInstrumentationNode())
                         ->end()
                     ->end()

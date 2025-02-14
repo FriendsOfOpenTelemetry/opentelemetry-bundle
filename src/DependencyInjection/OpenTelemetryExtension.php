@@ -24,7 +24,8 @@ use Symfony\Component\Messenger\Envelope;
  * @phpstan-type TracingInstrumentationConfig array{
  *     enabled: bool,
  *     tracer: ?string,
- *     exclude_paths?: string[]
+ *     exclude_paths?: string[],
+ *     exclude_commands?: string[]
  * }
  * @phpstan-type MeteringInstrumentationConfig array{
  *     enabled: bool,
@@ -267,6 +268,17 @@ final class OpenTelemetryExtension extends ConfigurableExtension
                 $container->setParameter(
                     sprintf('open_telemetry.instrumentation.%s.tracing.exclude_paths', $name),
                     $config['tracing']['exclude_paths'],
+                );
+            }
+        }
+
+        if ('console' === $name) {
+            if (isset($config['tracing']['exclude_commands'])
+                && 0 < \count($config['tracing']['exclude_commands'])
+            ) {
+                $container->setParameter(
+                    sprintf('open_telemetry.instrumentation.%s.tracing.exclude_commands', $name),
+                    $config['tracing']['exclude_commands'],
                 );
             }
         }
