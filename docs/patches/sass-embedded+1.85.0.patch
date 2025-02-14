@@ -1,0 +1,15 @@
+diff --git a/node_modules/sass-embedded/dist/lib/src/compiler-path.js b/node_modules/sass-embedded/dist/lib/src/compiler-path.js
+index ae33aa3..7a49d16 100644
+--- a/node_modules/sass-embedded/dist/lib/src/compiler-path.js
++++ b/node_modules/sass-embedded/dist/lib/src/compiler-path.js
+@@ -24,6 +24,10 @@ function isLinuxMusl(path) {
+ }
+ /** The full command for the embedded compiler executable. */
+ exports.compilerCommand = (() => {
++    const binPath = process.env.SASS_EMBEDDED_BIN_PATH;
++    if (binPath) {
++        return [binPath];
++    }
+     const platform = process.platform === 'linux' && isLinuxMusl(process.execPath)
+         ? 'linux-musl'
+         : process.platform;

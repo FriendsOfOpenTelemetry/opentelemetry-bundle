@@ -69,5 +69,3 @@ open_telemetry:
 ```
 
 For further details on the configuration, please refer to the [Configuration page](/user-guide/configuration.md).
-
-Next: [Instrumentation - Introduction](/instrumentation/introduction.md).

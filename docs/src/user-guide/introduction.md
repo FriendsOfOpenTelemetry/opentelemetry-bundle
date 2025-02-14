@@ -32,5 +32,3 @@ As long as the release goals are not reached and fully defined, no stable versio
 But you are welcome to try this bundle and give feedback or contribute to it.
 
 In case you want to try it, a Symfony demo is maintained on this [repository](https://github.com/FriendsOfOpenTelemetry/symfony-demo).
-
-Next: [Getting started](/user-guide/getting-started.md).

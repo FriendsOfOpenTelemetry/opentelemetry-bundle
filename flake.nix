@@ -59,6 +59,7 @@
 
               pkgs.nodePackages.nodejs
               pkgs.nodePackages.npm
+              pkgs.dart-sass
 
               php
               php.packages.composer
@@ -66,6 +67,7 @@
             inputsFrom = [
               treefmtEval.config.build.devShell
             ];
+            SASS_EMBEDDED_BIN_PATH = "${pkgs.dart-sass}/bin/sass";
             inherit (self.checks.${system}.pre-commit-check) shellHook;
           };
         };
