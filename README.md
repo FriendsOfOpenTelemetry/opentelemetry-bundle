@@ -45,6 +45,8 @@ To accomplish this:
 
 Once the services are functional according to OpenTelemetry SDK capabilities and Symfony's service definitions, this phase will be complete.
 
+~~[Milestone (closed)](https://github.com/FriendsOfOpenTelemetry/opentelemetry-bundle/milestone/1)~~
+
 ### Beta
 
 The goal of the Beta release is to enable tracing instrumentation for a Symfony application, either automatically or selectively.
@@ -62,6 +64,8 @@ This phase will conclude once:
 - All components are fully covered by instrumentation.
 - Both automatic and selective configuration methods are implemented.
 
+[Milestone (active)](https://github.com/FriendsOfOpenTelemetry/opentelemetry-bundle/milestone/2)
+
 ### Stable
 
 To complete the Stable release, the following goals must be met:
@@ -70,6 +74,8 @@ To complete the Stable release, the following goals must be met:
 - Stabilization of tracing instrumentation, incorporating feedback and addressing reported issues.
 - Comprehensive test coverage for each component.
 - A complete documentation set, covering tracing services, configurations, and bundle capabilities.
+
+[Milestone](https://github.com/FriendsOfOpenTelemetry/opentelemetry-bundle/milestone/3)
 
 ## Credits
 

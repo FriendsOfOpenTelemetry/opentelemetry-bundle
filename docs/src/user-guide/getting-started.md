@@ -34,7 +34,7 @@ To ensure a clean and optimal setup:
 You may also be prompted to enable the `php-http/discovery` Composer plugin. This plugin allows libraries to discover HTTP PSR implementations dynamically. While this is required by many OpenTelemetry dependencies, our bundle relies directly on Guzzle HTTP for simplicity.
 
 - Recommendation: Enable the plugin if your application requires it, but this is optional.
-- If you believe relying directly on Guzzle HTTP is not ideal, please open an issue to share your feedback. As this package is in active Alpha development, we are open to exploring better solutions.
+- If you believe relying directly on Guzzle HTTP is not ideal, please open an issue to share your feedback. As this package is in active development, we are open to exploring better solutions.
 
 ### Supported Versions
 
