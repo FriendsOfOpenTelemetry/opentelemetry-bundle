@@ -95,6 +95,12 @@ open_telemetry:
 when@auto:
   open_telemetry:
     instrumentation:
+      console:
+        type: auto
+        tracing:
+          enabled: true
+          exclude_commands:
+            - dummy
       http_kernel:
         type: auto
         tracing:

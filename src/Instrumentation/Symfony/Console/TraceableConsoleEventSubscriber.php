@@ -25,6 +25,10 @@ use Symfony\Contracts\Service\ServiceSubscriberInterface;
 final class TraceableConsoleEventSubscriber implements EventSubscriberInterface, ServiceSubscriberInterface, InstrumentationTypeInterface
 {
     private InstrumentationTypeEnum $instrumentationType = InstrumentationTypeEnum::Auto;
+    /**
+     * @var string[]
+     */
+    private array $excludeCommands = [];
 
     public function __construct(
         private readonly TracerInterface $tracer,
@@ -148,7 +152,16 @@ final class TraceableConsoleEventSubscriber implements EventSubscriberInterface,
 
     private function isAutoTraceable(Command $command): bool
     {
-        return InstrumentationTypeEnum::Auto === $this->instrumentationType;
+        if (InstrumentationTypeEnum::Auto !== $this->instrumentationType) {
+            return false;
+        }
+
+        $combinedExcludeCommands = implode('|', $this->excludeCommands);
+        if (preg_match("#{$combinedExcludeCommands}#", $command->getName())) {
+            return false;
+        }
+
+        return true;
     }
 
     private function isAttributeTraceable(Command $command): bool
@@ -167,5 +180,13 @@ final class TraceableConsoleEventSubscriber implements EventSubscriberInterface,
     public function setInstrumentationType(InstrumentationTypeEnum $type): void
     {
         $this->instrumentationType = $type;
+    }
+
+    /**
+     * @param string[] $excludeCommands
+     */
+    public function setExcludeCommands(array $excludeCommands): void
+    {
+        $this->excludeCommands = $excludeCommands;
     }
 }
