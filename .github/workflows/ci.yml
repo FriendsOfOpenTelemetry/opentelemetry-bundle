@@ -127,10 +127,17 @@ jobs:
         php:
           - '8.2'
           - '8.3'
+          - '8.4'
         dependencies:
           - 'highest'
         include:
+          - php: '8.4'
+            dependencies: 'highest'
+            coverage: true
           - php: '8.3'
+            dependencies: 'highest'
+            coverage: true
+          - php: '8.2'
             dependencies: 'highest'
             coverage: true
       fail-fast: false
