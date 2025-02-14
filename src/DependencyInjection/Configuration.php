@@ -17,6 +17,7 @@ use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Trace\TraceSamplerE
 use Monolog\Level;
 use OpenTelemetry\SDK\Logs\Processor\BatchLogRecordProcessor;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
+use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
@@ -115,7 +116,11 @@ final class Configuration implements ConfigurationInterface
                                 ->defaultValue(InstrumentationTypeEnum::Auto->value)
                                 ->values(array_map(fn (InstrumentationTypeEnum $type) => $type->value, InstrumentationTypeEnum::cases()))
                             ->end()
-                            ->append($this->getTracingInstrumentationNode())
+                            ->append($this->getTracingInstrumentationNode(
+                                (new ArrayNodeDefinition('exclude_paths'))
+                                    ->info('Exclude paths from auto instrumentation')
+                                    ->scalarPrototype()->cannotBeEmpty()->end()
+                            ))
                             ->append($this->getMeteringInstrumentationNode())
                         ->end()
                     ->end()
@@ -149,7 +154,7 @@ final class Configuration implements ConfigurationInterface
         ;
     }
 
-    private function getTracingInstrumentationNode(): ArrayNodeDefinition
+    private function getTracingInstrumentationNode(?NodeDefinition $extraNode = null): ArrayNodeDefinition
     {
         $treeBuilder = new TreeBuilder('tracing');
 
@@ -161,6 +166,10 @@ final class Configuration implements ConfigurationInterface
                     ->cannotBeEmpty()
                 ->end()
             ->end();
+
+        if ($extraNode instanceof NodeDefinition) {
+            $node->append($extraNode);
+        }
 
         return $node;
     }

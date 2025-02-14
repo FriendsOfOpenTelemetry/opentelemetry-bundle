@@ -50,6 +50,11 @@ final class TraceableHttpKernelEventSubscriber implements EventSubscriberInterfa
     private InstrumentationTypeEnum $instrumentationType = InstrumentationTypeEnum::Auto;
 
     /**
+     * @var string[]
+     */
+    private array $excludePaths = [];
+
+    /**
      * @param iterable<string> $requestHeaders
      * @param iterable<string> $responseHeaders
      */
@@ -276,7 +281,16 @@ final class TraceableHttpKernelEventSubscriber implements EventSubscriberInterfa
 
     private function isAutoTraceable(Request $request): bool
     {
-        return InstrumentationTypeEnum::Auto === $this->instrumentationType;
+        if (InstrumentationTypeEnum::Auto !== $this->instrumentationType) {
+            return false;
+        }
+
+        $combinedExcludePaths = implode('|', $this->excludePaths);
+        if (preg_match("#{$combinedExcludePaths}#", $request->getPathInfo())) {
+            return false;
+        }
+
+        return true;
     }
 
     private function isAttributeTraceable(Request $request): bool
@@ -387,5 +401,13 @@ final class TraceableHttpKernelEventSubscriber implements EventSubscriberInterfa
     public function setInstrumentationType(InstrumentationTypeEnum $type): void
     {
         $this->instrumentationType = $type;
+    }
+
+    /**
+     * @param string[] $excludePaths
+     */
+    public function setExcludePaths(array $excludePaths): void
+    {
+        $this->excludePaths = $excludePaths;
     }
 }

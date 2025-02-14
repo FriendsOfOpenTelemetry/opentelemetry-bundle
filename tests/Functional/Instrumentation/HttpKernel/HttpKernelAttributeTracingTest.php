@@ -1,6 +1,6 @@
 <?php
 
-namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\Tests\Functional\Instrumentation;
+namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\Tests\Functional\Instrumentation\HttpKernel;
 
 use App\Kernel;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\Tests\Functional\LoggingTestCaseTrait;
@@ -12,7 +12,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Zalas\PHPUnit\Globals\Attribute\Env;
 
 #[Env('KERNEL_CLASS', Kernel::class)]
-class HttpKernelTracingTest extends WebTestCase
+class HttpKernelAttributeTracingTest extends WebTestCase
 {
     use TracingTestCaseTrait;
     use LoggingTestCaseTrait;
