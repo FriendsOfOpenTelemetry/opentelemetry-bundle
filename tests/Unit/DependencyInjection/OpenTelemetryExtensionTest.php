@@ -132,7 +132,7 @@ class OpenTelemetryExtensionTest extends AbstractExtensionTestCase
                 'cache' => $instrumentationConfig,
                 'console' => ['tracing' => ['enabled' => true], 'type' => 'attribute'],
                 'http_client' => $instrumentationConfig,
-                'http_kernel' => ['tracing' => ['enabled' => true], 'type' => 'attribute'],
+                'http_kernel' => ['tracing' => ['enabled' => true, 'exclude_paths' => ['/test']], 'type' => 'attribute'],
                 'mailer' => $instrumentationConfig,
                 'messenger' => $instrumentationConfig,
                 'twig' => $instrumentationConfig,
@@ -148,5 +148,6 @@ class OpenTelemetryExtensionTest extends AbstractExtensionTestCase
 
         self::assertContainerBuilderHasParameter('open_telemetry.instrumentation.console.type', InstrumentationTypeEnum::Attribute);
         self::assertContainerBuilderHasParameter('open_telemetry.instrumentation.http_kernel.type', InstrumentationTypeEnum::Attribute);
+        self::assertContainerBuilderHasParameter('open_telemetry.instrumentation.http_kernel.tracing.exclude_paths', ['/test']);
     }
 }

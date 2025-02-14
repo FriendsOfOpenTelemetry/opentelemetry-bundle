@@ -92,3 +92,12 @@ open_telemetry:
     exporters:
       in_memory:
         dsn: in-memory://default
+when@auto:
+  open_telemetry:
+    instrumentation:
+      http_kernel:
+        type: auto
+        tracing:
+          enabled: true
+          exclude_paths:
+            - ^/auto-exclude$

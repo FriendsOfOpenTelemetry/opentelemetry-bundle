@@ -82,6 +82,7 @@ final class ConfigurationTest extends TestCase
                     'type' => 'auto',
                     'tracing' => [
                         'enabled' => false,
+                        'exclude_paths' => [],
                     ],
                     'metering' => [
                         'enabled' => false,
@@ -203,6 +204,9 @@ final class ConfigurationTest extends TestCase
 
                         # The tracer to use, defaults to `traces.default_tracer` or first tracer in `traces.tracers`
                         tracer:               ~
+
+                        # Exclude paths from auto instrumentation
+                        exclude_paths:        []
                     metering:
                         enabled:              false
 
