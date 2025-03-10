@@ -12,6 +12,8 @@ open_telemetry:
       type: attribute
       tracing:
         enabled: true
+      metering:
+        enabled: true
     doctrine:
       tracing:
         enabled: true
@@ -21,6 +23,8 @@ open_telemetry:
     http_kernel:
       type: attribute
       tracing:
+        enabled: true
+      metering:
         enabled: true
     mailer:
       tracing:

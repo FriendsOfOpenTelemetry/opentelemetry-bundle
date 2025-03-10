@@ -54,10 +54,12 @@ class BundleInitializationTest extends KernelTestCase
             'open_telemetry.instrumentation.cache.trace.adapter',
             'open_telemetry.instrumentation.cache.trace.tag_aware_adapter',
             'open_telemetry.instrumentation.console.trace.event_subscriber',
+            'open_telemetry.instrumentation.console.metric.event_subscriber',
             'open_telemetry.instrumentation.doctrine.trace.event_subscriber',
             'open_telemetry.instrumentation.doctrine.trace.middleware',
             'open_telemetry.instrumentation.http_client.trace.client',
             'open_telemetry.instrumentation.http_kernel.trace.event_subscriber',
+            'open_telemetry.instrumentation.http_kernel.metric.event_subscriber',
             'open_telemetry.instrumentation.mailer.trace.event_subscriber',
             'open_telemetry.instrumentation.mailer.trace.default_transport',
             'open_telemetry.instrumentation.mailer.trace.mailer',
@@ -82,6 +84,7 @@ class BundleInitializationTest extends KernelTestCase
         array_map(fn (string $parameter) => self::assertTrue($container->hasParameter($parameter)), [
             'open_telemetry.service.namespace',
             'open_telemetry.service.name',
+            'open_telemetry.service.version',
             'open_telemetry.service.environment',
         ]);
 
@@ -306,6 +309,25 @@ class BundleInitializationTest extends KernelTestCase
         self::bootKernel(['config' => function (TestKernel $kernel) {
             $kernel->addTestConfig(__DIR__.'/Fixtures/yml/metrics-service-exemplar-filter-exception.yml');
         }]);
+    }
+
+    public function testMetricsProviderTag(): void
+    {
+        $kernel = self::bootKernel(['config' => function (TestKernel $kernel) {
+            $kernel->addTestConfig(__DIR__.'/Fixtures/yml/metrics-provider-tag.yml');
+        }]);
+
+        $publicContainer = $kernel->getContainer();
+        $privateContainer = self::getContainer();
+
+        self::assertTrue($privateContainer->has('open_telemetry.instrumentation.console.metric.event_subscriber'));
+        self::assertTrue($privateContainer->has('open_telemetry.instrumentation.http_kernel.metric.event_subscriber'));
+
+        self::assertFalse($publicContainer->has('open_telemetry.metrics.providers.default'));
+        self::assertTrue($privateContainer->has('open_telemetry.metrics.providers.default'));
+
+        $provider = $privateContainer->get('open_telemetry.metrics.providers.default');
+        self::assertInstanceOf(MeterProvider::class, $provider);
     }
 
     public function testLogsMonologHandlerWithProvider(): void

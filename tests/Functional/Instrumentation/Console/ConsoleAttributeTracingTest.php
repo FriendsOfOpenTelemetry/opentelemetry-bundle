@@ -26,17 +26,17 @@ class ConsoleAttributeTracingTest extends KernelTestCase
 
         $tester = new ApplicationTester($application);
 
-        $tester->run(['command' => 'traceable-command']);
+        $tester->run(['command' => 'traceable:traceable-command']);
         $tester->assertCommandIsSuccessful();
 
         self::assertSpansCount(1);
 
         $mainSpan = self::getSpans()[0];
-        self::assertSpanName($mainSpan, 'traceable-command');
+        self::assertSpanName($mainSpan, 'traceable:traceable-command');
         self::assertSpanStatus($mainSpan, StatusData::ok());
         self::assertSpanAttributes($mainSpan, [
             'code.function.name' => 'execute',
-            'code.namespace' => 'App\Command\TraceableCommand',
+            'code.namespace' => 'App\Command\Traceable\TraceableCommand',
             'symfony.console.exit_code' => 0,
         ]);
         self::assertSpanEventsCount($mainSpan, 0);
@@ -52,7 +52,7 @@ class ConsoleAttributeTracingTest extends KernelTestCase
         $tester = new ApplicationTester($application);
 
         $tester->run([
-            'command' => 'traceable-command',
+            'command' => 'traceable:traceable-command',
             '--fail' => true,
         ]);
         self::assertSame(1, $tester->getStatusCode());
@@ -60,11 +60,11 @@ class ConsoleAttributeTracingTest extends KernelTestCase
         self::assertSpansCount(1);
 
         $mainSpan = self::getSpans()[0];
-        self::assertSpanName($mainSpan, 'traceable-command');
+        self::assertSpanName($mainSpan, 'traceable:traceable-command');
         self::assertSpanStatus($mainSpan, StatusData::error());
         self::assertSpanAttributes($mainSpan, [
             'code.function.name' => 'execute',
-            'code.namespace' => 'App\Command\TraceableCommand',
+            'code.namespace' => 'App\Command\Traceable\TraceableCommand',
             'symfony.console.exit_code' => 1,
         ]);
         self::assertSpanEventsCount($mainSpan, 0);
@@ -80,7 +80,7 @@ class ConsoleAttributeTracingTest extends KernelTestCase
         $tester = new ApplicationTester($application);
 
         $tester->run([
-            'command' => 'traceable-command',
+            'command' => 'traceable:traceable-command',
             '--throw' => true,
         ], [
             'verbosity' => OutputInterface::VERBOSITY_QUIET,
@@ -93,11 +93,11 @@ class ConsoleAttributeTracingTest extends KernelTestCase
         self::assertSpansCount(1);
 
         $mainSpan = self::getSpans()[0];
-        self::assertSpanName($mainSpan, 'traceable-command');
+        self::assertSpanName($mainSpan, 'traceable:traceable-command');
         self::assertSpanStatus($mainSpan, StatusData::error());
         self::assertSpanAttributes($mainSpan, [
             'code.function.name' => 'execute',
-            'code.namespace' => 'App\Command\TraceableCommand',
+            'code.namespace' => 'App\Command\Traceable\TraceableCommand',
             'symfony.console.exit_code' => 1,
         ]);
 
@@ -121,7 +121,7 @@ class ConsoleAttributeTracingTest extends KernelTestCase
 
         $tester = new ApplicationTester($application);
 
-        $tester->run(['command' => 'fallback-command']);
+        $tester->run(['command' => 'traceable:fallback-command']);
         $tester->assertCommandIsSuccessful();
 
         self::assertSpansCount(0);
@@ -129,11 +129,11 @@ class ConsoleAttributeTracingTest extends KernelTestCase
         self::assertSpansCount(1, 'open_telemetry.traces.exporters.fallback');
 
         $mainSpan = self::getSpans('open_telemetry.traces.exporters.fallback')[0];
-        self::assertSpanName($mainSpan, 'fallback-command');
+        self::assertSpanName($mainSpan, 'traceable:fallback-command');
         self::assertSpanStatus($mainSpan, StatusData::ok());
         self::assertSpanAttributes($mainSpan, [
             'code.function.name' => 'execute',
-            'code.namespace' => 'App\Command\FallbackCommand',
+            'code.namespace' => 'App\Command\Traceable\FallbackCommand',
             'symfony.console.exit_code' => 0,
         ]);
         self::assertSpanEventsCount($mainSpan, 0);

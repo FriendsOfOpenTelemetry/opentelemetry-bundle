@@ -51,7 +51,7 @@
         "doctrine/doctrine-migrations-bundle": "^3.4",
         "doctrine/orm": "^2.18 || ^3.3",
         "ergebnis/composer-normalize": "^2.45",
-        "matthiasnoback/symfony-config-test": "^5.2",
+        "matthiasnoback/symfony-config-test": "^6.0",
         "matthiasnoback/symfony-dependency-injection-test": "^6.0",
         "mcaskill/composer-exclude-files": "^4.0",
         "nyholm/symfony-bundle-test": "^3.0",
@@ -74,7 +74,7 @@
         "symfony/twig-bundle": "^7.2",
         "symfony/yaml": "^7.2",
         "twig/twig": "^3.18",
-        "zalas/phpunit-globals": "^3.5"
+        "zalas/phpunit-globals": "^4.0"
     },
     "suggest": {
         "doctrine/doctrine-bundle": "Needed to enable Doctrine DBAL & ORM instrumentation",

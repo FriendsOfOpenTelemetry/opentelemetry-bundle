@@ -1,17 +1,16 @@
 <?php
 
-namespace App\Controller;
+namespace App\Controller\Traceable;
 
 use OpenTelemetry\API\Trace\StatusCode;
 use OpenTelemetry\API\Trace\TracerInterface;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\SemConv\TraceAttributes;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-class AutowireTracerController extends AbstractController
+class AutowireTracerController extends AbstractTraceableController
 {
     public function __construct(
         #[Autowire('@open_telemetry.traces.tracers.fallback')]

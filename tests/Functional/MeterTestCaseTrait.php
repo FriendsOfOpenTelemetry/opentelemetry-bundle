@@ -3,6 +3,7 @@
 namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\Tests\Functional;
 
 use OpenTelemetry\SDK\Metrics\Data\Metric;
+use OpenTelemetry\SDK\Metrics\MeterProviderInterface;
 use OpenTelemetry\SDK\Metrics\MetricExporter\InMemoryExporter;
 
 trait MeterTestCaseTrait
@@ -15,9 +16,10 @@ trait MeterTestCaseTrait
         return $exporter;
     }
 
-    protected static function shutdownMetrics(?string $providerId = null): void
+    protected static function flushMetrics(?string $providerId = null): void
     {
         $provider = self::getContainer()->get($providerId ?? 'open_telemetry.metrics.providers.default');
+        self::assertInstanceOf(MeterProviderInterface::class, $provider);
         $provider->shutdown();
     }
 
