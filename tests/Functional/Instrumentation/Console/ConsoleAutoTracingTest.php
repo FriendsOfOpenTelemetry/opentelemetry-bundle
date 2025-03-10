@@ -25,17 +25,17 @@ class ConsoleAutoTracingTest extends KernelTestCase
 
         $tester = new ApplicationTester($application);
 
-        $tester->run(['command' => 'auto-command']);
+        $tester->run(['command' => 'traceable:auto-command']);
         self::assertSame(0, $tester->getStatusCode());
 
         self::assertSpansCount(1);
 
         $mainSpan = self::getSpans()[0];
-        self::assertSpanName($mainSpan, 'auto-command');
+        self::assertSpanName($mainSpan, 'traceable:auto-command');
         self::assertSpanStatus($mainSpan, StatusData::ok());
         self::assertSpanAttributes($mainSpan, [
             'code.function.name' => 'execute',
-            'code.namespace' => 'App\Command\AutoCommand',
+            'code.namespace' => 'App\Command\Traceable\AutoCommand',
             'symfony.console.exit_code' => 0,
         ]);
         self::assertSpanEventsCount($mainSpan, 0);
@@ -50,7 +50,7 @@ class ConsoleAutoTracingTest extends KernelTestCase
 
         $tester = new ApplicationTester($application);
 
-        $tester->run(['command' => 'dummy-command']);
+        $tester->run(['command' => 'traceable:dummy-command']);
         self::assertSame(0, $tester->getStatusCode());
 
         self::assertSpansCount(0);

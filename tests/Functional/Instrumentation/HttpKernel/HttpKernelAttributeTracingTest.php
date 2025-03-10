@@ -28,7 +28,7 @@ class HttpKernelAttributeTracingTest extends WebTestCase
         self::assertSpansCount(1);
 
         $mainSpan = self::getSpans()[0];
-        self::assertSpanName($mainSpan, 'app_actiontraceable_ok');
+        self::assertSpanName($mainSpan, 'app_traceable_actiontraceable_ok');
         self::assertSpanStatus($mainSpan, StatusData::ok());
         self::assertSpanAttributes($mainSpan, [
             'url.full' => 'http://localhost/ok',
@@ -42,7 +42,7 @@ class HttpKernelAttributeTracingTest extends WebTestCase
             'symfony.kernel.net.peer_ip' => '127.0.0.1',
             'server.address' => 'localhost',
             'server.port' => 80,
-            'http.route' => 'app_actiontraceable_ok',
+            'http.route' => 'app_traceable_actiontraceable_ok',
             'http.response.status_code' => Response::HTTP_OK,
         ]);
         self::assertSpanEventsCount($mainSpan, 0);
@@ -59,7 +59,7 @@ class HttpKernelAttributeTracingTest extends WebTestCase
         self::assertSpansCount(1);
 
         $mainSpan = self::getSpans()[0];
-        self::assertSpanName($mainSpan, 'app_actiontraceable_failure');
+        self::assertSpanName($mainSpan, 'app_traceable_actiontraceable_failure');
         self::assertSpanStatus($mainSpan, StatusData::error());
         self::assertSpanAttributes($mainSpan, [
             'url.full' => 'http://localhost/failure',
@@ -73,7 +73,7 @@ class HttpKernelAttributeTracingTest extends WebTestCase
             'symfony.kernel.net.peer_ip' => '127.0.0.1',
             'server.address' => 'localhost',
             'server.port' => 80,
-            'http.route' => 'app_actiontraceable_failure',
+            'http.route' => 'app_traceable_actiontraceable_failure',
             'http.response.status_code' => Response::HTTP_SERVICE_UNAVAILABLE,
         ]);
         self::assertSpanEventsCount($mainSpan, 0);
@@ -91,7 +91,7 @@ class HttpKernelAttributeTracingTest extends WebTestCase
         $spans = self::getSpans();
 
         $mainSpan = $spans[array_key_last($spans)];
-        self::assertSpanName($mainSpan, 'app_actiontraceable_exception');
+        self::assertSpanName($mainSpan, 'app_traceable_actiontraceable_exception');
         self::assertSpanStatus($mainSpan, StatusData::error());
         self::assertSpanAttributes($mainSpan, [
             'url.full' => 'http://localhost/exception',
@@ -105,7 +105,7 @@ class HttpKernelAttributeTracingTest extends WebTestCase
             'symfony.kernel.net.peer_ip' => '127.0.0.1',
             'server.address' => 'localhost',
             'server.port' => 80,
-            'http.route' => 'app_actiontraceable_exception',
+            'http.route' => 'app_traceable_actiontraceable_exception',
             'http.response.status_code' => Response::HTTP_INTERNAL_SERVER_ERROR,
         ]);
         self::assertSpanEventsCount($mainSpan, 1);
@@ -129,7 +129,7 @@ class HttpKernelAttributeTracingTest extends WebTestCase
         self::assertSpansCount(1);
 
         $mainSpan = self::getSpans()[0];
-        self::assertSpanName($mainSpan, 'app_classinvoketraceable__invoke');
+        self::assertSpanName($mainSpan, 'app_traceable_classinvoketraceable__invoke');
         self::assertSpanStatus($mainSpan, StatusData::ok());
         self::assertSpanAttributes($mainSpan, [
             'url.full' => 'http://localhost/class-invoke-traceable',
@@ -143,7 +143,7 @@ class HttpKernelAttributeTracingTest extends WebTestCase
             'symfony.kernel.net.peer_ip' => '127.0.0.1',
             'server.address' => 'localhost',
             'server.port' => 80,
-            'http.route' => 'app_classinvoketraceable__invoke',
+            'http.route' => 'app_traceable_classinvoketraceable__invoke',
             'http.response.status_code' => Response::HTTP_OK,
         ]);
         self::assertSpanEventsCount($mainSpan, 0);
@@ -160,7 +160,7 @@ class HttpKernelAttributeTracingTest extends WebTestCase
         self::assertSpansCount(1);
 
         $mainSpan = self::getSpans()[0];
-        self::assertSpanName($mainSpan, 'app_classtraceable_index');
+        self::assertSpanName($mainSpan, 'app_traceable_classtraceable_index');
         self::assertSpanStatus($mainSpan, StatusData::ok());
         self::assertSpanAttributes($mainSpan, [
             'url.full' => 'http://localhost/class-traceable',
@@ -174,7 +174,7 @@ class HttpKernelAttributeTracingTest extends WebTestCase
             'symfony.kernel.net.peer_ip' => '127.0.0.1',
             'server.address' => 'localhost',
             'server.port' => 80,
-            'http.route' => 'app_classtraceable_index',
+            'http.route' => 'app_traceable_classtraceable_index',
             'http.response.status_code' => Response::HTTP_OK,
         ]);
         self::assertSpanEventsCount($mainSpan, 0);
@@ -195,7 +195,7 @@ class HttpKernelAttributeTracingTest extends WebTestCase
         self::assertSpanStatus($manualSpan, StatusData::ok());
         self::assertSpanAttributes($manualSpan, [
             'code.function.name' => 'manual',
-            'code.namespace' => 'App\Controller\ClassTraceableController',
+            'code.namespace' => 'App\Controller\Traceable\ClassTraceableController',
         ]);
         self::assertSpanEventsCount($manualSpan, 1);
         $manualSpanEvent = $manualSpan->getEvents()[0];
@@ -205,7 +205,7 @@ class HttpKernelAttributeTracingTest extends WebTestCase
         ]);
 
         $mainSpan = self::getSpans()[1];
-        self::assertSpanName($mainSpan, 'app_classtraceable_manual');
+        self::assertSpanName($mainSpan, 'app_traceable_classtraceable_manual');
         self::assertSpanStatus($mainSpan, StatusData::ok());
         self::assertSpanAttributes($mainSpan, [
             'url.full' => 'http://localhost/class-manual',
@@ -219,7 +219,7 @@ class HttpKernelAttributeTracingTest extends WebTestCase
             'symfony.kernel.net.peer_ip' => '127.0.0.1',
             'server.address' => 'localhost',
             'server.port' => 80,
-            'http.route' => 'app_classtraceable_manual',
+            'http.route' => 'app_traceable_classtraceable_manual',
             'http.response.status_code' => Response::HTTP_OK,
         ]);
 
@@ -259,7 +259,7 @@ class HttpKernelAttributeTracingTest extends WebTestCase
         self::assertSpansCount(1, 'open_telemetry.traces.exporters.fallback');
 
         $mainSpan = self::getSpans('open_telemetry.traces.exporters.fallback')[0];
-        self::assertSpanName($mainSpan, 'app_fallbacktraceable__invoke');
+        self::assertSpanName($mainSpan, 'app_traceable_fallbacktraceable__invoke');
         self::assertSpanStatus($mainSpan, StatusData::ok());
         self::assertSpanAttributes($mainSpan, [
             'url.full' => 'http://localhost/fallback-traceable',
@@ -273,7 +273,7 @@ class HttpKernelAttributeTracingTest extends WebTestCase
             'symfony.kernel.net.peer_ip' => '127.0.0.1',
             'server.address' => 'localhost',
             'server.port' => 80,
-            'http.route' => 'app_fallbacktraceable__invoke',
+            'http.route' => 'app_traceable_fallbacktraceable__invoke',
             'http.response.status_code' => Response::HTTP_OK,
         ]);
         self::assertSpanEventsCount($mainSpan, 0);
@@ -294,7 +294,7 @@ class HttpKernelAttributeTracingTest extends WebTestCase
         self::assertSpanStatus($manualSpan, StatusData::ok());
         self::assertSpanAttributes($manualSpan, [
             'code.function.name' => 'manual',
-            'code.namespace' => 'App\Controller\ActionTraceableController',
+            'code.namespace' => 'App\Controller\Traceable\ActionTraceableController',
         ]);
         self::assertSpanEventsCount($manualSpan, 1);
         $manualSpanEvent = $manualSpan->getEvents()[0];
@@ -304,7 +304,7 @@ class HttpKernelAttributeTracingTest extends WebTestCase
         ]);
 
         $mainSpan = self::getSpans()[1];
-        self::assertSpanName($mainSpan, 'app_actiontraceable_manual');
+        self::assertSpanName($mainSpan, 'app_traceable_actiontraceable_manual');
         self::assertSpanStatus($mainSpan, StatusData::ok());
         self::assertSpanAttributes($mainSpan, [
             'url.full' => 'http://localhost/manual-action',
@@ -318,7 +318,7 @@ class HttpKernelAttributeTracingTest extends WebTestCase
             'symfony.kernel.net.peer_ip' => '127.0.0.1',
             'server.address' => 'localhost',
             'server.port' => 80,
-            'http.route' => 'app_actiontraceable_manual',
+            'http.route' => 'app_traceable_actiontraceable_manual',
             'http.response.status_code' => Response::HTTP_OK,
         ]);
 
@@ -342,7 +342,7 @@ class HttpKernelAttributeTracingTest extends WebTestCase
         self::assertSpanStatus($manualSpan, StatusData::ok());
         self::assertSpanAttributes($manualSpan, [
             'code.function.name' => 'manual',
-            'code.namespace' => 'App\Controller\AutowireTracerController',
+            'code.namespace' => 'App\Controller\Traceable\AutowireTracerController',
         ]);
         self::assertSpanEventsCount($manualSpan, 1);
         $manualSpanEvent = $manualSpan->getEvents()[0];
@@ -363,7 +363,7 @@ class HttpKernelAttributeTracingTest extends WebTestCase
         self::assertSpansCount(1);
 
         $mainSpan = self::getSpans()[0];
-        self::assertSpanName($mainSpan, 'app_dualtracer_fallback');
+        self::assertSpanName($mainSpan, 'app_traceable_dualtracer_fallback');
         self::assertSpanStatus($mainSpan, StatusData::ok());
         self::assertSpanAttributes($mainSpan, [
             'url.full' => 'http://localhost/fallback-dual-tracer',
@@ -377,7 +377,7 @@ class HttpKernelAttributeTracingTest extends WebTestCase
             'symfony.kernel.net.peer_ip' => '127.0.0.1',
             'server.address' => 'localhost',
             'server.port' => 80,
-            'http.route' => 'app_dualtracer_fallback',
+            'http.route' => 'app_traceable_dualtracer_fallback',
             'http.response.status_code' => 200,
         ]);
 
@@ -388,7 +388,7 @@ class HttpKernelAttributeTracingTest extends WebTestCase
         self::assertSpanStatus($manualSpan, StatusData::ok());
         self::assertSpanAttributes($manualSpan, [
             'code.function.name' => 'manual',
-            'code.namespace' => 'App\Controller\DualTracerController',
+            'code.namespace' => 'App\Controller\Traceable\DualTracerController',
         ]);
         self::assertSpanEventsCount($manualSpan, 1);
         $manualSpanEvent = $manualSpan->getEvents()[0];
@@ -415,7 +415,7 @@ class HttpKernelAttributeTracingTest extends WebTestCase
         self::assertSpanStatus($manualSpan, StatusData::ok());
         self::assertSpanAttributes($manualSpan, [
             'code.function.name' => 'manual',
-            'code.namespace' => 'App\Controller\DualTracerController',
+            'code.namespace' => 'App\Controller\Traceable\DualTracerController',
         ]);
         self::assertSpanEventsCount($manualSpan, 1);
         $manualSpanEvent = $manualSpan->getEvents()[0];
@@ -425,7 +425,7 @@ class HttpKernelAttributeTracingTest extends WebTestCase
         ]);
 
         $mainSpan = self::getSpans()[1];
-        self::assertSpanName($mainSpan, 'app_dualtracer_main');
+        self::assertSpanName($mainSpan, 'app_traceable_dualtracer_main');
         self::assertSpanStatus($mainSpan, StatusData::ok());
         self::assertSpanAttributes($mainSpan, [
             'url.full' => 'http://localhost/main-dual-tracer',
@@ -439,7 +439,7 @@ class HttpKernelAttributeTracingTest extends WebTestCase
             'symfony.kernel.net.peer_ip' => '127.0.0.1',
             'server.address' => 'localhost',
             'server.port' => 80,
-            'http.route' => 'app_dualtracer_main',
+            'http.route' => 'app_traceable_dualtracer_main',
             'http.response.status_code' => 200,
         ]);
 
@@ -457,7 +457,7 @@ class HttpKernelAttributeTracingTest extends WebTestCase
         self::assertSpansCount(1);
 
         $mainSpan = self::getSpans()[0];
-        self::assertSpanName($mainSpan, 'app_actiontraceable_logspancontext');
+        self::assertSpanName($mainSpan, 'app_traceable_actiontraceable_logspancontext');
 
         $log = self::getLog('A detailed log message.', Level::Debug->getName());
         self::assertNotNull($log);

@@ -29,7 +29,7 @@ final class DummyMeterServiceTest extends KernelTestCase
     {
         $this->meterService->count([21, 21]);
         $this->meterService->count([21, 21]);
-        self::shutdownMetrics();
+        self::flushMetrics();
 
         self::assertMetricsCount(1);
 
@@ -61,7 +61,7 @@ final class DummyMeterServiceTest extends KernelTestCase
     public function testGauge(): void
     {
         $this->meterService->gauge([21, 21]);
-        self::shutdownMetrics();
+        self::flushMetrics();
 
         self::assertMetricsCount(1);
 
@@ -92,7 +92,7 @@ final class DummyMeterServiceTest extends KernelTestCase
     {
         $this->meterService->upDownCount([21, -21]);
         $this->meterService->upDownCount([-21, 21]);
-        self::shutdownMetrics();
+        self::flushMetrics();
 
         self::assertMetricsCount(1);
 
@@ -125,7 +125,7 @@ final class DummyMeterServiceTest extends KernelTestCase
     {
         $this->meterService->histogram([21, 42]);
         $this->meterService->histogram([84, 42]);
-        self::shutdownMetrics();
+        self::flushMetrics();
 
         self::assertMetricsCount(1);
 

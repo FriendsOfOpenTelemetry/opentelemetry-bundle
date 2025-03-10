@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Command;
+namespace App\Command\Traceable;
 
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\Instrumentation\Attribute\Traceable;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -10,7 +10,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 #[Traceable]
-#[AsCommand('traceable-command')]
+#[AsCommand('traceable:traceable-command')]
 class TraceableCommand extends Command
 {
     protected function configure(): void

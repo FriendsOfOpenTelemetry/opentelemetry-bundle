@@ -37,6 +37,7 @@ return static function (ContainerConfigurator $container): void {
         ->set('open_telemetry.instrumentation.console.trace.event_subscriber', TraceableConsoleEventSubscriber::class)
             ->arg('$tracer', service('open_telemetry.traces.default_tracer'))
             ->tag('kernel.event_subscriber')
+            ->tag('container.service_subscriber')
             ->tag('monolog.logger', ['channel' => 'open_telemetry'])
 
         // Doctrine
@@ -56,6 +57,7 @@ return static function (ContainerConfigurator $container): void {
             ->arg('$propagator', service('open_telemetry.propagator_text_map.noop'))
             ->arg('$propagationGetter', service('open_telemetry.propagation_getter.headers'))
             ->tag('kernel.event_subscriber')
+            ->tag('container.service_subscriber')
             ->tag('monolog.logger', ['channel' => 'open_telemetry'])
 
         ->set('open_telemetry.instrumentation.http_kernel.trace.route_loader', TraceableRouteLoader::class)

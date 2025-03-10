@@ -270,6 +270,7 @@ class OpenTelemetryMetricsExtensionTest extends AbstractExtensionTestCase
             2,
             new Reference('open_telemetry.resource_info'),
         );
+        self::assertContainerBuilderHasServiceDefinitionWithTag('open_telemetry.metrics.providers.main', 'open_telemetry.metrics.provider');
         $provider = $this->container->getDefinition('open_telemetry.metrics.providers.main');
         self::assertEquals([new Reference(sprintf('open_telemetry.metrics.provider_factory.%s', $type)), 'createProvider'], $provider->getFactory());
     }

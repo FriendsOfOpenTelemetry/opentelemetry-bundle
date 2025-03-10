@@ -26,7 +26,7 @@ class HttpKernelAutoTracingTest extends WebTestCase
         self::assertSpansCount(1);
 
         $mainSpan = self::getSpans()[0];
-        self::assertSpanName($mainSpan, 'app_autotraceable_index');
+        self::assertSpanName($mainSpan, 'app_traceable_autotraceable_index');
         self::assertSpanStatus($mainSpan, StatusData::ok());
         self::assertSpanAttributes($mainSpan, [
             'url.full' => 'http://localhost/auto-traceable',
@@ -40,7 +40,7 @@ class HttpKernelAutoTracingTest extends WebTestCase
             'symfony.kernel.net.peer_ip' => '127.0.0.1',
             'server.address' => 'localhost',
             'server.port' => 80,
-            'http.route' => 'app_autotraceable_index',
+            'http.route' => 'app_traceable_autotraceable_index',
             'http.response.status_code' => Response::HTTP_OK,
         ]);
         self::assertSpanEventsCount($mainSpan, 0);

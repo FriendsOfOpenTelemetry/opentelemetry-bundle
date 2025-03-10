@@ -1,12 +1,11 @@
 <?php
 
-namespace App\Controller;
+namespace App\Controller\Traceable;
 
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-class NotTraceableClassController extends AbstractController
+class NotTraceableClassController extends AbstractTraceableController
 {
     #[Route('/not-traceable-class', methods: ['GET'])]
     public function index(): Response

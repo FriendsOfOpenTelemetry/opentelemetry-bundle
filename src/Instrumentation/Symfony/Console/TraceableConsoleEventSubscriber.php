@@ -56,6 +56,11 @@ final class TraceableConsoleEventSubscriber implements EventSubscriberInterface,
         ];
     }
 
+    public static function getSubscribedServices(): array
+    {
+        return [TracerInterface::class];
+    }
+
     public function startSpan(ConsoleCommandEvent $event): void
     {
         $command = $event->getCommand();
@@ -170,11 +175,6 @@ final class TraceableConsoleEventSubscriber implements EventSubscriberInterface,
 
         return InstrumentationTypeEnum::Attribute === $this->instrumentationType
             && true === $traceable instanceof Traceable;
-    }
-
-    public static function getSubscribedServices(): array
-    {
-        return [TracerInterface::class];
     }
 
     public function setInstrumentationType(InstrumentationTypeEnum $type): void

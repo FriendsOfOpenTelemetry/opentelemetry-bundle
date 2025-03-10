@@ -9,7 +9,7 @@
         "package.json",
         "package-lock.json",
         "composer.lock",
-        "tests/Functional/DummyMeterServiceTest.php"
+        "tests/*"
     ],
     "AllowedContentTypes": [],
     "PassedFiles": [],

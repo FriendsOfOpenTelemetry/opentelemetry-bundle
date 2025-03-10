@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controller;
+namespace App\Controller\Traceable;
 
 use App\Entity\Dummy;
 use Doctrine\ORM\EntityManagerInterface;
@@ -10,12 +10,11 @@ use OpenTelemetry\API\Trace\TracerInterface;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\SemConv\TraceAttributes;
 use Psr\Log\LoggerInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-class ActionTraceableController extends AbstractController
+class ActionTraceableController extends AbstractTraceableController
 {
     #[Traceable]
     #[Route('/ok', methods: ['GET'])]

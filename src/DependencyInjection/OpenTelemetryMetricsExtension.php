@@ -115,7 +115,9 @@ final class OpenTelemetryMetricsExtension
                 isset($config['exporter']) ? new Reference($config['exporter']) : null,
                 $filter,
                 new Reference('open_telemetry.resource_info'),
-            ]);
+            ])
+            ->addTag('open_telemetry.metrics.provider')
+        ;
     }
 
     /**

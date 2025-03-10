@@ -43,6 +43,7 @@ final class OpenTelemetryExtension extends ConfigurableExtension
         $loader->load('services_metrics.php');
         $loader->load('services_traces.php');
         $loader->load('services_tracing_instrumentation.php');
+        $loader->load('services_metering_instrumentation.php');
 
         $this->registerService($mergedConfig['service'], $container);
         $this->registerInstrumentation($mergedConfig['instrumentation'], $container);
@@ -91,10 +92,16 @@ final class OpenTelemetryExtension extends ConfigurableExtension
     private function registerInstrumentation(array $config, ContainerBuilder $container): void
     {
         $this->registerCacheTracingInstrumentationConfiguration($container, $config['cache']);
+
         $this->registerConsoleTracingInstrumentationConfiguration($container, $config['console']);
+        $this->registerConsoleMeteringInstrumentationConfiguration($container, $config['console']);
+
         $this->registerDoctrineTracingInstrumentationConfiguration($container, $config['doctrine']);
         $this->registerHttpClientTracingInstrumentationConfiguration($container, $config['http_client']);
+
         $this->registerHttpKernelTracingInstrumentationConfiguration($container, $config['http_kernel']);
+        $this->registerHttpKernelMeteringInstrumentationConfiguration($container, $config['http_kernel']);
+
         $this->registerMailerTracingInstrumentationConfiguration($container, $config['mailer']);
         $this->registerMessengerTracingInstrumentationConfiguration($container, $config['messenger']);
         $this->registerTwigTracingInstrumentationConfiguration($container, $config['twig']);
@@ -135,6 +142,22 @@ final class OpenTelemetryExtension extends ConfigurableExtension
         }
 
         $this->setTracingInstrumentationParams($container, 'console', $config, $isConfigEnabled);
+    }
+
+    /**
+     * @param InstrumentationConfig $config
+     */
+    private function registerConsoleMeteringInstrumentationConfiguration(ContainerBuilder $container, array $config): void
+    {
+        $isConfigEnabled = $this->isConfigEnabled($container, $config['metering']);
+
+        if ($isConfigEnabled && !class_exists(Command::class)) {
+            throw new \LogicException('Console instrumentation cannot be enabled because the symfony/console package is not installed.');
+        }
+
+        if (!$isConfigEnabled) {
+            $container->removeDefinition('open_telemetry.instrumentation.console.metric.event_subscriber');
+        }
     }
 
     /**
@@ -186,6 +209,18 @@ final class OpenTelemetryExtension extends ConfigurableExtension
         }
 
         $this->setTracingInstrumentationParams($container, 'http_kernel', $config, $isConfigEnabled);
+    }
+
+    /**
+     * @param InstrumentationConfig $config
+     */
+    private function registerHttpKernelMeteringInstrumentationConfiguration(ContainerBuilder $container, array $config): void
+    {
+        $isConfigEnabled = $this->isConfigEnabled($container, $config['metering']);
+
+        if (!$isConfigEnabled) {
+            $container->removeDefinition('open_telemetry.instrumentation.http_kernel.metric.event_subscriber');
+        }
     }
 
     /**

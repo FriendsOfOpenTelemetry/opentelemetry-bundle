@@ -104,6 +104,11 @@ final class TraceableHttpKernelEventSubscriber implements EventSubscriberInterfa
         ];
     }
 
+    public static function getSubscribedServices(): array
+    {
+        return [TracerInterface::class];
+    }
+
     public function startRequest(RequestEvent $event): void
     {
         $request = $event->getRequest();
@@ -391,11 +396,6 @@ final class TraceableHttpKernelEventSubscriber implements EventSubscriberInterfa
         }
 
         return $headerAttributes;
-    }
-
-    public static function getSubscribedServices(): array
-    {
-        return [TracerInterface::class];
     }
 
     public function setInstrumentationType(InstrumentationTypeEnum $type): void
