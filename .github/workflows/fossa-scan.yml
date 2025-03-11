@@ -12,7 +12,7 @@ jobs:
       - name: Install Nix
         uses: DeterminateSystems/nix-installer-action@v16
       - name: Setup Cachix
-        uses: cachix/cachix-action@v15
+        uses: cachix/cachix-action@v16
         with:
           name: opentelemetry
           extraPullNames: nix-shell, php-src-nix
