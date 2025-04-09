@@ -18,3 +18,9 @@ framework:
       messenger.bus.default:
         middleware:
           - open_telemetry_tracer
+
+when@messenger_doctrine_transport:
+  framework:
+    messenger:
+      transports:
+        main: 'trace(doctrine://app)'
