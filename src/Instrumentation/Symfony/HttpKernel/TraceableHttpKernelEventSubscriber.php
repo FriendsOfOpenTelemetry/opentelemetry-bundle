@@ -290,6 +290,10 @@ final class TraceableHttpKernelEventSubscriber implements EventSubscriberInterfa
             return false;
         }
 
+        if (0 === count($this->excludePaths)) {
+            return true;
+        }
+
         $combinedExcludePaths = implode('|', $this->excludePaths);
         if (preg_match("#{$combinedExcludePaths}#", $request->getPathInfo())) {
             return false;
