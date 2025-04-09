@@ -111,3 +111,16 @@ when@auto:
           enabled: true
           exclude_paths:
             - ^/auto-exclude$
+when@empty_excludes:
+  open_telemetry:
+    instrumentation:
+      console:
+        type: auto
+        tracing:
+          enabled: true
+          exclude_commands: []
+      http_kernel:
+        type: auto
+        tracing:
+          enabled: true
+          exclude_paths: []

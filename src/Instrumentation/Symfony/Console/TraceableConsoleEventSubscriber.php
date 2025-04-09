@@ -161,6 +161,10 @@ final class TraceableConsoleEventSubscriber implements EventSubscriberInterface,
             return false;
         }
 
+        if (0 === count($this->excludeCommands)) {
+            return true;
+        }
+
         $combinedExcludeCommands = implode('|', $this->excludeCommands);
         if (preg_match("#{$combinedExcludeCommands}#", $command->getName())) {
             return false;
