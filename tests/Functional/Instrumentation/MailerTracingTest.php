@@ -31,8 +31,6 @@ class MailerTracingTest extends KernelTestCase
 
         $mailer->send($email);
 
-        $spans = self::getSpans();
-
         self::assertEmailCount(1);
         self::assertSpansCount(3);
 
