@@ -292,9 +292,7 @@ final class ConfigurationTest extends TestCase
                             headers:
 
                                 # Prototype
-                                -
-                                    name:                 ~ # Required
-                                    value:                ~ # Required
+                                name:                 ~
                             timeout:              0.1
                             retry:                100
                             max:                  3
@@ -331,9 +329,7 @@ final class ConfigurationTest extends TestCase
                             headers:
 
                                 # Prototype
-                                -
-                                    name:                 ~ # Required
-                                    value:                ~ # Required
+                                name:                 ~
                             timeout:              0.1
                             retry:                100
                             max:                  3
@@ -395,9 +391,7 @@ final class ConfigurationTest extends TestCase
                             headers:
 
                                 # Prototype
-                                -
-                                    name:                 ~ # Required
-                                    value:                ~ # Required
+                                name:                 ~
                             timeout:              0.1
                             retry:                100
                             max:                  3
