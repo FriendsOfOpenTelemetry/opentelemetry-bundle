@@ -11,6 +11,7 @@ use FriendsOfOpenTelemetry\OpenTelemetryBundle\Instrumentation\Symfony\Mailer\Tr
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\Instrumentation\Symfony\Mailer\TraceableMailerTransport;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\Instrumentation\Symfony\Messenger\EventSubscriber\EndSpanEventSubscriber;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\Instrumentation\Symfony\Messenger\EventSubscriber\StartSpanEventSubscriber;
+use FriendsOfOpenTelemetry\OpenTelemetryBundle\Instrumentation\Symfony\Messenger\Amqp\AddStampForPropagationMiddleware;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\Instrumentation\Symfony\Messenger\TraceableMessengerMiddleware;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\Instrumentation\Symfony\Messenger\TraceableMessengerTransport;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\Instrumentation\Symfony\Messenger\TraceableMessengerTransportFactory;
@@ -114,6 +115,11 @@ return static function (ContainerConfigurator $container): void {
         ->set('open_telemetry.instrumentation.messenger.trace.end_span', EndSpanEventSubscriber::class)
             ->tag('monolog.logger', ['channel' => 'open_telemetry'])
             ->tag('kernel.event_subscriber')
+
+        ->set('open_telemetry.instrumentation.messenger.propagation.amqp.middleware', AddStampForPropagationMiddleware::class)
+            ->arg('$propagator', service('open_telemetry.propagator_text_map.multi'))
+            ->tag('messenger.middleware')
+            ->tag('monolog.logger', ['channel' => 'open_telemetry'])
 
         // Twig
         ->set('open_telemetry.instrumentation.twig.trace.extension', TraceableTwigExtension::class)
