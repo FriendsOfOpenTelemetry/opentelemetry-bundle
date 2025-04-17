@@ -260,6 +260,8 @@ final class OpenTelemetryExtension extends ConfigurableExtension
             $container->removeDefinition('open_telemetry.instrumentation.messenger.trace.transport');
             $container->removeDefinition('open_telemetry.instrumentation.messenger.trace.transport_factory');
             $container->removeDefinition('open_telemetry.instrumentation.messenger.trace.middleware');
+            $container->removeDefinition('open_telemetry.instrumentation.messenger.trace.start_span');
+            $container->removeDefinition('open_telemetry.instrumentation.messenger.trace.end_span');
         }
 
         $this->setTracingInstrumentationParams($container, 'messenger', $config, $isConfigEnabled);
