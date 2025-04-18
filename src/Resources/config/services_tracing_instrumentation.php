@@ -10,7 +10,7 @@ use FriendsOfOpenTelemetry\OpenTelemetryBundle\Instrumentation\Symfony\HttpKerne
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\Instrumentation\Symfony\Mailer\TraceableMailer;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\Instrumentation\Symfony\Mailer\TraceableMailerTransport;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\Instrumentation\Symfony\Messenger\AddStampForPropagationMiddleware;
-use FriendsOfOpenTelemetry\OpenTelemetryBundle\Instrumentation\Symfony\Messenger\InstrumentationEventSubscriber;
+use FriendsOfOpenTelemetry\OpenTelemetryBundle\Instrumentation\Symfony\Messenger\WorkerMessageEventSubscriber;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\Instrumentation\Symfony\Messenger\TraceableMessengerMiddleware;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\Instrumentation\Symfony\Messenger\TraceableMessengerTransport;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\Instrumentation\Symfony\Messenger\TraceableMessengerTransportFactory;
@@ -110,7 +110,7 @@ return static function (ContainerConfigurator $container): void {
             ->tag('messenger.middleware')
             ->tag('monolog.logger', ['channel' => 'open_telemetry'])
 
-        ->set('open_telemetry.instrumentation.messenger', InstrumentationEventSubscriber::class)
+        ->set('open_telemetry.instrumentation.messenger.worker', WorkerMessageEventSubscriber::class)
             ->arg('$propagator', service('open_telemetry.propagator_text_map.multi'))
             ->arg('$tracer', service('open_telemetry.traces.default_tracer'))
             ->tag('monolog.logger', ['channel' => 'open_telemetry'])
