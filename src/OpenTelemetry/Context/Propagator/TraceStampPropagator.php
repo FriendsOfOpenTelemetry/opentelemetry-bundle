@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Context\Propagator;
 
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\Instrumentation\Symfony\Messenger\TraceStamp;
@@ -20,7 +18,7 @@ class TraceStampPropagator implements PropagationSetterInterface
             throw new \InvalidArgumentException(sprintf('The carrier for trace stamp propagation must be instance of %s', Envelope::class));
         }
 
-        if ($key !== TraceContextPropagator::TRACEPARENT) {
+        if (TraceContextPropagator::TRACEPARENT !== $key) {
             return;
         }
 

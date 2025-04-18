@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\Instrumentation\Symfony\Messenger;
 
 use Symfony\Component\Messenger\Stamp\StampInterface;
