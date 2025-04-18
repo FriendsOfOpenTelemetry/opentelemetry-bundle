@@ -8,9 +8,6 @@ use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Middleware\MiddlewareInterface;
 use Symfony\Component\Messenger\Middleware\StackInterface;
 
-/**
- * @deprecated: span should be created from event subscriber to avoid issue with orphan span
- */
 class TraceableMessengerMiddleware implements MiddlewareInterface
 {
     public function __construct(

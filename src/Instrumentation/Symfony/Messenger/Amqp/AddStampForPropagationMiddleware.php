@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\Instrumentation\Symfony\Messenger\Amqp;
 
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Context\Propagator\TraceStampPropagator;
@@ -21,11 +19,12 @@ readonly class AddStampForPropagationMiddleware implements MiddlewareInterface
     public function __construct(
         private MultiTextMapPropagator $propagator,
         private ?LoggerInterface $logger = null,
-    ) {}
+    ) {
+    }
 
     public function handle(Envelope $envelope, StackInterface $stack): Envelope
     {
-        if ($envelope->last(AmqpStamp::class) !== null) {
+        if (null !== $envelope->last(AmqpStamp::class)) {
             $this->onMessageSent($envelope);
         }
 
@@ -36,7 +35,7 @@ readonly class AddStampForPropagationMiddleware implements MiddlewareInterface
     {
         $scope = Context::storage()->scope();
 
-        if ($scope === null) {
+        if (null === $scope) {
             $this->logger?->debug('No active scope');
         }
 
