@@ -3,10 +3,12 @@
 namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\Instrumentation\Symfony\Messenger;
 
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\Instrumentation\InstrumentationTypeEnum;
+use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Context\Propagator\TraceStampPropagator;
 use OpenTelemetry\API\Trace\SpanKind;
 use OpenTelemetry\API\Trace\StatusCode;
 use OpenTelemetry\API\Trace\TracerInterface;
 use OpenTelemetry\Context\Context;
+use OpenTelemetry\Context\Propagation\MultiTextMapPropagator;
 use OpenTelemetry\SDK\Trace\Span;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -24,6 +26,7 @@ class InstrumentationEventSubscriber implements EventSubscriberInterface
     private ?InstrumentationTypeEnum $instrumentationType = null;
 
     public function __construct(
+        private readonly MultiTextMapPropagator $propagator,
         private readonly TracerInterface $tracer,
         private readonly LoggerInterface $logger,
     ) {
@@ -49,6 +52,9 @@ class InstrumentationEventSubscriber implements EventSubscriberInterface
             return;
         }
 
+        // ensure propagation from incoming trace
+        $context = $this->propagator->extract($event->getEnvelope(), new TraceStampPropagator($this->logger));
+
         $scope = Context::storage()->scope();
 
         if (null !== $scope) {
@@ -57,7 +63,6 @@ class InstrumentationEventSubscriber implements EventSubscriberInterface
             $this->logger->debug('No active scope');
         }
 
-        $context = Context::getCurrent();
         $span = $this->tracer
             ->spanBuilder($event->getReceiverName())
             ->setParent($context)

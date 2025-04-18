@@ -1,12 +1,11 @@
 <?php
 
-namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\Instrumentation\Symfony\Messenger\Amqp;
+namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\Instrumentation\Symfony\Messenger;
 
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Context\Propagator\TraceStampPropagator;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\Propagation\MultiTextMapPropagator;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\Messenger\Bridge\Amqp\Transport\AmqpStamp;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Middleware\MiddlewareInterface;
 use Symfony\Component\Messenger\Middleware\StackInterface;
@@ -24,22 +23,18 @@ readonly class AddStampForPropagationMiddleware implements MiddlewareInterface
 
     public function handle(Envelope $envelope, StackInterface $stack): Envelope
     {
-        if (null !== $envelope->last(AmqpStamp::class)) {
-            $this->onMessageSent($envelope);
+        $traceStamp = $envelope->last(TraceStamp::class);
+
+        if (null !== $traceStamp) {
+            return $stack->next()->handle($envelope, $stack);
+        }
+
+        $scope = Context::storage()->scope();
+
+        if (null !== $scope) {
+            $this->propagator->inject($envelope, new TraceStampPropagator($this->logger), Context::getCurrent());
         }
 
         return $stack->next()->handle($envelope, $stack);
-    }
-
-    private function onMessageSent(Envelope &$envelope): void
-    {
-        $scope = Context::storage()->scope();
-
-        if (null === $scope) {
-            $this->logger?->debug('No active scope');
-        }
-
-        $this->propagator->inject($envelope, new TraceStampPropagator(), Context::getCurrent());
-        $this->logger?->debug('Trace stamp added to envelope for propagation');
     }
 }
