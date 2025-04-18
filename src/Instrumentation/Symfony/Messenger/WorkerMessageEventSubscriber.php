@@ -21,7 +21,7 @@ use Symfony\Component\Messenger\Stamp\BusNameStamp;
  * Be aware if you start a span before this subscriber, it could leads to orphan span issue.
  * Be sure your span is properly ended.
  */
-class InstrumentationEventSubscriber implements EventSubscriberInterface
+class WorkerMessageEventSubscriber implements EventSubscriberInterface
 {
     private ?InstrumentationTypeEnum $instrumentationType = null;
 

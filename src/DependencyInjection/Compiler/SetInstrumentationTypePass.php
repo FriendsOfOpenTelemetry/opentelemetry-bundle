@@ -28,8 +28,8 @@ class SetInstrumentationTypePass implements CompilerPassInterface
         if ($container->hasParameter('open_telemetry.instrumentation.messenger.type')) {
             $messengerInstrumentationType = $container->getParameter('open_telemetry.instrumentation.messenger.type');
 
-            if ($container->hasDefinition('open_telemetry.instrumentation.messenger')) {
-                $container->getDefinition('open_telemetry.instrumentation.messenger')
+            if ($container->hasDefinition('open_telemetry.instrumentation.messenger.worker')) {
+                $container->getDefinition('open_telemetry.instrumentation.messenger.worker')
                     ->addMethodCall('setInstrumentationType', [$messengerInstrumentationType]);
             }
         }
