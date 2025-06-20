@@ -22,8 +22,7 @@ class DummyLoggerService
 
         $span = $this->tracer->spanBuilder('logWithSpan')
             ->setAttributes([
-                TraceAttributes::CODE_FUNCTION_NAME => 'logWithSpan',
-                TraceAttributes::CODE_NAMESPACE => self::class,
+                TraceAttributes::CODE_FUNCTION_NAME => self::class.'::infoWithSpan',
             ])
             ->setParent($parent)
             ->startSpan();

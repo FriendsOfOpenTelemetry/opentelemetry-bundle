@@ -194,8 +194,7 @@ class HttpKernelAttributeTracingTest extends WebTestCase
         self::assertSpanName($manualSpan, 'Manual');
         self::assertSpanStatus($manualSpan, StatusData::ok());
         self::assertSpanAttributes($manualSpan, [
-            'code.function.name' => 'manual',
-            'code.namespace' => 'App\Controller\Traceable\ClassTraceableController',
+            'code.function.name' => 'App\Controller\Traceable\ClassTraceableController::manual',
         ]);
         self::assertSpanEventsCount($manualSpan, 1);
         $manualSpanEvent = $manualSpan->getEvents()[0];
@@ -293,8 +292,7 @@ class HttpKernelAttributeTracingTest extends WebTestCase
         self::assertSpanName($manualSpan, 'Manual');
         self::assertSpanStatus($manualSpan, StatusData::ok());
         self::assertSpanAttributes($manualSpan, [
-            'code.function.name' => 'manual',
-            'code.namespace' => 'App\Controller\Traceable\ActionTraceableController',
+            'code.function.name' => 'App\Controller\Traceable\ActionTraceableController::manual',
         ]);
         self::assertSpanEventsCount($manualSpan, 1);
         $manualSpanEvent = $manualSpan->getEvents()[0];
@@ -341,8 +339,7 @@ class HttpKernelAttributeTracingTest extends WebTestCase
         self::assertSpanName($manualSpan, 'Manual');
         self::assertSpanStatus($manualSpan, StatusData::ok());
         self::assertSpanAttributes($manualSpan, [
-            'code.function.name' => 'manual',
-            'code.namespace' => 'App\Controller\Traceable\AutowireTracerController',
+            'code.function.name' => 'App\Controller\Traceable\AutowireTracerController::index',
         ]);
         self::assertSpanEventsCount($manualSpan, 1);
         $manualSpanEvent = $manualSpan->getEvents()[0];
@@ -387,8 +384,7 @@ class HttpKernelAttributeTracingTest extends WebTestCase
         self::assertSpanName($manualSpan, 'Manual');
         self::assertSpanStatus($manualSpan, StatusData::ok());
         self::assertSpanAttributes($manualSpan, [
-            'code.function.name' => 'manual',
-            'code.namespace' => 'App\Controller\Traceable\DualTracerController',
+            'code.function.name' => 'App\Controller\Traceable\DualTracerController::fallback',
         ]);
         self::assertSpanEventsCount($manualSpan, 1);
         $manualSpanEvent = $manualSpan->getEvents()[0];
@@ -414,8 +410,7 @@ class HttpKernelAttributeTracingTest extends WebTestCase
         self::assertSpanName($manualSpan, 'Manual');
         self::assertSpanStatus($manualSpan, StatusData::ok());
         self::assertSpanAttributes($manualSpan, [
-            'code.function.name' => 'manual',
-            'code.namespace' => 'App\Controller\Traceable\DualTracerController',
+            'code.function.name' => 'App\Controller\Traceable\DualTracerController::main',
         ]);
         self::assertSpanEventsCount($manualSpan, 1);
         $manualSpanEvent = $manualSpan->getEvents()[0];

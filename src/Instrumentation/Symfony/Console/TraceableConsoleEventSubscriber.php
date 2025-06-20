@@ -79,8 +79,7 @@ final class TraceableConsoleEventSubscriber implements EventSubscriberInterface,
         $spanBuilder = $tracer
             ->spanBuilder($name)
             ->setAttributes([
-                TraceAttributes::CODE_FUNCTION_NAME => 'execute',
-                TraceAttributes::CODE_NAMESPACE => $class,
+                TraceAttributes::CODE_FUNCTION_NAME => $class.'::execute',
             ]);
 
         $parent = Context::getCurrent();

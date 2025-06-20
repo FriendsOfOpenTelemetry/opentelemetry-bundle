@@ -22,8 +22,7 @@ class DualTracerController extends AbstractTraceableController
         $spanBuilder = $tracer
             ->spanBuilder('Manual')
             ->setAttributes([
-                TraceAttributes::CODE_FUNCTION_NAME => 'manual',
-                TraceAttributes::CODE_NAMESPACE => self::class,
+                TraceAttributes::CODE_FUNCTION_NAME => self::class.'::fallback',
             ]);
 
         $parent = Context::getCurrent();
@@ -49,8 +48,7 @@ class DualTracerController extends AbstractTraceableController
         $spanBuilder = $tracer
             ->spanBuilder('Manual')
             ->setAttributes([
-                TraceAttributes::CODE_FUNCTION_NAME => 'manual',
-                TraceAttributes::CODE_NAMESPACE => self::class,
+                TraceAttributes::CODE_FUNCTION_NAME => self::class.'::main',
             ]);
 
         $parent = Context::getCurrent();
