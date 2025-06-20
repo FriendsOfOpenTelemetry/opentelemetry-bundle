@@ -459,4 +459,35 @@ class HttpKernelAttributeTracingTest extends WebTestCase
 
         self::assertLogHasSpanContext($log, $mainSpan);
     }
+
+    public function testPhpConfig(): void
+    {
+        $client = static::createClient();
+        $client->request('GET', '/php-config');
+
+        static::assertResponseIsSuccessful();
+        static::assertSame('{"status":"ok"}', $client->getResponse()->getContent());
+
+        self::assertSpansCount(1);
+
+        $mainSpan = self::getSpans()[0];
+        self::assertSpanName($mainSpan, 'php-config');
+        self::assertSpanStatus($mainSpan, StatusData::ok());
+        self::assertSpanAttributes($mainSpan, [
+            'url.full' => 'http://localhost/php-config',
+            'http.request.method' => 'GET',
+            'url.path' => '/php-config',
+            'symfony.kernel.http.host' => 'localhost',
+            'url.scheme' => 'http',
+            'network.protocol.version' => '1.1',
+            'user_agent.original' => 'Symfony BrowserKit',
+            'network.peer.address' => '127.0.0.1',
+            'symfony.kernel.net.peer_ip' => '127.0.0.1',
+            'server.address' => 'localhost',
+            'server.port' => 80,
+            'http.route' => 'php-config',
+            'http.response.status_code' => Response::HTTP_OK,
+        ]);
+        self::assertSpanEventsCount($mainSpan, 0);
+    }
 }

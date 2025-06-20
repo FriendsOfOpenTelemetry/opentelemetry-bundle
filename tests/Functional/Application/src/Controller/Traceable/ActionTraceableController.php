@@ -120,4 +120,12 @@ class ActionTraceableController extends AbstractTraceableController
             'status' => 'ok',
         ]);
     }
+
+    #[Traceable]
+    public function phpConfig(): Response
+    {
+        return $this->json([
+            'status' => 'ok',
+        ]);
+    }
 }
