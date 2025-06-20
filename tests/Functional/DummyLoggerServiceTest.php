@@ -47,8 +47,7 @@ class DummyLoggerServiceTest extends KernelTestCase
         self::assertSpanName($span, 'logWithSpan');
         self::assertSpanStatus($span, StatusData::ok());
         self::assertSpanAttributes($span, [
-            'code.function.name' => 'logWithSpan',
-            'code.namespace' => 'App\Service\DummyLoggerService',
+            'code.function.name' => 'App\Service\DummyLoggerService::infoWithSpan',
         ]);
 
         self::assertSame($span->getSpanId(), $log->getSpanContext()->getSpanId());

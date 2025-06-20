@@ -92,8 +92,7 @@ class ActionTraceableController extends AbstractTraceableController
         $spanBuilder = $tracer
             ->spanBuilder('Manual')
             ->setAttributes([
-                TraceAttributes::CODE_FUNCTION_NAME => 'manual',
-                TraceAttributes::CODE_NAMESPACE => self::class,
+                TraceAttributes::CODE_FUNCTION_NAME => self::class.'::manual',
             ]);
 
         $parent = Context::getCurrent();

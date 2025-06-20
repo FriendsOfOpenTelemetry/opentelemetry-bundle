@@ -35,8 +35,7 @@ class ConsoleAttributeTracingTest extends KernelTestCase
         self::assertSpanName($mainSpan, 'traceable:traceable-command');
         self::assertSpanStatus($mainSpan, StatusData::ok());
         self::assertSpanAttributes($mainSpan, [
-            'code.function.name' => 'execute',
-            'code.namespace' => 'App\Command\Traceable\TraceableCommand',
+            'code.function.name' => 'App\Command\Traceable\TraceableCommand::execute',
             'symfony.console.exit_code' => 0,
         ]);
         self::assertSpanEventsCount($mainSpan, 0);
@@ -63,8 +62,7 @@ class ConsoleAttributeTracingTest extends KernelTestCase
         self::assertSpanName($mainSpan, 'traceable:traceable-command');
         self::assertSpanStatus($mainSpan, StatusData::error());
         self::assertSpanAttributes($mainSpan, [
-            'code.function.name' => 'execute',
-            'code.namespace' => 'App\Command\Traceable\TraceableCommand',
+            'code.function.name' => 'App\Command\Traceable\TraceableCommand::execute',
             'symfony.console.exit_code' => 1,
         ]);
         self::assertSpanEventsCount($mainSpan, 0);
@@ -96,8 +94,7 @@ class ConsoleAttributeTracingTest extends KernelTestCase
         self::assertSpanName($mainSpan, 'traceable:traceable-command');
         self::assertSpanStatus($mainSpan, StatusData::error());
         self::assertSpanAttributes($mainSpan, [
-            'code.function.name' => 'execute',
-            'code.namespace' => 'App\Command\Traceable\TraceableCommand',
+            'code.function.name' => 'App\Command\Traceable\TraceableCommand::execute',
             'symfony.console.exit_code' => 1,
         ]);
 
@@ -132,8 +129,7 @@ class ConsoleAttributeTracingTest extends KernelTestCase
         self::assertSpanName($mainSpan, 'traceable:fallback-command');
         self::assertSpanStatus($mainSpan, StatusData::ok());
         self::assertSpanAttributes($mainSpan, [
-            'code.function.name' => 'execute',
-            'code.namespace' => 'App\Command\Traceable\FallbackCommand',
+            'code.function.name' => 'App\Command\Traceable\FallbackCommand::execute',
             'symfony.console.exit_code' => 0,
         ]);
         self::assertSpanEventsCount($mainSpan, 0);
