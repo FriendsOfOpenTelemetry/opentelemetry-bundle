@@ -13,7 +13,7 @@ jobs:
         with:
           fetch-depth: 0
       - name: Install Nix
-        uses: DeterminateSystems/nix-installer-action@v17
+        uses: DeterminateSystems/nix-installer-action@v19
       - name: Setup Cachix
         uses: cachix/cachix-action@v16
         with:
