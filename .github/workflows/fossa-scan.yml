@@ -8,7 +8,7 @@ jobs:
     timeout-minutes: 20
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - name: Install Nix
         uses: DeterminateSystems/nix-installer-action@v19
       - name: Setup Cachix
