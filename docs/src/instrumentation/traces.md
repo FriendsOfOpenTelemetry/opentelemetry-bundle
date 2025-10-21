@@ -42,13 +42,14 @@ A DSN starts with a transport and an exporter separated by a `+` character. The 
 
 Here is table list of the available transport and exporter for traces:
 
-| Transport | Exporter  | Description                                                  | Example                                   | Default      |
-|-----------|-----------|--------------------------------------------------------------|-------------------------------------------|--------------|
-| http(s)   | otlp      | OpenTelemetry exporter using HTTP protocol (over TLS)        | http+otlp://localhost:4318/v1/traces      | N/A          |
-| grpc(s)   | otlp      | OpenTelemetry exporter using gRPC protocol (over TLS)        | grpc+otlp://localhost:4317                | N/A          |
-| http(s)   | zipkin    | Zipkin exporter using HTTP protocol (over TLS)               | http+zipkin://localhost:9411/api/v2/spans | N/A          |
-| empty     | in-memory | In-memory exporter for testing purpose                       | in-memory://default                       | N/A          |
-| stream    | console   | Console exporter for testing purpose using a stream resource | stream+console://default                  | php://stdout |
+| Transport | Exporter  | Description                                                                                                               | Example                                                                        | Default      |
+|-----------|-----------|---------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------|--------------|
+| http(s)   | otlp      | OpenTelemetry exporter using HTTP protocol (over TLS)                                                                     | http+otlp://localhost:4318/v1/traces                                           | N/A          |
+| grpc(s)   | otlp      | OpenTelemetry exporter using gRPC protocol (over TLS)                                                                     | grpc+otlp://localhost:4317                                                     | N/A          |
+| kafka     | otlp      | OpenTelemetry exporter using the Kafka message broker. Add query parameters for configuring the message broker.           | kafka+otlp://open_telemetry_local_alpha_traces?metadata.broker.list=kafka:9092 | N/A          |
+| http(s)   | zipkin    | Zipkin exporter using HTTP protocol (over TLS)                                                                            | http+zipkin://localhost:9411/api/v2/spans                                      | N/A          |
+| empty     | in-memory | In-memory exporter for testing purpose                                                                                    | in-memory://default                                                            | N/A          |
+| stream    | console   | Console exporter for testing purpose using a stream resource                                                              | stream+console://default                                                       | php://stdout |
 
 Note: The `stream+console` DSN is the only DSN than can refer to a stream resource using the `path` block. For example: `stream+console://default/file.log`.
 

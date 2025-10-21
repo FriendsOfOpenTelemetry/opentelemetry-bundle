@@ -375,9 +375,9 @@ final class TraceableHttpKernelEventSubscriber implements EventSubscriberInterfa
     /**
      * @param array<string> $headers
      *
-     * @return array<string, mixed>
+     * @return \Generator<string, array<int, string>>
      */
-    private function headerAttributes(HeaderBag $headerBag, array $headers): iterable
+    private function headerAttributes(HeaderBag $headerBag, array $headers): \Generator
     {
         foreach ($headers as $header => $attribute) {
             if ($headerBag->has($header)) {

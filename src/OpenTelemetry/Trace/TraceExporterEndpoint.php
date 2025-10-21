@@ -52,4 +52,9 @@ final class TraceExporterEndpoint implements ExporterEndpointInterface
     {
         return $this->transport?->value;
     }
+
+    public function getDsn(): ExporterDsn
+    {
+        return $this->dsn;
+    }
 }

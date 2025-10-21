@@ -2,6 +2,7 @@
 
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Transport\AbstractTransportFactory;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Transport\GrpcTransportFactory;
+use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Transport\KafkaTransportFactory;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Transport\OtlpHttpTransportFactory;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Transport\PsrHttpTransportFactory;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Transport\StreamTransportFactory;
@@ -38,6 +39,9 @@ return static function (ContainerConfigurator $container): void {
         ->set('open_telemetry.transport_factory.stream', StreamTransportFactory::class)
             ->parent('open_telemetry.transport_factory.abstract')
             ->tag('open_telemetry.transport_factory')
+
+        ->set('open_telemetry.transport_factory.kafka', KafkaTransportFactory::class)
+        ->tag('open_telemetry.transport_factory')
 
         ->set('open_telemetry.transport_factory', TransportFactory::class)
             ->args([

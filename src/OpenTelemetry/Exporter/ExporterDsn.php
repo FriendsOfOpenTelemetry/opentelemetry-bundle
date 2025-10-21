@@ -4,6 +4,7 @@ namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Exporter;
 
 use Zenstruck\Dsn;
 use Zenstruck\Uri;
+use Zenstruck\Uri\Part\Query;
 
 final class ExporterDsn
 {
@@ -58,6 +59,11 @@ final class ExporterDsn
     public function getPort(?int $default = null): ?int
     {
         return $this->uri->port() ?? $default;
+    }
+
+    public function getQuery(): Query
+    {
+        return $this->uri->query();
     }
 
     /**

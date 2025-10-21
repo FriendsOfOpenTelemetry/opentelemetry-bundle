@@ -50,4 +50,9 @@ final class LogExporterEndpoint implements ExporterEndpointInterface
     {
         return $this->exporter->value;
     }
+
+    public function getDsn(): ExporterDsn
+    {
+        return $this->dsn;
+    }
 }

@@ -43,6 +43,7 @@
         "ext-grpc": "*",
         "ext-mbstring": "*",
         "ext-opentelemetry": "*",
+        "ext-rdkafka": "*",
         "ext-pdo": "*",
         "ext-pdo_sqlite": "*",
         "ext-xdebug": "*",

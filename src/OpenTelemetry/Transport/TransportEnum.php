@@ -11,12 +11,14 @@ enum TransportEnum: string
     case Http = 'http';
     case Https = 'https';
     case Stream = 'stream';
+    case Kafka = 'kafka';
 
     public function getScheme(): ?string
     {
         return match ($this) {
             self::Http, self::Grpc => 'http',
             self::Https, self::Grpcs => 'https',
+            self::Kafka => 'kafka',
             default => null,
         };
     }

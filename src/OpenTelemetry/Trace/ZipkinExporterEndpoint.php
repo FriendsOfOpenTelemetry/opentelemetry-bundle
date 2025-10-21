@@ -53,4 +53,9 @@ final class ZipkinExporterEndpoint implements ExporterEndpointInterface
     {
         return 'zipkin';
     }
+
+    public function getDsn(): ExporterDsn
+    {
+        return $this->dsn;
+    }
 }

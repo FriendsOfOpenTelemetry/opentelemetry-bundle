@@ -42,6 +42,10 @@ final class OtlpExporterEndpoint implements ExporterEndpointInterface
 
     public function __toString()
     {
+        if (TransportEnum::Kafka === $this->transport) {
+            return \sprintf('kafka://%s?%s', $this->dsn->getHost(), $this->dsn->getQuery()->toString());
+        }
+
         $uri = $this->uriFactory->createUri();
         $uri = $uri
             ->withScheme($this->transport->getScheme())
@@ -77,5 +81,10 @@ final class OtlpExporterEndpoint implements ExporterEndpointInterface
     public function getExporter(): string
     {
         return 'otlp';
+    }
+
+    public function getDsn(): ExporterDsn
+    {
+        return $this->dsn;
     }
 }
