@@ -175,7 +175,7 @@ jobs:
           XDEBUG_MODE: coverage
       - name: Upload test artifacts
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: phpunit-logs-php${{ matrix.php }}-${{ matrix.dependencies }}
           path: build/logs/phpunit
