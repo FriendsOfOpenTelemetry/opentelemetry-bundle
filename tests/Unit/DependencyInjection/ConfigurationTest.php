@@ -149,7 +149,7 @@ final class ConfigurationTest extends TestCase
         self::assertSame(<<<YML
         open_telemetry:
 
-            # PSR-18 HTTP client service ID used for telemetry export transports. Defaults to the built-in Symfony Psr18Client.
+            # Service ID used for telemetry export transports. Must implement PSR-18 ClientInterface and PSR-17 RequestFactoryInterface, StreamFactoryInterface. Defaults to Symfony Psr18Client.
             transport_http_client: null
             service:
                 namespace:            ~ # Required, Example: MyOrganization
