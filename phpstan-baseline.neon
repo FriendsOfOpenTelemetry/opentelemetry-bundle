@@ -89,3 +89,9 @@ parameters:
 			identifier: method.resultUnused
 			count: 1
 			path: tests/Unit/OpenTelemetry/Trace/TracerProvider/NoopTracerProviderFactoryTest.php
+
+		-
+			message: '#^Call to an undefined static method ReflectionMethod\:\:createFromMethodName\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 1
+			path: src/Instrumentation/Symfony/Framework/Routing/TraceableRouteLoader.php
