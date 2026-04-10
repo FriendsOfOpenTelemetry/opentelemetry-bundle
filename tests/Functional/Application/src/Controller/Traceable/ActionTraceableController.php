@@ -8,7 +8,7 @@ use FriendsOfOpenTelemetry\OpenTelemetryBundle\Instrumentation\Attribute\Traceab
 use OpenTelemetry\API\Trace\StatusCode;
 use OpenTelemetry\API\Trace\TracerInterface;
 use OpenTelemetry\Context\Context;
-use OpenTelemetry\SemConv\TraceAttributes;
+use OpenTelemetry\SemConv\Attributes\CodeAttributes;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -67,7 +67,7 @@ class ActionTraceableController extends AbstractTraceableController
     #[Route('/dummy', methods: ['POST'])]
     public function createDummy(EntityManagerInterface $entityManager, Request $request): Response
     {
-        $name = $request->get('name');
+        $name = $request->request->get('name');
 
         $dummy = new Dummy(name: $name);
         $entityManager->persist($dummy);
@@ -92,7 +92,7 @@ class ActionTraceableController extends AbstractTraceableController
         $spanBuilder = $tracer
             ->spanBuilder('Manual')
             ->setAttributes([
-                TraceAttributes::CODE_FUNCTION_NAME => self::class.'::manual',
+                CodeAttributes::CODE_FUNCTION_NAME => self::class.'::manual',
             ]);
 
         $parent = Context::getCurrent();

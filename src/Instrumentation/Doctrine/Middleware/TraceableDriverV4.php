@@ -20,7 +20,7 @@ use OpenTelemetry\API\Trace\SpanKind;
 use OpenTelemetry\API\Trace\StatusCode;
 use OpenTelemetry\API\Trace\TracerInterface;
 use OpenTelemetry\Context\Context;
-use OpenTelemetry\SemConv\TraceAttributes;
+use OpenTelemetry\SemConv\Attributes\DbAttributes;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -57,7 +57,7 @@ final class TraceableDriverV4 extends AbstractDriverMiddleware
                 ->spanBuilder('doctrine.dbal.connection')
                 ->setSpanKind(SpanKind::KIND_CLIENT)
                 ->setParent($scope?->context())
-                ->setAttribute(TraceAttributes::DB_NAMESPACE, $params['dbname'] ?? 'default')
+                ->setAttribute(DbAttributes::DB_NAMESPACE, $params['dbname'] ?? 'default')
                 ->setAttribute(DoctrineTraceAttributeEnum::User->toString(), $params['user'])
             ;
 
@@ -67,7 +67,7 @@ final class TraceableDriverV4 extends AbstractDriverMiddleware
 
             $connection = parent::connect($params);
 
-            $span->setAttribute(TraceAttributes::DB_SYSTEM_NAME, $this->getSemanticDbSystem($connection->getServerVersion()));
+            $span->setAttribute(DbAttributes::DB_SYSTEM_NAME, $this->getSemanticDbSystem($connection->getServerVersion()));
             $span->setStatus(StatusCode::STATUS_OK);
 
             return new TraceableConnection($connection, new Tracer($this->tracer, $this->logger));
