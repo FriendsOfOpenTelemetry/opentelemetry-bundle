@@ -10,7 +10,7 @@ use OpenTelemetry\API\Trace\Span;
 use OpenTelemetry\API\Trace\StatusCode;
 use OpenTelemetry\API\Trace\TracerInterface;
 use OpenTelemetry\Context\Context;
-use OpenTelemetry\SemConv\TraceAttributes;
+use OpenTelemetry\SemConv\Attributes\CodeAttributes;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\ConsoleEvents;
@@ -79,8 +79,7 @@ final class TraceableConsoleEventSubscriber implements EventSubscriberInterface,
         $spanBuilder = $tracer
             ->spanBuilder($name)
             ->setAttributes([
-                TraceAttributes::CODE_FUNCTION_NAME => 'execute',
-                TraceAttributes::CODE_NAMESPACE => $class,
+                CodeAttributes::CODE_FUNCTION_NAME => $class.'::execute',
             ]);
 
         $parent = Context::getCurrent();

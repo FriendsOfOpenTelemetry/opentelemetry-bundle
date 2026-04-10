@@ -14,7 +14,13 @@ use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\Propagation\PropagationGetterInterface;
 use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
 use OpenTelemetry\Context\ScopeInterface;
-use OpenTelemetry\SemConv\TraceAttributes;
+use OpenTelemetry\SemConv\Attributes\ClientAttributes;
+use OpenTelemetry\SemConv\Attributes\HttpAttributes;
+use OpenTelemetry\SemConv\Attributes\NetworkAttributes;
+use OpenTelemetry\SemConv\Attributes\ServerAttributes;
+use OpenTelemetry\SemConv\Attributes\UrlAttributes;
+use OpenTelemetry\SemConv\Attributes\UserAgentAttributes;
+use OpenTelemetry\SemConv\Incubating\Attributes\HttpIncubatingAttributes;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -138,7 +144,7 @@ final class TraceableHttpKernelEventSubscriber implements EventSubscriberInterfa
         }
 
         $span->updateName($routeName);
-        $span->setAttribute(TraceAttributes::HTTP_ROUTE, $routeName);
+        $span->setAttribute(HttpAttributes::HTTP_ROUTE, $routeName);
     }
 
     private function startSpan(RequestEvent $event): SpanInterface
@@ -230,9 +236,9 @@ final class TraceableHttpKernelEventSubscriber implements EventSubscriberInterfa
         }
 
         $response = $event->getResponse();
-        $span->setAttribute(TraceAttributes::HTTP_RESPONSE_BODY_SIZE, $response->headers->get('Content-Length'));
-        $span->setAttribute(TraceAttributes::NETWORK_PROTOCOL_VERSION, $response->getProtocolVersion());
-        $span->setAttribute(TraceAttributes::HTTP_RESPONSE_STATUS_CODE, $response->getStatusCode());
+        $span->setAttribute(HttpIncubatingAttributes::HTTP_RESPONSE_BODY_SIZE, $response->headers->get('Content-Length'));
+        $span->setAttribute(NetworkAttributes::NETWORK_PROTOCOL_VERSION, $response->getProtocolVersion());
+        $span->setAttribute(HttpAttributes::HTTP_RESPONSE_STATUS_CODE, $response->getStatusCode());
         if ($response->getStatusCode() >= 500 && $response->getStatusCode() < 600) {
             $span->setStatus(StatusCode::STATUS_ERROR);
         } else {
@@ -346,38 +352,38 @@ final class TraceableHttpKernelEventSubscriber implements EventSubscriberInterfa
     }
 
     /**
-     * @return iterable<string, string>
+     * @return array<string, mixed>
      */
-    private function requestAttributes(Request $request): iterable
+    private function requestAttributes(Request $request): array
     {
         return [
-            TraceAttributes::URL_FULL => $request->getUri(),
-            TraceAttributes::HTTP_REQUEST_METHOD => $request->getMethod(),
-            TraceAttributes::URL_PATH => $request->getPathInfo(),
+            UrlAttributes::URL_FULL => $request->getUri(),
+            HttpAttributes::HTTP_REQUEST_METHOD => $request->getMethod(),
+            UrlAttributes::URL_PATH => $request->getPathInfo(),
             HttpKernelTraceAttributeEnum::HttpHost->toString() => $request->getHttpHost(),
-            TraceAttributes::URL_SCHEME => $request->getScheme(),
-            TraceAttributes::NETWORK_PROTOCOL_VERSION => ($protocolVersion = $request->getProtocolVersion()) !== null
+            UrlAttributes::URL_SCHEME => $request->getScheme(),
+            NetworkAttributes::NETWORK_PROTOCOL_VERSION => ($protocolVersion = $request->getProtocolVersion()) !== null
                 ? strtr($protocolVersion, ['HTTP/' => ''])
                 : null,
-            TraceAttributes::USER_AGENT_ORIGINAL => $request->headers->get('User-Agent'),
-            TraceAttributes::HTTP_REQUEST_BODY_SIZE => $request->headers->get('Content-Length'),
-            TraceAttributes::NETWORK_PEER_ADDRESS => $request->getClientIp(),
+            UserAgentAttributes::USER_AGENT_ORIGINAL => $request->headers->get('User-Agent'),
+            HttpIncubatingAttributes::HTTP_REQUEST_BODY_SIZE => $request->headers->get('Content-Length'),
+            NetworkAttributes::NETWORK_PEER_ADDRESS => $request->getClientIp(),
 
             HttpKernelTraceAttributeEnum::NetPeerIp->toString() => $request->server->get('REMOTE_ADDR'),
-            TraceAttributes::CLIENT_ADDRESS => $request->server->get('REMOTE_HOST'),
-            TraceAttributes::CLIENT_PORT => $request->server->get('REMOTE_PORT'),
+            ClientAttributes::CLIENT_ADDRESS => $request->server->get('REMOTE_HOST'),
+            ClientAttributes::CLIENT_PORT => $request->server->get('REMOTE_PORT'),
             HttpKernelTraceAttributeEnum::NetHostIp->toString() => $request->server->get('SERVER_ADDR'),
-            TraceAttributes::SERVER_ADDRESS => $request->server->get('SERVER_NAME'),
-            TraceAttributes::SERVER_PORT => $request->server->get('SERVER_PORT'),
+            ServerAttributes::SERVER_ADDRESS => $request->server->get('SERVER_NAME'),
+            ServerAttributes::SERVER_PORT => $request->server->get('SERVER_PORT'),
         ];
     }
 
     /**
      * @param array<string> $headers
      *
-     * @return array<string, mixed>
+     * @return \Generator<string, mixed>
      */
-    private function headerAttributes(HeaderBag $headerBag, array $headers): iterable
+    private function headerAttributes(HeaderBag $headerBag, array $headers): \Generator
     {
         foreach ($headers as $header => $attribute) {
             if ($headerBag->has($header)) {

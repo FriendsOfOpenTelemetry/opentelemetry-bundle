@@ -4,7 +4,10 @@ namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Resource;
 
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
-use OpenTelemetry\SemConv\ResourceAttributes;
+use OpenTelemetry\SemConv\Attributes\ServiceAttributes;
+use OpenTelemetry\SemConv\Incubating\Attributes\DeploymentIncubatingAttributes;
+use OpenTelemetry\SemConv\Incubating\Attributes\ServiceIncubatingAttributes;
+use OpenTelemetry\SemConv\Version;
 
 final class ResourceInfoFactory
 {
@@ -13,10 +16,10 @@ final class ResourceInfoFactory
         $resourceInfo = \OpenTelemetry\SDK\Resource\ResourceInfoFactory::defaultResource();
 
         return $resourceInfo->merge(ResourceInfo::create(Attributes::create([
-            ResourceAttributes::SERVICE_NAMESPACE => $namespace,
-            ResourceAttributes::SERVICE_NAME => $name,
-            ResourceAttributes::SERVICE_VERSION => $version,
-            ResourceAttributes::DEPLOYMENT_ENVIRONMENT_NAME => $environment,
-        ]), ResourceAttributes::SCHEMA_URL));
+            ServiceIncubatingAttributes::SERVICE_NAMESPACE => $namespace,
+            ServiceAttributes::SERVICE_NAME => $name,
+            ServiceAttributes::SERVICE_VERSION => $version,
+            DeploymentIncubatingAttributes::DEPLOYMENT_ENVIRONMENT_NAME => $environment,
+        ]), Version::VERSION_1_38_0->url()));
     }
 }

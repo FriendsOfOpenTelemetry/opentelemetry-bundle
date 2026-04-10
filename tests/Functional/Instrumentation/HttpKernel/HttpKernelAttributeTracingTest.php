@@ -194,8 +194,7 @@ class HttpKernelAttributeTracingTest extends WebTestCase
         self::assertSpanName($manualSpan, 'Manual');
         self::assertSpanStatus($manualSpan, StatusData::ok());
         self::assertSpanAttributes($manualSpan, [
-            'code.function.name' => 'manual',
-            'code.namespace' => 'App\Controller\Traceable\ClassTraceableController',
+            'code.function.name' => 'App\Controller\Traceable\ClassTraceableController::manual',
         ]);
         self::assertSpanEventsCount($manualSpan, 1);
         $manualSpanEvent = $manualSpan->getEvents()[0];
@@ -293,8 +292,7 @@ class HttpKernelAttributeTracingTest extends WebTestCase
         self::assertSpanName($manualSpan, 'Manual');
         self::assertSpanStatus($manualSpan, StatusData::ok());
         self::assertSpanAttributes($manualSpan, [
-            'code.function.name' => 'manual',
-            'code.namespace' => 'App\Controller\Traceable\ActionTraceableController',
+            'code.function.name' => 'App\Controller\Traceable\ActionTraceableController::manual',
         ]);
         self::assertSpanEventsCount($manualSpan, 1);
         $manualSpanEvent = $manualSpan->getEvents()[0];
@@ -341,8 +339,7 @@ class HttpKernelAttributeTracingTest extends WebTestCase
         self::assertSpanName($manualSpan, 'Manual');
         self::assertSpanStatus($manualSpan, StatusData::ok());
         self::assertSpanAttributes($manualSpan, [
-            'code.function.name' => 'manual',
-            'code.namespace' => 'App\Controller\Traceable\AutowireTracerController',
+            'code.function.name' => 'App\Controller\Traceable\AutowireTracerController::index',
         ]);
         self::assertSpanEventsCount($manualSpan, 1);
         $manualSpanEvent = $manualSpan->getEvents()[0];
@@ -387,8 +384,7 @@ class HttpKernelAttributeTracingTest extends WebTestCase
         self::assertSpanName($manualSpan, 'Manual');
         self::assertSpanStatus($manualSpan, StatusData::ok());
         self::assertSpanAttributes($manualSpan, [
-            'code.function.name' => 'manual',
-            'code.namespace' => 'App\Controller\Traceable\DualTracerController',
+            'code.function.name' => 'App\Controller\Traceable\DualTracerController::fallback',
         ]);
         self::assertSpanEventsCount($manualSpan, 1);
         $manualSpanEvent = $manualSpan->getEvents()[0];
@@ -414,8 +410,7 @@ class HttpKernelAttributeTracingTest extends WebTestCase
         self::assertSpanName($manualSpan, 'Manual');
         self::assertSpanStatus($manualSpan, StatusData::ok());
         self::assertSpanAttributes($manualSpan, [
-            'code.function.name' => 'manual',
-            'code.namespace' => 'App\Controller\Traceable\DualTracerController',
+            'code.function.name' => 'App\Controller\Traceable\DualTracerController::main',
         ]);
         self::assertSpanEventsCount($manualSpan, 1);
         $manualSpanEvent = $manualSpan->getEvents()[0];
@@ -463,5 +458,36 @@ class HttpKernelAttributeTracingTest extends WebTestCase
         self::assertNotNull($log);
 
         self::assertLogHasSpanContext($log, $mainSpan);
+    }
+
+    public function testPhpConfig(): void
+    {
+        $client = static::createClient();
+        $client->request('GET', '/php-config');
+
+        static::assertResponseIsSuccessful();
+        static::assertSame('{"status":"ok"}', $client->getResponse()->getContent());
+
+        self::assertSpansCount(1);
+
+        $mainSpan = self::getSpans()[0];
+        self::assertSpanName($mainSpan, 'php-config');
+        self::assertSpanStatus($mainSpan, StatusData::ok());
+        self::assertSpanAttributes($mainSpan, [
+            'url.full' => 'http://localhost/php-config',
+            'http.request.method' => 'GET',
+            'url.path' => '/php-config',
+            'symfony.kernel.http.host' => 'localhost',
+            'url.scheme' => 'http',
+            'network.protocol.version' => '1.1',
+            'user_agent.original' => 'Symfony BrowserKit',
+            'network.peer.address' => '127.0.0.1',
+            'symfony.kernel.net.peer_ip' => '127.0.0.1',
+            'server.address' => 'localhost',
+            'server.port' => 80,
+            'http.route' => 'php-config',
+            'http.response.status_code' => Response::HTTP_OK,
+        ]);
+        self::assertSpanEventsCount($mainSpan, 0);
     }
 }

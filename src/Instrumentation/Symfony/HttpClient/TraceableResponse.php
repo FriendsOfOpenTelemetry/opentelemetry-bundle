@@ -4,7 +4,8 @@ namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\Instrumentation\Symfony\Htt
 
 use OpenTelemetry\API\Trace\SpanInterface;
 use OpenTelemetry\API\Trace\StatusCode;
-use OpenTelemetry\SemConv\TraceAttributes;
+use OpenTelemetry\SemConv\Attributes\HttpAttributes;
+use OpenTelemetry\SemConv\Incubating\Attributes\HttpIncubatingAttributes;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpClient\Response\StreamableInterface;
 use Symfony\Component\HttpClient\Response\StreamWrapper;
@@ -138,13 +139,13 @@ final class TraceableResponse implements ResponseInterface, StreamableInterface
         if (0 !== $statusCode && $this->span->isRecording()) {
             $headers = $this->response->getHeaders(false);
             if (isset($headers['Content-Length'])) {
-                $this->span->setAttribute(TraceAttributes::HTTP_RESPONSE_BODY_SIZE, $headers['Content-Length']);
+                $this->span->setAttribute(HttpIncubatingAttributes::HTTP_RESPONSE_BODY_SIZE, $headers['Content-Length']);
             }
 
-            $this->span->setAttribute(TraceAttributes::HTTP_RESPONSE_STATUS_CODE, $statusCode);
+            $this->span->setAttribute(HttpAttributes::HTTP_RESPONSE_STATUS_CODE, $statusCode);
 
             if ($statusCode >= 400 && $statusCode < 600) {
-                $this->span->setAttribute(TraceAttributes::HTTP_RESPONSE_STATUS_CODE, $statusCode);
+                $this->span->setAttribute(HttpAttributes::HTTP_RESPONSE_STATUS_CODE, $statusCode);
                 $this->span->setStatus(StatusCode::STATUS_ERROR);
             }
         }

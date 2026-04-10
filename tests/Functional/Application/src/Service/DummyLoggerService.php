@@ -5,7 +5,7 @@ namespace App\Service;
 use OpenTelemetry\API\Trace\StatusCode;
 use OpenTelemetry\API\Trace\TracerInterface;
 use OpenTelemetry\Context\Context;
-use OpenTelemetry\SemConv\TraceAttributes;
+use OpenTelemetry\SemConv\Attributes\CodeAttributes;
 use Psr\Log\LoggerInterface;
 
 class DummyLoggerService
@@ -22,8 +22,7 @@ class DummyLoggerService
 
         $span = $this->tracer->spanBuilder('logWithSpan')
             ->setAttributes([
-                TraceAttributes::CODE_FUNCTION_NAME => 'logWithSpan',
-                TraceAttributes::CODE_NAMESPACE => self::class,
+                CodeAttributes::CODE_FUNCTION_NAME => self::class.'::infoWithSpan',
             ])
             ->setParent($parent)
             ->startSpan();

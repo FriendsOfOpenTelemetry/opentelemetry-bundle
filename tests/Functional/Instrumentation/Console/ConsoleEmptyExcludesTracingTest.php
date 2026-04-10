@@ -34,8 +34,7 @@ class ConsoleEmptyExcludesTracingTest extends KernelTestCase
         self::assertSpanName($mainSpan, 'traceable:auto-command');
         self::assertSpanStatus($mainSpan, StatusData::ok());
         self::assertSpanAttributes($mainSpan, [
-            'code.function.name' => 'execute',
-            'code.namespace' => 'App\Command\Traceable\AutoCommand',
+            'code.function.name' => 'App\Command\Traceable\AutoCommand::execute',
             'symfony.console.exit_code' => 0,
         ]);
         self::assertSpanEventsCount($mainSpan, 0);

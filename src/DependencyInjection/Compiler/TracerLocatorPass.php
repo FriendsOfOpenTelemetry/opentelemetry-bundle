@@ -31,9 +31,14 @@ class TracerLocatorPass implements CompilerPassInterface
      */
     private function setTracerLocatorArgument(ContainerBuilder $container, Definition $service, array $tracers): void
     {
+        $refs = [];
+        foreach ($tracers as $id => $_) {
+            $refs[$id] = new Reference($id);
+        }
+
         $service->setArgument(
             '$tracerLocator',
-            ServiceLocatorTagPass::register($container, array_map(fn (string $id) => new Reference($id), array_keys($tracers))),
+            ServiceLocatorTagPass::register($container, $refs),
         );
     }
 }
