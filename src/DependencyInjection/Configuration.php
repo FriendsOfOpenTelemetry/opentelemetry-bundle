@@ -29,6 +29,15 @@ final class Configuration implements ConfigurationInterface
 
         $rootNode = $treeBuilder->getRootNode();
 
+        $rootNode
+            ->children()
+                ->scalarNode('http_client')
+                    ->info('PSR-18 HTTP client service ID. Defaults to the built-in Symfony Psr18Client.')
+                    ->defaultNull()
+                ->end()
+            ->end()
+        ;
+
         $this->addServiceSection($rootNode);
         $this->addInstrumentationSection($rootNode);
         $this->addTracesSection($rootNode);

@@ -35,6 +35,13 @@ You may also be prompted to enable the `php-http/discovery` Composer plugin. Thi
 
 - Recommendation: Enable the plugin if your application requires it, but this is optional.
 
+If you want to use a custom PSR-18 HTTP client instead of the built-in Symfony `Psr18Client`, you can configure it via the `http_client` option:
+
+```yaml
+open_telemetry:
+  http_client: app.my_custom_psr18_client
+```
+
 ### Supported Versions
 
 There is no stable version yet, so you can use the `dev` version to install the bundle.

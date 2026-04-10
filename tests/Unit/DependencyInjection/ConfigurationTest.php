@@ -43,6 +43,7 @@ final class ConfigurationTest extends TestCase
         $configuration = $this->process([]);
 
         self::assertSame([
+            'http_client' => null,
             'service' => [],
             'instrumentation' => [
                 'cache' => [
@@ -147,6 +148,9 @@ final class ConfigurationTest extends TestCase
 
         self::assertSame(<<<YML
         open_telemetry:
+
+            # PSR-18 HTTP client service ID. Defaults to the built-in Symfony Psr18Client.
+            http_client:          null
             service:
                 namespace:            ~ # Required, Example: MyOrganization
                 name:                 ~ # Required, Example: MyApp

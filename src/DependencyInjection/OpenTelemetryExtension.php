@@ -45,6 +45,7 @@ final class OpenTelemetryExtension extends ConfigurableExtension
         $loader->load('services_tracing_instrumentation.php');
         $loader->load('services_metering_instrumentation.php');
 
+        $this->registerHttpClient($mergedConfig['http_client'], $container);
         $this->registerService($mergedConfig['service'], $container);
         $this->registerInstrumentation($mergedConfig['instrumentation'], $container);
 
@@ -75,6 +76,14 @@ final class OpenTelemetryExtension extends ConfigurableExtension
                 $config['version'],
                 $config['environment'],
             ]);
+    }
+
+    private function registerHttpClient(?string $httpClientServiceId, ContainerBuilder $container): void
+    {
+        $container->setAlias(
+            'open_telemetry.http_client',
+            $httpClientServiceId ?? 'open_telemetry.http_client.psr18',
+        );
     }
 
     /**
