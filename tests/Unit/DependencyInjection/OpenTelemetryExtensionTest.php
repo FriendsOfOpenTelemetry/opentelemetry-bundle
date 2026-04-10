@@ -95,14 +95,32 @@ class OpenTelemetryExtensionTest extends AbstractExtensionTestCase
     {
         $this->load();
 
+        self::assertContainerBuilderHasService('open_telemetry.transport_http_client.psr18');
         self::assertContainerBuilderHasAlias('open_telemetry.transport_http_client', 'open_telemetry.transport_http_client.psr18');
+
+        $transportHttpClientRef = new Reference('open_telemetry.transport_http_client');
+        self::assertContainerBuilderHasServiceDefinitionWithArgument('open_telemetry.transport_factory.otlp_http', 0, $transportHttpClientRef);
+        self::assertContainerBuilderHasServiceDefinitionWithArgument('open_telemetry.transport_factory.otlp_http', 1, $transportHttpClientRef);
+        self::assertContainerBuilderHasServiceDefinitionWithArgument('open_telemetry.transport_factory.otlp_http', 2, $transportHttpClientRef);
+        self::assertContainerBuilderHasServiceDefinitionWithArgument('open_telemetry.transport_factory.psr_http', 0, $transportHttpClientRef);
+        self::assertContainerBuilderHasServiceDefinitionWithArgument('open_telemetry.transport_factory.psr_http', 1, $transportHttpClientRef);
+        self::assertContainerBuilderHasServiceDefinitionWithArgument('open_telemetry.transport_factory.psr_http', 2, $transportHttpClientRef);
     }
 
     public function testCustomTransportHttpClient(): void
     {
         $this->load(['transport_http_client' => 'app.my_custom_psr18_client']);
 
+        self::assertFalse($this->container->has('open_telemetry.transport_http_client.psr18'));
         self::assertContainerBuilderHasAlias('open_telemetry.transport_http_client', 'app.my_custom_psr18_client');
+
+        $transportHttpClientRef = new Reference('open_telemetry.transport_http_client');
+        self::assertContainerBuilderHasServiceDefinitionWithArgument('open_telemetry.transport_factory.otlp_http', 0, $transportHttpClientRef);
+        self::assertContainerBuilderHasServiceDefinitionWithArgument('open_telemetry.transport_factory.otlp_http', 1, $transportHttpClientRef);
+        self::assertContainerBuilderHasServiceDefinitionWithArgument('open_telemetry.transport_factory.otlp_http', 2, $transportHttpClientRef);
+        self::assertContainerBuilderHasServiceDefinitionWithArgument('open_telemetry.transport_factory.psr_http', 0, $transportHttpClientRef);
+        self::assertContainerBuilderHasServiceDefinitionWithArgument('open_telemetry.transport_factory.psr_http', 1, $transportHttpClientRef);
+        self::assertContainerBuilderHasServiceDefinitionWithArgument('open_telemetry.transport_factory.psr_http', 2, $transportHttpClientRef);
     }
 
     public function testTransports(): void

@@ -7,7 +7,6 @@ use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Transport\PsrHttpTr
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Transport\StreamTransportFactory;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Transport\TransportFactory;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
-use Symfony\Component\HttpClient\Psr18Client;
 
 use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
 use function Symfony\Component\DependencyInjection\Loader\Configurator\tagged_iterator;
@@ -16,8 +15,6 @@ return static function (ContainerConfigurator $container): void {
     $container->services()
         ->defaults()
         ->private()
-
-        ->set('open_telemetry.transport_http_client.psr18', Psr18Client::class)
 
         ->set('open_telemetry.transport_factory.abstract', AbstractTransportFactory::class)
             ->abstract()

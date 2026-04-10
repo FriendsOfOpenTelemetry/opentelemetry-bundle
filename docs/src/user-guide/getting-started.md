@@ -31,11 +31,19 @@ To ensure a clean and optimal setup:
 
 #### HTTP PSR Discovery and `php-http/discovery`
 
-You may also be prompted to enable the `php-http/discovery` Composer plugin. This plugin allows libraries to discover HTTP PSR implementations dynamically. While this is required by many OpenTelemetry dependencies, our bundle relies on Symfony HTTP Client with `nyholm/psr7` as PSR-7/17 implementation.
+You may also be prompted to enable the `php-http/discovery` Composer plugin. This plugin allows libraries to discover HTTP PSR implementations dynamically.
 
 - Recommendation: Enable the plugin if your application requires it, but this is optional.
 
-If you want to use a custom PSR-18 HTTP client for telemetry export transports instead of the built-in Symfony `Psr18Client`, you can configure it via the `transport_http_client` option:
+#### HTTP client for telemetry export transports
+
+The bundle needs a PSR-18 HTTP client to export telemetry data over HTTP (OTLP, Zipkin). By default, it uses Symfony's `Psr18Client` if `symfony/http-client` is installed:
+
+```bash
+composer require symfony/http-client
+```
+
+You can use any PSR-18 compatible client by configuring the `transport_http_client` option:
 
 ```yaml
 open_telemetry:
