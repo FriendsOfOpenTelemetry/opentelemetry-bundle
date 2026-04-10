@@ -9,13 +9,11 @@ use FriendsOfOpenTelemetry\OpenTelemetryBundle\Instrumentation\Symfony\HttpClien
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\Instrumentation\Symfony\HttpKernel\TraceableHttpKernelEventSubscriber;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\Instrumentation\Symfony\Mailer\TraceableMailer;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\Instrumentation\Symfony\Mailer\TraceableMailerTransport;
-use FriendsOfOpenTelemetry\OpenTelemetryBundle\Instrumentation\Symfony\Messenger\EventSubscriber\EndSpanEventSubscriber;
-use FriendsOfOpenTelemetry\OpenTelemetryBundle\Instrumentation\Symfony\Messenger\EventSubscriber\StartSpanEventSubscriber;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\Instrumentation\Symfony\Messenger\AddStampForPropagationMiddleware;
-use FriendsOfOpenTelemetry\OpenTelemetryBundle\Instrumentation\Symfony\Messenger\WorkerMessageEventSubscriber;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\Instrumentation\Symfony\Messenger\TraceableMessengerMiddleware;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\Instrumentation\Symfony\Messenger\TraceableMessengerTransport;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\Instrumentation\Symfony\Messenger\TraceableMessengerTransportFactory;
+use FriendsOfOpenTelemetry\OpenTelemetryBundle\Instrumentation\Symfony\Messenger\WorkerMessageEventSubscriber;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\Instrumentation\Twig\TraceableTwigExtension;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 
@@ -118,11 +116,6 @@ return static function (ContainerConfigurator $container): void {
             ->arg('$tracer', service('open_telemetry.traces.default_tracer'))
             ->tag('monolog.logger', ['channel' => 'open_telemetry'])
             ->tag('kernel.event_subscriber')
-
-        ->set('open_telemetry.instrumentation.messenger.propagation.amqp.middleware', AddStampForPropagationMiddleware::class)
-            ->arg('$propagator', service('open_telemetry.propagator_text_map.multi'))
-            ->tag('messenger.middleware')
-            ->tag('monolog.logger', ['channel' => 'open_telemetry'])
 
         // Twig
         ->set('open_telemetry.instrumentation.twig.trace.extension', TraceableTwigExtension::class)

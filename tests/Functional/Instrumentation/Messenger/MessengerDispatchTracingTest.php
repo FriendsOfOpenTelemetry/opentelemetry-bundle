@@ -1,6 +1,6 @@
 <?php
 
-namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\Tests\Functional\Instrumentation;
+namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\Tests\Functional\Instrumentation\Messenger;
 
 use App\Kernel;
 use App\Message\DummyMessage;
@@ -12,7 +12,7 @@ use Symfony\Component\Messenger\MessageBusInterface;
 use Zalas\PHPUnit\Globals\Attribute\Env;
 
 #[Env('KERNEL_CLASS', Kernel::class)]
-class MessengerTracingTest extends KernelTestCase
+class MessengerDispatchTracingTest extends KernelTestCase
 {
     use TracingTestCaseTrait;
 

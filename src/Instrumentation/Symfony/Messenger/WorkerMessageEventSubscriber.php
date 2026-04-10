@@ -3,13 +3,14 @@
 namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\Instrumentation\Symfony\Messenger;
 
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\Instrumentation\InstrumentationTypeEnum;
+use FriendsOfOpenTelemetry\OpenTelemetryBundle\Instrumentation\InstrumentationTypeInterface;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Context\Propagator\TraceStampPropagator;
+use OpenTelemetry\API\Trace\Span;
 use OpenTelemetry\API\Trace\SpanKind;
 use OpenTelemetry\API\Trace\StatusCode;
 use OpenTelemetry\API\Trace\TracerInterface;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\Propagation\MultiTextMapPropagator;
-use OpenTelemetry\SDK\Trace\Span;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Messenger\Event\WorkerMessageFailedEvent;
@@ -17,11 +18,7 @@ use Symfony\Component\Messenger\Event\WorkerMessageHandledEvent;
 use Symfony\Component\Messenger\Event\WorkerMessageReceivedEvent;
 use Symfony\Component\Messenger\Stamp\BusNameStamp;
 
-/**
- * Be aware if you start a span before this subscriber, it could leads to orphan span issue.
- * Be sure your span is properly ended.
- */
-class WorkerMessageEventSubscriber implements EventSubscriberInterface
+class WorkerMessageEventSubscriber implements EventSubscriberInterface, InstrumentationTypeInterface
 {
     private ?InstrumentationTypeEnum $instrumentationType = null;
 
@@ -32,17 +29,23 @@ class WorkerMessageEventSubscriber implements EventSubscriberInterface
     ) {
     }
 
-    public function setInstrumentationType(InstrumentationTypeEnum $instrumentationType): void
+    public function setInstrumentationType(InstrumentationTypeEnum $type): void
     {
-        $this->instrumentationType = $instrumentationType;
+        $this->instrumentationType = $type;
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
-            WorkerMessageReceivedEvent::class => ['startSpan'],
-            WorkerMessageFailedEvent::class => ['endSpanOnError'],
-            WorkerMessageHandledEvent::class => ['endSpanWithSuccess'],
+            WorkerMessageReceivedEvent::class => [
+                ['startSpan', 10000],
+            ],
+            WorkerMessageFailedEvent::class => [
+                ['endSpanOnError', -10000],
+            ],
+            WorkerMessageHandledEvent::class => [
+                ['endSpanWithSuccess', -10000],
+            ],
         ];
     }
 
@@ -52,21 +55,16 @@ class WorkerMessageEventSubscriber implements EventSubscriberInterface
             return;
         }
 
-        // ensure propagation from incoming trace
         $context = $this->propagator->extract($event->getEnvelope(), new TraceStampPropagator($this->logger));
 
-        $scope = Context::storage()->scope();
-
-        if (null !== $scope) {
-            $this->logger->debug(sprintf('Using scope "%s"', spl_object_id($scope)));
-        } else {
-            $this->logger->debug('No active scope');
-        }
+        $messageClass = get_class($event->getEnvelope()->getMessage());
 
         $span = $this->tracer
-            ->spanBuilder($event->getReceiverName())
+            ->spanBuilder(sprintf('%s %s', $event->getReceiverName(), $messageClass))
             ->setParent($context)
             ->setSpanKind(SpanKind::KIND_CONSUMER)
+            ->setAttribute('messaging.operation.type', 'process')
+            ->setAttribute('messaging.destination.name', $event->getReceiverName())
             ->startSpan();
 
         $busNameStamp = $event->getEnvelope()->last(BusNameStamp::class);
