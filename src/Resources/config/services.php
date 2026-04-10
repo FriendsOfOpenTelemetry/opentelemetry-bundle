@@ -18,7 +18,6 @@ return static function (ContainerConfigurator $container): void {
     $container->parameters()
         ->set('open_telemetry.bundle.name', OpenTelemetryBundle::name())
         ->set('open_telemetry.bundle.version', OpenTelemetryBundle::version())
-        ->set('monolog.additional_channels', ['open_telemetry'])
     ;
 
     $container->services()
