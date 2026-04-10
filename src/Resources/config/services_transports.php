@@ -7,6 +7,7 @@ use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Transport\PsrHttpTr
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Transport\StreamTransportFactory;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Transport\TransportFactory;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
+use Symfony\Component\HttpClient\Psr18Client;
 
 use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
 use function Symfony\Component\DependencyInjection\Loader\Configurator\tagged_iterator;
@@ -15,6 +16,8 @@ return static function (ContainerConfigurator $container): void {
     $container->services()
         ->defaults()
         ->private()
+
+        ->set('open_telemetry.http_client.psr18', Psr18Client::class)
 
         ->set('open_telemetry.transport_factory.abstract', AbstractTransportFactory::class)
             ->abstract()
@@ -28,11 +31,19 @@ return static function (ContainerConfigurator $container): void {
             ->tag('open_telemetry.transport_factory')
 
         ->set('open_telemetry.transport_factory.otlp_http', OtlpHttpTransportFactory::class)
-            ->parent('open_telemetry.transport_factory.abstract')
+            ->args([
+                service('open_telemetry.http_client.psr18'),
+                service('open_telemetry.http_client.psr18'),
+                service('open_telemetry.http_client.psr18'),
+            ])
             ->tag('open_telemetry.transport_factory')
 
         ->set('open_telemetry.transport_factory.psr_http', PsrHttpTransportFactory::class)
-            ->parent('open_telemetry.transport_factory.abstract')
+            ->args([
+                service('open_telemetry.http_client.psr18'),
+                service('open_telemetry.http_client.psr18'),
+                service('open_telemetry.http_client.psr18'),
+            ])
             ->tag('open_telemetry.transport_factory')
 
         ->set('open_telemetry.transport_factory.stream', StreamTransportFactory::class)

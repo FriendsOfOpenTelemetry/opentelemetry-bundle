@@ -49,6 +49,7 @@ return static function (ContainerConfigurator $container): void {
         // HTTP Client
         ->set('open_telemetry.instrumentation.http_client.trace.client', TraceableHttpClient::class)
             ->arg('$tracer', service('open_telemetry.traces.default_tracer'))
+            ->arg('$uriFactory', service('open_telemetry.http_client.psr18'))
             ->tag('monolog.logger', ['channel' => 'open_telemetry'])
 
         // HTTP Kernel

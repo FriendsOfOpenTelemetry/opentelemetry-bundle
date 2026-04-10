@@ -22,9 +22,8 @@
     ],
     "require": {
         "php": ">=8.2",
-        "guzzlehttp/guzzle": "^7.10",
-        "guzzlehttp/psr7": "^2.9",
         "monolog/monolog": "^3.10",
+        "nyholm/psr7": "^1.8",
         "open-telemetry/api": "^1",
         "open-telemetry/context": "^1",
         "open-telemetry/opentelemetry-logger-monolog": "^1",
@@ -36,6 +35,7 @@
         "symfony/config": "^7.4",
         "symfony/dependency-injection": "^7.4",
         "symfony/event-dispatcher": "^7.4",
+        "symfony/http-client": "^7.4",
         "zenstruck/dsn": "^0.2",
         "zenstruck/uri": "^2.4"
     },
@@ -64,7 +64,6 @@
         "symfony/browser-kit": "^7.4",
         "symfony/cache": "^7.4",
         "symfony/framework-bundle": "^7.4",
-        "symfony/http-client": "^7.4",
         "symfony/http-kernel": "^7.4",
         "symfony/mailer": "^7.4",
         "symfony/messenger": "^7.4",

@@ -6,7 +6,7 @@ use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Exporter\ExporterDs
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Exporter\ExporterEndpointInterface;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Trace\SpanExporter\TraceExporterEnum;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Transport\TransportEnum;
-use GuzzleHttp\Psr7\HttpFactory;
+use Nyholm\Psr7\Factory\Psr17Factory;
 use Psr\Http\Message\UriFactoryInterface;
 
 final class ZipkinExporterEndpoint implements ExporterEndpointInterface
@@ -25,7 +25,7 @@ final class ZipkinExporterEndpoint implements ExporterEndpointInterface
 
     public static function fromDsn(ExporterDsn $dsn): self
     {
-        return new self($dsn, new HttpFactory());
+        return new self($dsn, new Psr17Factory());
     }
 
     public function __toString()

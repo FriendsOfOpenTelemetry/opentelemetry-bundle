@@ -2,12 +2,12 @@
 
 namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\Instrumentation\Symfony\HttpClient;
 
-use GuzzleHttp\Psr7\Uri;
 use OpenTelemetry\API\Trace\SpanKind;
 use OpenTelemetry\API\Trace\TracerInterface;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\SemConv\Attributes\HttpAttributes;
 use OpenTelemetry\SemConv\Attributes\UrlAttributes;
+use Psr\Http\Message\UriFactoryInterface;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpClient\Response\ResponseStream;
@@ -21,6 +21,7 @@ final class TraceableHttpClient implements HttpClientInterface, LoggerAwareInter
     public function __construct(
         private HttpClientInterface $client,
         private readonly TracerInterface $tracer,
+        private readonly UriFactoryInterface $uriFactory,
         private ?LoggerInterface $logger = null,
     ) {
     }
@@ -37,7 +38,7 @@ final class TraceableHttpClient implements HttpClientInterface, LoggerAwareInter
             $this->logger?->debug('No active scope');
         }
 
-        $uri = new Uri($url);
+        $uri = $this->uriFactory->createUri($url);
 
         $spanBuilder = $this->tracer
             ->spanBuilder('http.client')

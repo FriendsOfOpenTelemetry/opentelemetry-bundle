@@ -5,6 +5,7 @@ namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\Tests\Functional\Instrument
 use App\Kernel;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\Instrumentation\Symfony\HttpClient\TraceableHttpClient;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\Tests\Functional\TracingTestCaseTrait;
+use Nyholm\Psr7\Factory\Psr17Factory;
 use OpenTelemetry\SDK\Trace\StatusData;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\HttpClient\Exception\ServerException;
@@ -31,6 +32,7 @@ final class HttpClientTracingTest extends KernelTestCase
                 'response_headers' => ['Content-Type' => 'application/json'],
             ])),
             self::getContainer()->get('open_telemetry.traces.tracers.main'),
+            new Psr17Factory(),
         );
 
         $response = $client->request('GET', 'http://localhost/ok');
@@ -68,6 +70,7 @@ final class HttpClientTracingTest extends KernelTestCase
                 'response_headers' => ['Content-Type' => 'application/json'],
             ])),
             self::getContainer()->get('open_telemetry.traces.tracers.main'),
+            new Psr17Factory(),
         );
 
         $response = $client->request('GET', 'http://localhost/failure');
@@ -105,6 +108,7 @@ final class HttpClientTracingTest extends KernelTestCase
                 yield new TransportException('Error at transport level');
             })())),
             self::getContainer()->get('open_telemetry.traces.tracers.main'),
+            new Psr17Factory(),
         );
 
         $response = $client->request('GET', 'http://localhost');
@@ -148,6 +152,7 @@ final class HttpClientTracingTest extends KernelTestCase
                 'response_headers' => ['Content-Type' => 'application/json'],
             ])),
             self::getContainer()->get('open_telemetry.traces.tracers.main'),
+            new Psr17Factory(),
         );
 
         $response = $client->request('GET', 'http://localhost/stream');

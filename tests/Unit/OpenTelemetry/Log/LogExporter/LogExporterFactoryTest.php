@@ -28,16 +28,19 @@ use OpenTelemetry\SDK\Logs\LogRecordExporterInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpClient\Psr18Client;
 
 #[CoversClass(LogExporterFactory::class)]
 class LogExporterFactoryTest extends TestCase
 {
     private function getTransportFactory(): TransportFactory
     {
+        $psr18Client = new Psr18Client();
+
         return new TransportFactory([
             new GrpcTransportFactory(),
-            new OtlpHttpTransportFactory(),
-            new PsrHttpTransportFactory(),
+            new OtlpHttpTransportFactory($psr18Client, $psr18Client, $psr18Client),
+            new PsrHttpTransportFactory($psr18Client, $psr18Client, $psr18Client),
             new StreamTransportFactory(),
         ]);
     }

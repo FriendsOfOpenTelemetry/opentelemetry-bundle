@@ -101,17 +101,26 @@ class OpenTelemetryExtensionTest extends AbstractExtensionTestCase
         self::assertEquals([new Reference('logger', ContainerInterface::IGNORE_ON_INVALID_REFERENCE)], $abstractTransport->getArguments());
         self::assertSame([['channel' => 'open_telemetry']], $abstractTransport->getTag('monolog.logger'));
 
-        $transportFactories = [
+        $parentTransportFactories = [
             'grpc' => GrpcTransportFactory::class,
-            'otlp_http' => OtlpHttpTransportFactory::class,
-            'psr_http' => PsrHttpTransportFactory::class,
             'stream' => StreamTransportFactory::class,
         ];
 
-        foreach ($transportFactories as $name => $class) {
+        foreach ($parentTransportFactories as $name => $class) {
             $transportId = sprintf('open_telemetry.transport_factory.%s', $name);
             self::assertContainerBuilderHasService($transportId, $class);
             self::assertContainerBuilderHasServiceDefinitionWithParent($transportId, 'open_telemetry.transport_factory.abstract');
+            self::assertContainerBuilderHasServiceDefinitionWithTag($transportId, 'open_telemetry.transport_factory');
+        }
+
+        $psrTransportFactories = [
+            'otlp_http' => OtlpHttpTransportFactory::class,
+            'psr_http' => PsrHttpTransportFactory::class,
+        ];
+
+        foreach ($psrTransportFactories as $name => $class) {
+            $transportId = sprintf('open_telemetry.transport_factory.%s', $name);
+            self::assertContainerBuilderHasService($transportId, $class);
             self::assertContainerBuilderHasServiceDefinitionWithTag($transportId, 'open_telemetry.transport_factory');
         }
 
