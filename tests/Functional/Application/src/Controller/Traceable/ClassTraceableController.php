@@ -6,7 +6,7 @@ use FriendsOfOpenTelemetry\OpenTelemetryBundle\Instrumentation\Attribute\Traceab
 use OpenTelemetry\API\Trace\StatusCode;
 use OpenTelemetry\API\Trace\TracerInterface;
 use OpenTelemetry\Context\Context;
-use OpenTelemetry\SemConv\TraceAttributes;
+use OpenTelemetry\SemConv\Attributes\CodeAttributes;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
@@ -31,7 +31,7 @@ class ClassTraceableController extends AbstractTraceableController
         $spanBuilder = $this->tracer
             ->spanBuilder('Manual')
             ->setAttributes([
-                TraceAttributes::CODE_FUNCTION_NAME => self::class.'::manual',
+                CodeAttributes::CODE_FUNCTION_NAME => self::class.'::manual',
             ]);
 
         $parent = Context::getCurrent();

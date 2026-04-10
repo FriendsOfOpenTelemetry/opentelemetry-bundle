@@ -6,7 +6,8 @@ use GuzzleHttp\Psr7\Uri;
 use OpenTelemetry\API\Trace\SpanKind;
 use OpenTelemetry\API\Trace\TracerInterface;
 use OpenTelemetry\Context\Context;
-use OpenTelemetry\SemConv\TraceAttributes;
+use OpenTelemetry\SemConv\Attributes\HttpAttributes;
+use OpenTelemetry\SemConv\Attributes\UrlAttributes;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpClient\Response\ResponseStream;
@@ -42,12 +43,12 @@ final class TraceableHttpClient implements HttpClientInterface, LoggerAwareInter
             ->spanBuilder('http.client')
             ->setSpanKind(SpanKind::KIND_CLIENT)
             ->setParent($scope?->context())
-            ->setAttribute(TraceAttributes::URL_FULL, $url)
-            ->setAttribute(TraceAttributes::URL_SCHEME, $uri->getScheme())
-            ->setAttribute(TraceAttributes::URL_PATH, $uri->getPath())
-            ->setAttribute(TraceAttributes::URL_QUERY, $uri->getQuery())
-            ->setAttribute(TraceAttributes::URL_FRAGMENT, $uri->getFragment())
-            ->setAttribute(TraceAttributes::HTTP_REQUEST_METHOD, $method)
+            ->setAttribute(UrlAttributes::URL_FULL, $url)
+            ->setAttribute(UrlAttributes::URL_SCHEME, $uri->getScheme())
+            ->setAttribute(UrlAttributes::URL_PATH, $uri->getPath())
+            ->setAttribute(UrlAttributes::URL_QUERY, $uri->getQuery())
+            ->setAttribute(UrlAttributes::URL_FRAGMENT, $uri->getFragment())
+            ->setAttribute(HttpAttributes::HTTP_REQUEST_METHOD, $method)
         ;
 
         $span = $spanBuilder->startSpan();

@@ -19,3 +19,4 @@ var
 docs/node_modules
 docs/src/.vuepress/dist
 docs/src/reference.yaml
+/tests/Functional/Application/config/reference.php
