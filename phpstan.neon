@@ -13,6 +13,7 @@ parameters:
 	reportUnmatchedIgnoredErrors: true
 	excludePaths:
 		- tests/*/var/*
+		- tests/Functional/Application/config/reference.php
 
 		# Doctrine ^3.8
 		- src/Instrumentation/Doctrine/Middleware/TraceableConnectionV3.php

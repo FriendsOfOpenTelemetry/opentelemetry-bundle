@@ -58,9 +58,9 @@ class TraceableRouteLoader implements LoaderInterface
         try {
             $controller = $route->getDefault('_controller');
             if (is_array($controller) && 2 === count($controller)) {
-                $reflection = new \ReflectionMethod(sprintf('%s::%s', $controller[0], $controller[1]));
+                $reflection = self::createReflectionMethod(sprintf('%s::%s', $controller[0], $controller[1]));
             } elseif (true === str_contains($controller, '::')) {
-                $reflection = new \ReflectionMethod($controller);
+                $reflection = self::createReflectionMethod($controller);
             } else {
                 $reflection = new \ReflectionClass($controller);
             }
@@ -81,5 +81,14 @@ class TraceableRouteLoader implements LoaderInterface
                 self::TRACER_KEY => $traceable->tracer ?? null,
             ]);
         }
+    }
+
+    private static function createReflectionMethod(string $method): \ReflectionMethod
+    {
+        if (\PHP_VERSION_ID >= 80400) {
+            return \ReflectionMethod::createFromMethodName($method);
+        }
+
+        return new \ReflectionMethod($method);
     }
 }
