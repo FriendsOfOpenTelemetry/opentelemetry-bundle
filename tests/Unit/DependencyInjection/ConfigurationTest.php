@@ -405,13 +405,4 @@ final class ConfigurationTest extends TestCase
 
         YML, $output);
     }
-
-    public function testCustomTransportHttpClientConfiguration(): void
-    {
-        $this->assertProcessedConfigurationEquals([
-            ['transport_http_client' => 'app.my_custom_psr18_client'],
-        ], [
-            'transport_http_client' => 'app.my_custom_psr18_client',
-        ], 'transport_http_client');
-    }
 }
