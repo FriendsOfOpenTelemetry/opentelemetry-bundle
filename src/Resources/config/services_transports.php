@@ -28,11 +28,19 @@ return static function (ContainerConfigurator $container): void {
             ->tag('open_telemetry.transport_factory')
 
         ->set('open_telemetry.transport_factory.otlp_http', OtlpHttpTransportFactory::class)
-            ->parent('open_telemetry.transport_factory.abstract')
+            ->args([
+                service('open_telemetry.transport_http_client'),
+                service('open_telemetry.transport_http_client'),
+                service('open_telemetry.transport_http_client'),
+            ])
             ->tag('open_telemetry.transport_factory')
 
         ->set('open_telemetry.transport_factory.psr_http', PsrHttpTransportFactory::class)
-            ->parent('open_telemetry.transport_factory.abstract')
+            ->args([
+                service('open_telemetry.transport_http_client'),
+                service('open_telemetry.transport_http_client'),
+                service('open_telemetry.transport_http_client'),
+            ])
             ->tag('open_telemetry.transport_factory')
 
         ->set('open_telemetry.transport_factory.stream', StreamTransportFactory::class)

@@ -100,6 +100,38 @@ class OpenTelemetryExtensionTest extends AbstractExtensionTestCase
         self::assertSame([OtlpExporterOptions::class, 'fromConfiguration'], $otlpExporterOptions->getFactory());
     }
 
+    public function testDefaultTransportHttpClient(): void
+    {
+        $this->load();
+
+        self::assertContainerBuilderHasService('open_telemetry.transport_http_client.psr18');
+        self::assertContainerBuilderHasAlias('open_telemetry.transport_http_client', 'open_telemetry.transport_http_client.psr18');
+
+        $transportHttpClientRef = new Reference('open_telemetry.transport_http_client');
+        self::assertContainerBuilderHasServiceDefinitionWithArgument('open_telemetry.transport_factory.otlp_http', 0, $transportHttpClientRef);
+        self::assertContainerBuilderHasServiceDefinitionWithArgument('open_telemetry.transport_factory.otlp_http', 1, $transportHttpClientRef);
+        self::assertContainerBuilderHasServiceDefinitionWithArgument('open_telemetry.transport_factory.otlp_http', 2, $transportHttpClientRef);
+        self::assertContainerBuilderHasServiceDefinitionWithArgument('open_telemetry.transport_factory.psr_http', 0, $transportHttpClientRef);
+        self::assertContainerBuilderHasServiceDefinitionWithArgument('open_telemetry.transport_factory.psr_http', 1, $transportHttpClientRef);
+        self::assertContainerBuilderHasServiceDefinitionWithArgument('open_telemetry.transport_factory.psr_http', 2, $transportHttpClientRef);
+    }
+
+    public function testCustomTransportHttpClient(): void
+    {
+        $this->load(['transport_http_client' => 'app.my_custom_psr18_client']);
+
+        self::assertFalse($this->container->has('open_telemetry.transport_http_client.psr18'));
+        self::assertContainerBuilderHasAlias('open_telemetry.transport_http_client', 'app.my_custom_psr18_client');
+
+        $transportHttpClientRef = new Reference('open_telemetry.transport_http_client');
+        self::assertContainerBuilderHasServiceDefinitionWithArgument('open_telemetry.transport_factory.otlp_http', 0, $transportHttpClientRef);
+        self::assertContainerBuilderHasServiceDefinitionWithArgument('open_telemetry.transport_factory.otlp_http', 1, $transportHttpClientRef);
+        self::assertContainerBuilderHasServiceDefinitionWithArgument('open_telemetry.transport_factory.otlp_http', 2, $transportHttpClientRef);
+        self::assertContainerBuilderHasServiceDefinitionWithArgument('open_telemetry.transport_factory.psr_http', 0, $transportHttpClientRef);
+        self::assertContainerBuilderHasServiceDefinitionWithArgument('open_telemetry.transport_factory.psr_http', 1, $transportHttpClientRef);
+        self::assertContainerBuilderHasServiceDefinitionWithArgument('open_telemetry.transport_factory.psr_http', 2, $transportHttpClientRef);
+    }
+
     public function testTransports(): void
     {
         $this->load();
@@ -110,17 +142,26 @@ class OpenTelemetryExtensionTest extends AbstractExtensionTestCase
         self::assertEquals([new Reference('logger', ContainerInterface::IGNORE_ON_INVALID_REFERENCE)], $abstractTransport->getArguments());
         self::assertSame([['channel' => 'open_telemetry']], $abstractTransport->getTag('monolog.logger'));
 
-        $transportFactories = [
+        $parentTransportFactories = [
             'grpc' => GrpcTransportFactory::class,
-            'otlp_http' => OtlpHttpTransportFactory::class,
-            'psr_http' => PsrHttpTransportFactory::class,
             'stream' => StreamTransportFactory::class,
         ];
 
-        foreach ($transportFactories as $name => $class) {
+        foreach ($parentTransportFactories as $name => $class) {
             $transportId = sprintf('open_telemetry.transport_factory.%s', $name);
             self::assertContainerBuilderHasService($transportId, $class);
             self::assertContainerBuilderHasServiceDefinitionWithParent($transportId, 'open_telemetry.transport_factory.abstract');
+            self::assertContainerBuilderHasServiceDefinitionWithTag($transportId, 'open_telemetry.transport_factory');
+        }
+
+        $psrTransportFactories = [
+            'otlp_http' => OtlpHttpTransportFactory::class,
+            'psr_http' => PsrHttpTransportFactory::class,
+        ];
+
+        foreach ($psrTransportFactories as $name => $class) {
+            $transportId = sprintf('open_telemetry.transport_factory.%s', $name);
+            self::assertContainerBuilderHasService($transportId, $class);
             self::assertContainerBuilderHasServiceDefinitionWithTag($transportId, 'open_telemetry.transport_factory');
         }
 

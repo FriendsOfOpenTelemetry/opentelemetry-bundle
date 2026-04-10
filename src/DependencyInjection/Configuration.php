@@ -29,6 +29,15 @@ final class Configuration implements ConfigurationInterface
 
         $rootNode = $treeBuilder->getRootNode();
 
+        $rootNode
+            ->children()
+                ->scalarNode('transport_http_client')
+                    ->info('Service ID used for telemetry export transports. Must implement PSR-18 ClientInterface and PSR-17 RequestFactoryInterface, StreamFactoryInterface. Defaults to Symfony Psr18Client.')
+                    ->defaultNull()
+                ->end()
+            ->end()
+        ;
+
         $this->addServiceSection($rootNode);
         $this->addInstrumentationSection($rootNode);
         $this->addTracesSection($rootNode);

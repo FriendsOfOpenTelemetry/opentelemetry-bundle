@@ -14,6 +14,7 @@ use OpenTelemetry\SDK\Metrics\Data\Temporality;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpClient\Psr18Client;
 
 #[CoversClass(OtlpMetricExporterFactory::class)]
 class OtlpMetricExporterFactoryTest extends TestCase
@@ -22,9 +23,10 @@ class OtlpMetricExporterFactoryTest extends TestCase
     public function testCreateExporter(string $dsn, ExporterOptionsInterface $options, ?string $temporality, bool $supports): void
     {
         $dsn = ExporterDsn::fromString($dsn);
+        $psr18Client = new Psr18Client();
         $exporterFactory = new OtlpMetricExporterFactory(new TransportFactory([
             new GrpcTransportFactory(),
-            new OtlpHttpTransportFactory(),
+            new OtlpHttpTransportFactory($psr18Client, $psr18Client, $psr18Client),
         ]));
         self::assertEquals($supports, $exporterFactory->supports($dsn, $options));
         if (false === $supports) {

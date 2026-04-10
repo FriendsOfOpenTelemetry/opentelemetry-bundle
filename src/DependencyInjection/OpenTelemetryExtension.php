@@ -11,6 +11,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 use Symfony\Component\HttpClient\HttpClient;
+use Symfony\Component\HttpClient\Psr18Client;
 use Symfony\Component\HttpKernel\DependencyInjection\ConfigurableExtension;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Messenger\Envelope;
@@ -52,6 +53,7 @@ final class OpenTelemetryExtension extends ConfigurableExtension
         $loader->load('services_tracing_instrumentation.php');
         $loader->load('services_metering_instrumentation.php');
 
+        $this->registerTransportHttpClient($mergedConfig['transport_http_client'], $container);
         $this->registerService($mergedConfig['service'], $container);
         $this->registerInstrumentation($mergedConfig['instrumentation'], $container);
 
@@ -82,6 +84,20 @@ final class OpenTelemetryExtension extends ConfigurableExtension
                 $config['version'],
                 $config['environment'],
             ]);
+    }
+
+    private function registerTransportHttpClient(?string $httpClientServiceId, ContainerBuilder $container): void
+    {
+        if (null !== $httpClientServiceId) {
+            $container->setAlias('open_telemetry.transport_http_client', $httpClientServiceId);
+
+            return;
+        }
+
+        if (class_exists(Psr18Client::class)) {
+            $container->register('open_telemetry.transport_http_client.psr18', Psr18Client::class);
+            $container->setAlias('open_telemetry.transport_http_client', 'open_telemetry.transport_http_client.psr18');
+        }
     }
 
     /**
