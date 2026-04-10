@@ -38,6 +38,13 @@ final class OpenTelemetryExtension extends ConfigurableExtension
     {
         $loader = new PhpFileLoader($container, new FileLocator(dirname(__DIR__).'/Resources/config'));
         $loader->load('services.php');
+
+        $channels = $container->hasParameter('monolog.additional_channels')
+            ? $container->getParameter('monolog.additional_channels')
+            : [];
+        $channels[] = 'open_telemetry';
+        $container->setParameter('monolog.additional_channels', array_unique($channels));
+
         $loader->load('services_transports.php');
         $loader->load('services_logs.php');
         $loader->load('services_metrics.php');

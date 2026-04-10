@@ -65,6 +65,15 @@ class OpenTelemetryExtensionTest extends AbstractExtensionTestCase
         self::assertContainerBuilderHasParameter('monolog.additional_channels', ['open_telemetry']);
     }
 
+    public function testMonologAdditionalChannelsAreMerged(): void
+    {
+        $this->container->setParameter('monolog.additional_channels', ['deprecation']);
+
+        $this->load();
+
+        self::assertContainerBuilderHasParameter('monolog.additional_channels', ['deprecation', 'open_telemetry']);
+    }
+
     public function testDefaultServices(): void
     {
         $this->load();
