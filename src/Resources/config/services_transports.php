@@ -17,7 +17,7 @@ return static function (ContainerConfigurator $container): void {
         ->defaults()
         ->private()
 
-        ->set('open_telemetry.http_client.psr18', Psr18Client::class)
+        ->set('open_telemetry.transport_http_client.psr18', Psr18Client::class)
 
         ->set('open_telemetry.transport_factory.abstract', AbstractTransportFactory::class)
             ->abstract()
@@ -32,17 +32,17 @@ return static function (ContainerConfigurator $container): void {
 
         ->set('open_telemetry.transport_factory.otlp_http', OtlpHttpTransportFactory::class)
             ->args([
-                service('open_telemetry.http_client'),
-                service('open_telemetry.http_client'),
-                service('open_telemetry.http_client'),
+                service('open_telemetry.transport_http_client'),
+                service('open_telemetry.transport_http_client'),
+                service('open_telemetry.transport_http_client'),
             ])
             ->tag('open_telemetry.transport_factory')
 
         ->set('open_telemetry.transport_factory.psr_http', PsrHttpTransportFactory::class)
             ->args([
-                service('open_telemetry.http_client'),
-                service('open_telemetry.http_client'),
-                service('open_telemetry.http_client'),
+                service('open_telemetry.transport_http_client'),
+                service('open_telemetry.transport_http_client'),
+                service('open_telemetry.transport_http_client'),
             ])
             ->tag('open_telemetry.transport_factory')
 

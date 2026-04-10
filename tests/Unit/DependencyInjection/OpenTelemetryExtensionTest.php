@@ -91,18 +91,18 @@ class OpenTelemetryExtensionTest extends AbstractExtensionTestCase
         self::assertSame([OtlpExporterOptions::class, 'fromConfiguration'], $otlpExporterOptions->getFactory());
     }
 
-    public function testDefaultHttpClient(): void
+    public function testDefaultTransportHttpClient(): void
     {
         $this->load();
 
-        self::assertContainerBuilderHasAlias('open_telemetry.http_client', 'open_telemetry.http_client.psr18');
+        self::assertContainerBuilderHasAlias('open_telemetry.transport_http_client', 'open_telemetry.transport_http_client.psr18');
     }
 
-    public function testCustomHttpClient(): void
+    public function testCustomTransportHttpClient(): void
     {
-        $this->load(['http_client' => 'app.my_custom_psr18_client']);
+        $this->load(['transport_http_client' => 'app.my_custom_psr18_client']);
 
-        self::assertContainerBuilderHasAlias('open_telemetry.http_client', 'app.my_custom_psr18_client');
+        self::assertContainerBuilderHasAlias('open_telemetry.transport_http_client', 'app.my_custom_psr18_client');
     }
 
     public function testTransports(): void

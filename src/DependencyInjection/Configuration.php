@@ -31,8 +31,8 @@ final class Configuration implements ConfigurationInterface
 
         $rootNode
             ->children()
-                ->scalarNode('http_client')
-                    ->info('PSR-18 HTTP client service ID. Defaults to the built-in Symfony Psr18Client.')
+                ->scalarNode('transport_http_client')
+                    ->info('PSR-18 HTTP client service ID used for telemetry export transports. Defaults to the built-in Symfony Psr18Client.')
                     ->defaultNull()
                 ->end()
             ->end()
