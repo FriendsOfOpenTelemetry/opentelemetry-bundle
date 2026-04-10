@@ -7,6 +7,7 @@ on:
 concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
   cancel-in-progress: true
+# TODO: Add PHP 8.5 to the matrix once ext-grpc is compatible with it
 jobs:
   php-cs-fixer:
     name: PHP CS Fixer (PHP ${{ matrix.php }})
@@ -18,7 +19,6 @@ jobs:
           - '8.2'
           - '8.3'
           - '8.4'
-          - '8.5'
       fail-fast: false
     steps:
       - name: Checkout
@@ -52,7 +52,6 @@ jobs:
           - '8.2'
           - '8.3'
           - '8.4'
-          - '8.5'
       fail-fast: false
     steps:
       - name: Checkout
@@ -61,7 +60,7 @@ jobs:
         uses: shivammathur/setup-php@fcafdd6392932010c2bd5094439b8e33be2a8a09 # v2.37.0
         with:
           php-version: ${{ matrix.php }}
-          extensions: grpc, mbstring, opentelemetry, pdo, pdo_sqlite
+          extensions: grpc, mbstring, opentelemetry, pdo, pdo_sqlite, xdebug
           coverage: none
       - name: Get composer cache directory
         id: composercache
@@ -99,13 +98,9 @@ jobs:
           - '8.2'
           - '8.3'
           - '8.4'
-          - '8.5'
         dependencies:
           - 'highest'
         include:
-          - php: '8.5'
-            dependencies: 'highest'
-            coverage: true
           - php: '8.4'
             dependencies: 'highest'
             coverage: true
