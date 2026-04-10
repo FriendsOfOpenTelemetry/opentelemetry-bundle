@@ -9,18 +9,12 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-      - name: Install Nix
-        uses: DeterminateSystems/nix-installer-action@ef8a148080ab6020fd15196c2084a2eea5ff2d25 # v22
-      - name: Setup Cachix
-        uses: cachix/cachix-action@1eb2ef646ac0255473d23a5907ad7b04ce94065c # v17
+      - name: Setup PHP
+        uses: shivammathur/setup-php@fcafdd6392932010c2bd5094439b8e33be2a8a09 # v2.37.0
         with:
-          name: opentelemetry
-          extraPullNames: nix-shell, php-src-nix
-          authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
-      - name: Setup Nix magic cache
-        uses: DeterminateSystems/magic-nix-cache-action@565684385bcd71bad329742eefe8d12f2e765b39 # v13
-      - name: Instantiate Nix develop
-        uses: nicknovitski/nix-develop@9be7cfb4b10451d3390a75dc18ad0465bed4932a # v1.2.1
+          php-version: '8.4'
+          extensions: grpc, mbstring, opentelemetry, pdo, pdo_sqlite
+          coverage: xdebug
       - name: Get composer cache directory
         id: composercache
         run: echo "dir=$(composer config cache-files-dir)" >> "$GITHUB_OUTPUT"
