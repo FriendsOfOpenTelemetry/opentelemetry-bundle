@@ -128,9 +128,13 @@
     },
     "scripts": {
         "check-reqs": "@php tools/composer-require-checker/vendor/bin/composer-require-checker check",
-        "coverage": [
+        "coverage:html": [
             "@putenv XDEBUG_MODE=coverage",
-            "@phpunit --coverage-html=coverage"
+            "@phpunit --coverage-html=coverage/html"
+        ],
+        "coverage:xml": [
+            "@putenv XDEBUG_MODE=coverage",
+            "@phpunit --coverage-clover=coverage/coverage.xml"
         ],
         "format": [
             "@php-cs-fixer:fix",
