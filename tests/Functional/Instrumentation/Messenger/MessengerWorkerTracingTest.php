@@ -15,6 +15,7 @@ use Symfony\Component\Messenger\Event\WorkerMessageHandledEvent;
 use Symfony\Component\Messenger\Event\WorkerMessageReceivedEvent;
 use Symfony\Component\Messenger\Exception\HandlerFailedException;
 use Symfony\Component\Messenger\Stamp\BusNameStamp;
+use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Zalas\PHPUnit\Globals\Attribute\Env;
 
@@ -90,6 +91,7 @@ class MessengerWorkerTracingTest extends KernelTestCase
             'messaging.operation.type' => 'process',
             'messaging.destination.name' => 'main',
             'symfony.messenger.bus.name' => 'messenger.bus.default',
+            'symfony.messenger.will_retry' => false,
         ]);
         self::assertSpanEventsCount($span, 1);
 
@@ -152,6 +154,47 @@ class MessengerWorkerTracingTest extends KernelTestCase
         self::assertSpanEventAttributesSubSet($event2, [
             'exception.type' => 'LogicException',
             'exception.message' => 'Handler B failed',
+        ]);
+    }
+
+    public function testWorkerMessageFailedWillRetry(): void
+    {
+        $envelope = new Envelope(new DummyMessage('test'), [new BusNameStamp('messenger.bus.default')]);
+        $exception = new \RuntimeException('Transient failure');
+
+        $this->eventDispatcher->dispatch(new WorkerMessageReceivedEvent($envelope, 'main'));
+
+        $failedEvent = new WorkerMessageFailedEvent($envelope, 'main', $exception);
+        $failedEvent->setForRetry();
+        $this->eventDispatcher->dispatch($failedEvent);
+
+        self::assertSpansCount(1);
+
+        $span = self::getSpans()[0];
+        self::assertSpanStatus($span, new StatusData(StatusCode::STATUS_ERROR, 'Transient failure'));
+        self::assertSpanAttributesSubSet($span, [
+            'symfony.messenger.will_retry' => true,
+        ]);
+    }
+
+    public function testWorkerMessageFailedWithRedeliveryStamp(): void
+    {
+        $envelope = new Envelope(new DummyMessage('test'), [
+            new BusNameStamp('messenger.bus.default'),
+            new RedeliveryStamp(3),
+        ]);
+        $exception = new \RuntimeException('Retry exhausted');
+
+        $this->eventDispatcher->dispatch(new WorkerMessageReceivedEvent($envelope, 'main'));
+        $this->eventDispatcher->dispatch(new WorkerMessageFailedEvent($envelope, 'main', $exception));
+
+        self::assertSpansCount(1);
+
+        $span = self::getSpans()[0];
+        self::assertSpanStatus($span, new StatusData(StatusCode::STATUS_ERROR, 'Retry exhausted'));
+        self::assertSpanAttributesSubSet($span, [
+            'symfony.messenger.will_retry' => false,
+            'symfony.messenger.retry_count' => 3,
         ]);
     }
 

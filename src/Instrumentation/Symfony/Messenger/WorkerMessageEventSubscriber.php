@@ -2,30 +2,36 @@
 
 namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\Instrumentation\Symfony\Messenger;
 
+use FriendsOfOpenTelemetry\OpenTelemetryBundle\Instrumentation\Attribute\Traceable;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\Instrumentation\InstrumentationTypeEnum;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\Instrumentation\InstrumentationTypeInterface;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Context\Propagator\TraceStampPropagator;
 use OpenTelemetry\API\Trace\Span;
 use OpenTelemetry\API\Trace\SpanKind;
 use OpenTelemetry\API\Trace\StatusCode;
-use Symfony\Component\Messenger\Exception\WrappedExceptionsInterface;
 use OpenTelemetry\API\Trace\TracerInterface;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\Propagation\MultiTextMapPropagator;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Messenger\Event\WorkerMessageFailedEvent;
 use Symfony\Component\Messenger\Event\WorkerMessageHandledEvent;
 use Symfony\Component\Messenger\Event\WorkerMessageReceivedEvent;
+use Symfony\Component\Messenger\Exception\WrappedExceptionsInterface;
 use Symfony\Component\Messenger\Stamp\BusNameStamp;
+use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
+use Symfony\Contracts\Service\ServiceSubscriberInterface;
 
-class WorkerMessageEventSubscriber implements EventSubscriberInterface, InstrumentationTypeInterface
+class WorkerMessageEventSubscriber implements EventSubscriberInterface, ServiceSubscriberInterface, InstrumentationTypeInterface
 {
     private ?InstrumentationTypeEnum $instrumentationType = null;
 
     public function __construct(
         private readonly MultiTextMapPropagator $propagator,
         private readonly TracerInterface $tracer,
+        /** @var ServiceLocator<TracerInterface> */
+        private readonly ServiceLocator $tracerLocator,
         private readonly LoggerInterface $logger,
     ) {
     }
@@ -50,9 +56,16 @@ class WorkerMessageEventSubscriber implements EventSubscriberInterface, Instrume
         ];
     }
 
+    public static function getSubscribedServices(): array
+    {
+        return [];
+    }
+
     public function startSpan(WorkerMessageReceivedEvent $event): void
     {
-        if (InstrumentationTypeEnum::Auto !== $this->instrumentationType) {
+        $message = $event->getEnvelope()->getMessage();
+
+        if (false === $this->isAutoTraceable() && false === $this->isAttributeTraceable($message)) {
             return;
         }
 
@@ -70,9 +83,9 @@ class WorkerMessageEventSubscriber implements EventSubscriberInterface, Instrume
         // ensure propagation from incoming trace
         $context = $this->propagator->extract($event->getEnvelope(), new TraceStampPropagator($this->logger));
 
-        $messageClass = get_class($event->getEnvelope()->getMessage());
+        $messageClass = get_class($message);
 
-        $span = $this->tracer
+        $span = $this->getTracer($message)
             ->spanBuilder(sprintf('%s %s', $event->getReceiverName(), $messageClass))
             ->setParent($context)
             ->setSpanKind(SpanKind::KIND_CONSUMER)
@@ -97,10 +110,6 @@ class WorkerMessageEventSubscriber implements EventSubscriberInterface, Instrume
 
     public function endSpanWithSuccess(WorkerMessageHandledEvent $event): void
     {
-        if (InstrumentationTypeEnum::Auto !== $this->instrumentationType) {
-            return;
-        }
-
         $scope = Context::storage()->scope();
 
         if (null === $scope) {
@@ -117,10 +126,6 @@ class WorkerMessageEventSubscriber implements EventSubscriberInterface, Instrume
 
     public function endSpanOnError(WorkerMessageFailedEvent $event): void
     {
-        if (InstrumentationTypeEnum::Auto !== $this->instrumentationType) {
-            return;
-        }
-
         $scope = Context::storage()->scope();
 
         if (null === $scope) {
@@ -130,6 +135,14 @@ class WorkerMessageEventSubscriber implements EventSubscriberInterface, Instrume
         $scope->detach();
 
         $span = Span::fromContext($scope->context());
+
+        $span->setAttribute('symfony.messenger.will_retry', $event->willRetry());
+
+        $redeliveryStamp = $event->getEnvelope()->last(RedeliveryStamp::class);
+        if (null !== $redeliveryStamp) {
+            $span->setAttribute('symfony.messenger.retry_count', $redeliveryStamp->getRetryCount());
+        }
+
         $exception = $event->getThrowable();
 
         if ($exception instanceof WrappedExceptionsInterface) {
@@ -144,5 +157,35 @@ class WorkerMessageEventSubscriber implements EventSubscriberInterface, Instrume
 
         $this->logger->debug(sprintf('Ending span "%s"', $span->getContext()->getSpanId()));
         $span->end();
+    }
+
+    private function parseAttribute(object $message): ?Traceable
+    {
+        $reflection = new \ReflectionClass($message);
+        $attribute = $reflection->getAttributes(Traceable::class)[0] ?? null;
+
+        return $attribute?->newInstance();
+    }
+
+    private function getTracer(object $message): TracerInterface
+    {
+        $traceable = $this->parseAttribute($message);
+
+        if (null !== $traceable?->tracer) {
+            return $this->tracerLocator->get($traceable->tracer);
+        }
+
+        return $this->tracer;
+    }
+
+    private function isAutoTraceable(): bool
+    {
+        return InstrumentationTypeEnum::Auto === $this->instrumentationType;
+    }
+
+    private function isAttributeTraceable(object $message): bool
+    {
+        return InstrumentationTypeEnum::Attribute === $this->instrumentationType
+            && $this->parseAttribute($message) instanceof Traceable;
     }
 }

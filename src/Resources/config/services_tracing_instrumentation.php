@@ -114,8 +114,9 @@ return static function (ContainerConfigurator $container): void {
         ->set('open_telemetry.instrumentation.messenger.worker', WorkerMessageEventSubscriber::class)
             ->arg('$propagator', service('open_telemetry.propagator_text_map.multi'))
             ->arg('$tracer', service('open_telemetry.traces.default_tracer'))
-            ->tag('monolog.logger', ['channel' => 'open_telemetry'])
             ->tag('kernel.event_subscriber')
+            ->tag('container.service_subscriber')
+            ->tag('monolog.logger', ['channel' => 'open_telemetry'])
 
         // Twig
         ->set('open_telemetry.instrumentation.twig.trace.extension', TraceableTwigExtension::class)

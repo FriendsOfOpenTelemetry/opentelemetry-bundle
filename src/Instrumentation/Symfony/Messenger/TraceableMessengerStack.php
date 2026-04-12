@@ -49,8 +49,8 @@ class TraceableMessengerStack implements StackInterface
             ->spanBuilder('messenger.middleware')
             ->setSpanKind(SpanKind::KIND_INTERNAL)
             ->setParent($scope?->context())
-            ->setAttribute('event.category', $this->eventCategory)
-            ->setAttribute('bus.name', $this->busName)
+            ->setAttribute('symfony.messenger.event.category', $this->eventCategory)
+            ->setAttribute('symfony.messenger.bus.name', $this->busName)
         ;
 
         $parent = Context::getCurrent();
@@ -66,7 +66,7 @@ class TraceableMessengerStack implements StackInterface
         }
         $this->currentEvent .= sprintf(' on "%s"', $this->busName);
 
-        $span->setAttribute('event.current', $this->currentEvent);
+        $span->setAttribute('symfony.messenger.event.current', $this->currentEvent);
 
         $context = $span->storeInContext($parent);
         Context::storage()->attach($context);
