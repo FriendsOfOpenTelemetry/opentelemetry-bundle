@@ -49,7 +49,7 @@ class MessengerWorkerTracingTest extends KernelTestCase
         self::assertSpanAttributesSubSet($span, [
             'messaging.operation.type' => 'process',
             'messaging.destination.name' => 'main',
-            'bus.name' => 'messenger.bus.default',
+            'symfony.messenger.bus.name' => 'messenger.bus.default',
         ]);
         self::assertSpanEventsCount($span, 0);
     }
@@ -89,7 +89,7 @@ class MessengerWorkerTracingTest extends KernelTestCase
         self::assertSpanAttributesSubSet($span, [
             'messaging.operation.type' => 'process',
             'messaging.destination.name' => 'main',
-            'bus.name' => 'messenger.bus.default',
+            'symfony.messenger.bus.name' => 'messenger.bus.default',
         ]);
         self::assertSpanEventsCount($span, 1);
 

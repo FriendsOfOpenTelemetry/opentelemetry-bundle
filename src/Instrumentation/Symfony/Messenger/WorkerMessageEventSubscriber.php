@@ -72,7 +72,7 @@ class WorkerMessageEventSubscriber implements EventSubscriberInterface, Instrume
         $busNameStamp = $event->getEnvelope()->last(BusNameStamp::class);
 
         if (null !== $busNameStamp) {
-            $span->setAttribute('bus.name', $busNameStamp->getBusName());
+            $span->setAttribute('symfony.messenger.bus.name', $busNameStamp->getBusName());
         }
 
         $this->logger->debug(sprintf('Starting span "%s"', $span->getContext()->getSpanId()));
