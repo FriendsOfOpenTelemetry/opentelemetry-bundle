@@ -154,4 +154,27 @@ class MessengerWorkerTracingTest extends KernelTestCase
             'exception.message' => 'Handler B failed',
         ]);
     }
+
+    public function testLingeringScopeIsCleanedOnNextMessage(): void
+    {
+        $envelope1 = new Envelope(new DummyMessage('first'));
+        $envelope2 = new Envelope(new DummyMessage('second'));
+
+        // First message starts a span but is never handled/failed
+        $this->eventDispatcher->dispatch(new WorkerMessageReceivedEvent($envelope1, 'main'));
+
+        // Second message arrives — should clean up the orphaned span
+        $this->eventDispatcher->dispatch(new WorkerMessageReceivedEvent($envelope2, 'main'));
+        $this->eventDispatcher->dispatch(new WorkerMessageHandledEvent($envelope2, 'main'));
+
+        self::assertSpansCount(2);
+
+        $orphanedSpan = self::getSpans()[0];
+        self::assertSpanName($orphanedSpan, 'main App\Message\DummyMessage');
+        self::assertSpanStatus($orphanedSpan, new StatusData(StatusCode::STATUS_ERROR, 'Span was not properly ended'));
+
+        $normalSpan = self::getSpans()[1];
+        self::assertSpanName($normalSpan, 'main App\Message\DummyMessage');
+        self::assertSpanStatus($normalSpan, StatusData::ok());
+    }
 }

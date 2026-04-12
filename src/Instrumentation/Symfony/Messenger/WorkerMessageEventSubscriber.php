@@ -56,6 +56,17 @@ class WorkerMessageEventSubscriber implements EventSubscriberInterface, Instrume
             return;
         }
 
+        // Clean up any lingering scope from a previous message that was not
+        // properly ended (e.g. worker killed, unhandled error in another subscriber).
+        $previousScope = Context::storage()->scope();
+        if (null !== $previousScope) {
+            $previousScope->detach();
+            $orphanedSpan = Span::fromContext($previousScope->context());
+            $orphanedSpan->setStatus(StatusCode::STATUS_ERROR, 'Span was not properly ended');
+            $orphanedSpan->end();
+            $this->logger->warning(sprintf('Cleaned up orphaned span "%s"', $orphanedSpan->getContext()->getSpanId()));
+        }
+
         // ensure propagation from incoming trace
         $context = $this->propagator->extract($event->getEnvelope(), new TraceStampPropagator($this->logger));
 
