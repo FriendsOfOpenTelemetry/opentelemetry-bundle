@@ -8,6 +8,7 @@ use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Context\Propagator\
 use OpenTelemetry\API\Trace\Span;
 use OpenTelemetry\API\Trace\SpanKind;
 use OpenTelemetry\API\Trace\StatusCode;
+use Symfony\Component\Messenger\Exception\WrappedExceptionsInterface;
 use OpenTelemetry\API\Trace\TracerInterface;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\Propagation\MultiTextMapPropagator;
@@ -119,7 +120,15 @@ class WorkerMessageEventSubscriber implements EventSubscriberInterface, Instrume
 
         $span = Span::fromContext($scope->context());
         $exception = $event->getThrowable();
-        $span->recordException($exception);
+
+        if ($exception instanceof WrappedExceptionsInterface) {
+            foreach ($exception->getWrappedExceptions() as $nestedException) {
+                $span->recordException($nestedException);
+            }
+        } else {
+            $span->recordException($exception);
+        }
+
         $span->setStatus(StatusCode::STATUS_ERROR, $exception->getMessage());
 
         $this->logger->debug(sprintf('Ending span "%s"', $span->getContext()->getSpanId()));

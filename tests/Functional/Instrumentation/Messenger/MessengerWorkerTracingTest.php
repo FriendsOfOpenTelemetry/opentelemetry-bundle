@@ -13,6 +13,7 @@ use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Event\WorkerMessageFailedEvent;
 use Symfony\Component\Messenger\Event\WorkerMessageHandledEvent;
 use Symfony\Component\Messenger\Event\WorkerMessageReceivedEvent;
+use Symfony\Component\Messenger\Exception\HandlerFailedException;
 use Symfony\Component\Messenger\Stamp\BusNameStamp;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Zalas\PHPUnit\Globals\Attribute\Env;
@@ -120,6 +121,37 @@ class MessengerWorkerTracingTest extends KernelTestCase
         self::assertSpanEventAttributesSubSet($exceptionEvent, [
             'exception.type' => 'RuntimeException',
             'exception.message' => 'Something went wrong',
+        ]);
+    }
+
+    public function testWorkerMessageFailedWithHandlerFailedException(): void
+    {
+        $envelope = new Envelope(new DummyMessage('test'));
+        $nested1 = new \RuntimeException('Handler A failed');
+        $nested2 = new \LogicException('Handler B failed');
+        $exception = new HandlerFailedException($envelope, [$nested1, $nested2]);
+
+        $this->eventDispatcher->dispatch(new WorkerMessageReceivedEvent($envelope, 'main'));
+        $this->eventDispatcher->dispatch(new WorkerMessageFailedEvent($envelope, 'main', $exception));
+
+        self::assertSpansCount(1);
+
+        $span = self::getSpans()[0];
+        self::assertSpanStatus($span, new StatusData(StatusCode::STATUS_ERROR, $exception->getMessage()));
+        self::assertSpanEventsCount($span, 2);
+
+        $event1 = $span->getEvents()[0];
+        self::assertSpanEventName($event1, 'exception');
+        self::assertSpanEventAttributesSubSet($event1, [
+            'exception.type' => 'RuntimeException',
+            'exception.message' => 'Handler A failed',
+        ]);
+
+        $event2 = $span->getEvents()[1];
+        self::assertSpanEventName($event2, 'exception');
+        self::assertSpanEventAttributesSubSet($event2, [
+            'exception.type' => 'LogicException',
+            'exception.message' => 'Handler B failed',
         ]);
     }
 }
