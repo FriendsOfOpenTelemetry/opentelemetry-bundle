@@ -6,6 +6,7 @@ use App\Kernel;
 use App\Message\DummyMessage;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\Tests\Functional\TracingTestCaseTrait;
 use OpenTelemetry\API\Trace\SpanKind;
+use OpenTelemetry\API\Trace\StatusCode;
 use OpenTelemetry\SDK\Trace\StatusData;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Messenger\Envelope;
@@ -82,12 +83,19 @@ class MessengerWorkerTracingTest extends KernelTestCase
 
         $span = self::getSpans()[0];
         self::assertSpanName($span, 'main App\Message\DummyMessage');
-        self::assertSpanStatus($span, StatusData::error());
+        self::assertSpanStatus($span, new StatusData(StatusCode::STATUS_ERROR, 'Something went wrong'));
         self::assertSame(SpanKind::KIND_CONSUMER, $span->getKind());
         self::assertSpanAttributesSubSet($span, [
             'messaging.operation.type' => 'process',
             'messaging.destination.name' => 'main',
             'bus.name' => 'messenger.bus.default',
+        ]);
+        self::assertSpanEventsCount($span, 1);
+
+        $exceptionEvent = $span->getEvents()[0];
+        self::assertSpanEventName($exceptionEvent, 'exception');
+        self::assertSpanEventAttributesSubSet($exceptionEvent, [
+            'exception.type' => 'RuntimeException',
             'exception.message' => 'Something went wrong',
         ]);
     }
@@ -104,10 +112,14 @@ class MessengerWorkerTracingTest extends KernelTestCase
         self::assertSpansCount(1);
 
         $span = self::getSpans()[0];
-        self::assertSpanStatus($span, StatusData::error());
-        self::assertSpanAttributesSubSet($span, [
+        self::assertSpanStatus($span, new StatusData(StatusCode::STATUS_ERROR, 'Something went wrong'));
+        self::assertSpanEventsCount($span, 1);
+
+        $exceptionEvent = $span->getEvents()[0];
+        self::assertSpanEventName($exceptionEvent, 'exception');
+        self::assertSpanEventAttributesSubSet($exceptionEvent, [
+            'exception.type' => 'RuntimeException',
             'exception.message' => 'Something went wrong',
-            'exception.previous.message' => 'Root cause',
         ]);
     }
 }

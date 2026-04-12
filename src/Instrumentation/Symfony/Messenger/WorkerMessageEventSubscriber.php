@@ -118,13 +118,9 @@ class WorkerMessageEventSubscriber implements EventSubscriberInterface, Instrume
         $scope->detach();
 
         $span = Span::fromContext($scope->context());
-        $span->setStatus(StatusCode::STATUS_ERROR);
-        $span->setAttribute('exception.message', $event->getThrowable()->getMessage());
-        $previous = $event->getThrowable()->getPrevious();
-
-        if (null !== $previous) {
-            $span->setAttribute('exception.previous.message', $previous->getMessage());
-        }
+        $exception = $event->getThrowable();
+        $span->recordException($exception);
+        $span->setStatus(StatusCode::STATUS_ERROR, $exception->getMessage());
 
         $this->logger->debug(sprintf('Ending span "%s"', $span->getContext()->getSpanId()));
         $span->end();
