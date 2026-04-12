@@ -30,13 +30,6 @@ final class TraceableConsoleEventSubscriber implements EventSubscriberInterface,
      */
     private array $excludeCommands = [];
 
-    /**
-     * @var string[]
-     */
-    private array $notSupportedCommands = [
-        'messenger:consume', // designed to run indefinitely
-    ];
-
     public function __construct(
         private readonly TracerInterface $tracer,
         /** @var ServiceLocator<TracerInterface> */
@@ -76,10 +69,6 @@ final class TraceableConsoleEventSubscriber implements EventSubscriberInterface,
         $command = $event->getCommand();
 
         assert($command instanceof Command);
-
-        if ($this->isNotSupported($command)) {
-            return;
-        }
 
         if (false === $this->isAutoTraceable($command) && false === $this->isAttributeTraceable($command)) {
             return;
@@ -184,11 +173,6 @@ final class TraceableConsoleEventSubscriber implements EventSubscriberInterface,
         }
 
         return true;
-    }
-
-    private function isNotSupported(Command $command): bool
-    {
-        return in_array($command->getName(), $this->notSupportedCommands, true);
     }
 
     private function isAttributeTraceable(Command $command): bool
