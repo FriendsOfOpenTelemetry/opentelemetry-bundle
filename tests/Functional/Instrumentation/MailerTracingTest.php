@@ -44,9 +44,9 @@ class MailerTracingTest extends KernelTestCase
         self::assertSpanName($middlewareSpan, 'messenger.middleware');
         self::assertSpanStatus($middlewareSpan, StatusData::ok());
         self::assertSpanAttributes($middlewareSpan, [
-            'event.category' => 'messenger.middleware',
-            'bus.name' => 'default',
-            'event.current' => '"Symfony\Component\Messenger\Middleware\StackMiddleware" on "default"',
+            'symfony.messenger.event.category' => 'messenger.middleware',
+            'symfony.messenger.bus.name' => 'default',
+            'symfony.messenger.event.current' => '"Symfony\Component\Messenger\Middleware\StackMiddleware" on "default"',
         ]);
         self::assertSpanEventsCount($middlewareSpan, 0);
 
@@ -92,9 +92,9 @@ class MailerTracingTest extends KernelTestCase
         self::assertSpanName($middlewareSpan, 'messenger.middleware');
         self::assertSpanStatus($middlewareSpan, StatusData::ok());
         self::assertSpanAttributes($middlewareSpan, [
-            'event.category' => 'messenger.middleware',
-            'bus.name' => 'default',
-            'event.current' => '"Symfony\Component\Messenger\Middleware\HandleMessageMiddleware" on "default"',
+            'symfony.messenger.event.category' => 'messenger.middleware',
+            'symfony.messenger.bus.name' => 'default',
+            'symfony.messenger.event.current' => '"Symfony\Component\Messenger\Middleware\HandleMessageMiddleware" on "default"',
         ]);
         self::assertSpanEventsCount($middlewareSpan, 0);
 
