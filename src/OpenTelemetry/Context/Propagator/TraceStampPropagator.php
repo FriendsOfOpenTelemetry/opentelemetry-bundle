@@ -22,12 +22,23 @@ readonly class TraceStampPropagator implements PropagationSetterInterface, Propa
             throw new \InvalidArgumentException(sprintf('The carrier for trace stamp propagation must be instance of %s', Envelope::class));
         }
 
-        if (TraceContextPropagator::TRACEPARENT !== $key) {
+        if (TraceContextPropagator::TRACEPARENT === $key) {
+            $carrier = $carrier->with(new TraceStamp($value));
+            $this->logger?->debug("Trace stamp added to envelope for propagation with traceparent: $value");
+
             return;
         }
 
-        $carrier = $carrier->with(new TraceStamp($value));
-        $this->logger?->debug("Trace stamp added to envelope for propagation with value: $value");
+        if (TraceContextPropagator::TRACESTATE === $key) {
+            $existing = $carrier->last(TraceStamp::class);
+
+            if (null === $existing) {
+                return;
+            }
+
+            $carrier = $carrier->with(new TraceStamp($existing->getTraceParent(), $value));
+            $this->logger?->debug("Trace stamp updated with tracestate: $value");
+        }
     }
 
     public function keys($carrier): array
@@ -36,7 +47,7 @@ readonly class TraceStampPropagator implements PropagationSetterInterface, Propa
             throw new \InvalidArgumentException(sprintf('The carrier for trace stamp propagation must be instance of %s', Envelope::class));
         }
 
-        return [TraceContextPropagator::TRACEPARENT];
+        return [TraceContextPropagator::TRACEPARENT, TraceContextPropagator::TRACESTATE];
     }
 
     public function get($carrier, string $key): ?string
@@ -45,19 +56,23 @@ readonly class TraceStampPropagator implements PropagationSetterInterface, Propa
             throw new \InvalidArgumentException(sprintf('The carrier for trace stamp propagation must be instance of %s', Envelope::class));
         }
 
-        if (TraceContextPropagator::TRACEPARENT !== $key) {
-            return null;
-        }
-
         $traceStamp = $carrier->last(TraceStamp::class);
 
         if (null === $traceStamp) {
             return null;
         }
 
-        $traceParent = $traceStamp->getTraceParent();
-        $this->logger?->debug("Get trace parent from TraceStamp with value: $traceParent");
+        if (TraceContextPropagator::TRACEPARENT === $key) {
+            $traceParent = $traceStamp->getTraceParent();
+            $this->logger?->debug("Get trace parent from TraceStamp with value: $traceParent");
 
-        return $traceParent;
+            return $traceParent;
+        }
+
+        if (TraceContextPropagator::TRACESTATE === $key) {
+            return $traceStamp->getTraceState();
+        }
+
+        return null;
     }
 }
