@@ -7,26 +7,8 @@ on:
 concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
   cancel-in-progress: true
+# TODO: Add PHP 8.5 to the matrix once ext-grpc is compatible with it
 jobs:
-  flake-check:
-    name: Flake check
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Install Nix
-        uses: DeterminateSystems/nix-installer-action@v16
-      - name: Setup Cachix
-        uses: cachix/cachix-action@v16
-        with:
-          name: opentelemetry
-          extraPullNames: nix-shell, php-src-nix
-          authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
-      - name: Setup Nix magic cache
-        uses: DeterminateSystems/magic-nix-cache-action@v9
-      - name: Run Nix Flake check
-        run: nix flake check
   php-cs-fixer:
     name: PHP CS Fixer (PHP ${{ matrix.php }})
     runs-on: ubuntu-latest
@@ -34,34 +16,28 @@ jobs:
     strategy:
       matrix:
         php:
+          - '8.2'
           - '8.3'
+          - '8.4'
       fail-fast: false
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
-      - name: Install Nix
-        uses: DeterminateSystems/nix-installer-action@v16
-      - name: Setup Cachix
-        uses: cachix/cachix-action@v16
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - name: Setup PHP
+        uses: shivammathur/setup-php@fcafdd6392932010c2bd5094439b8e33be2a8a09 # v2.37.0
         with:
-          name: opentelemetry
-          extraPullNames: nix-shell, php-src-nix
-          authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
-      - name: Setup Nix magic cache
-        uses: DeterminateSystems/magic-nix-cache-action@v9
-      - name: Instantiate Nix develop
-        uses: nicknovitski/nix-develop@v1
+          php-version: ${{ matrix.php }}
+          extensions: mbstring
+          coverage: none
       - name: Get composer cache directory
         id: composercache
         run: echo "dir=$(composer config cache-files-dir)" >> "$GITHUB_OUTPUT"
       - name: Cache dependencies
-        uses: actions/cache@v4
+        uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
         with:
           path: ${{ steps.composercache.outputs.dir }}
           key: ${{ runner.os }}-composer-tools-php-cs-fixer-${{ hashFiles('**/composer.json') }}
           restore-keys: ${{ runner.os }}-composer-tools-php-cs-fixer
-      - name: List PHP installed extensions
-        run: php -m
       - name: Install PHP CS Fixer dependencies
         run: cd tools/php-cs-fixer && composer update --no-interaction --no-progress --ansi
       - name: Run PHP-CS-Fixer fix
@@ -73,40 +49,34 @@ jobs:
     strategy:
       matrix:
         php:
+          - '8.2'
           - '8.3'
+          - '8.4'
       fail-fast: false
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
-      - name: Install Nix
-        uses: DeterminateSystems/nix-installer-action@v16
-      - name: Setup Cachix
-        uses: cachix/cachix-action@v16
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - name: Setup PHP
+        uses: shivammathur/setup-php@fcafdd6392932010c2bd5094439b8e33be2a8a09 # v2.37.0
         with:
-          name: opentelemetry
-          extraPullNames: nix-shell, php-src-nix
-          authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
-      - name: Setup Nix magic cache
-        uses: DeterminateSystems/magic-nix-cache-action@v9
-      - name: Instantiate Nix develop
-        uses: nicknovitski/nix-develop@v1
+          php-version: ${{ matrix.php }}
+          extensions: grpc, mbstring, opentelemetry, pdo, pdo_sqlite
+          coverage: xdebug
       - name: Get composer cache directory
         id: composercache
         run: echo "dir=$(composer config cache-files-dir)" >> "$GITHUB_OUTPUT"
       - name: Cache dependencies
-        uses: actions/cache@v4
+        uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
         with:
           path: ${{ steps.composercache.outputs.dir }}
           key: ${{ runner.os }}-composer-tools-phpstan-${{ hashFiles('**/composer.json') }}
           restore-keys: ${{ runner.os }}-composer-tools-phpstan
-      - name: List PHP installed extensions
-        run: php -m
       - name: Install PHPStan dependencies
         run: |
           composer update --no-interaction --no-progress --ansi
           cd tools/phpstan && composer update --no-interaction --no-progress --ansi
       - name: Cache PHPStan results
-        uses: actions/cache@v4
+        uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
         with:
           path: /tmp/phpstan
           key: phpstan-php${{ matrix.php }}-${{ github.sha }}
@@ -143,24 +113,18 @@ jobs:
       fail-fast: false
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
-      - name: Install Nix
-        uses: DeterminateSystems/nix-installer-action@v16
-      - name: Setup Cachix
-        uses: cachix/cachix-action@v16
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - name: Setup PHP
+        uses: shivammathur/setup-php@fcafdd6392932010c2bd5094439b8e33be2a8a09 # v2.37.0
         with:
-          name: opentelemetry
-          extraPullNames: nix-shell, php-src-nix
-          authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
-      - name: Setup Nix magic cache
-        uses: DeterminateSystems/magic-nix-cache-action@v9
-      - name: Instantiate Nix develop
-        uses: nicknovitski/nix-develop@v1
+          php-version: ${{ matrix.php }}
+          extensions: grpc, mbstring, opentelemetry, pdo, pdo_sqlite
+          coverage: xdebug
       - name: Get composer cache directory
         id: composercache
         run: echo "dir=$(composer config cache-files-dir)" >> "$GITHUB_OUTPUT"
       - name: Cache dependencies
-        uses: actions/cache@v4
+        uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
         with:
           path: ${{ steps.composercache.outputs.dir }}
           key: ${{ runner.os }}-composer-${{ matrix.dependencies }}-${{ hashFiles('**/composer.json') }}
@@ -175,13 +139,13 @@ jobs:
           XDEBUG_MODE: coverage
       - name: Upload test artifacts
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
         with:
           name: phpunit-logs-php${{ matrix.php }}-${{ matrix.dependencies }}
           path: build/logs/phpunit
       - name: Upload coverage results to Codecov
         if: matrix.coverage
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@57e3a136b779b570ffcdbf80b3bdc90e7fab3de2 # v6.0.0
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
         with:

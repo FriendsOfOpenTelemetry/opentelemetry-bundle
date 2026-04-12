@@ -22,6 +22,6 @@ final class InMemoryMetricExporterFactory extends AbstractMetricExporterFactory
     {
         assert($options instanceof MetricExporterOptions);
 
-        return new InMemoryExporter($options->getTemporality()->toData());
+        return new InMemoryExporter(temporality: $options->getTemporality()->toData());
     }
 }

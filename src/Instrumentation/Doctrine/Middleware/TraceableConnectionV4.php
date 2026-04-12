@@ -7,7 +7,7 @@ use Doctrine\DBAL\Driver\Middleware\AbstractConnectionMiddleware;
 use Doctrine\DBAL\Driver\Result;
 use Doctrine\DBAL\Driver\Statement as DriverStatement;
 use OpenTelemetry\API\Trace\SpanInterface;
-use OpenTelemetry\SemConv\TraceAttributes;
+use OpenTelemetry\SemConv\Attributes\DbAttributes;
 use Psr\Log\LoggerInterface;
 
 class TraceableConnectionV4 extends AbstractConnectionMiddleware
@@ -23,7 +23,7 @@ class TraceableConnectionV4 extends AbstractConnectionMiddleware
     public function prepare(string $sql): DriverStatement
     {
         return $this->tracer->traceFunction('doctrine.dbal.statement.prepare', function (SpanInterface $span) use ($sql): DriverStatement {
-            $span->setAttribute(TraceAttributes::DB_QUERY_TEXT, $sql);
+            $span->setAttribute(DbAttributes::DB_QUERY_TEXT, $sql);
 
             return new TraceableStatement(parent::prepare($sql), $this->tracer);
         });
@@ -32,7 +32,7 @@ class TraceableConnectionV4 extends AbstractConnectionMiddleware
     public function query(string $sql): Result
     {
         return $this->tracer->traceFunction('doctrine.dbal.connection.query', function (SpanInterface $span) use ($sql): Result {
-            $span->setAttribute(TraceAttributes::DB_QUERY_TEXT, $sql);
+            $span->setAttribute(DbAttributes::DB_QUERY_TEXT, $sql);
 
             return parent::query($sql);
         });
@@ -41,7 +41,7 @@ class TraceableConnectionV4 extends AbstractConnectionMiddleware
     public function exec(string $sql): int
     {
         return $this->tracer->traceFunction('doctrine.dbal.connection.exec', function (SpanInterface $span) use ($sql): int {
-            $span->setAttribute(TraceAttributes::DB_QUERY_TEXT, $sql);
+            $span->setAttribute(DbAttributes::DB_QUERY_TEXT, $sql);
 
             return parent::exec($sql);
         });

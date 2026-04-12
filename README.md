@@ -5,7 +5,6 @@
 [![Codecov: Coverage][codecov-badge]][codecov-page]
 [![Coveralls: Coverage][coveralls-badge]][coveralls-page]
 [![Project stage: Development][project-stage-badge]][project-stage-page]
-[![Built with Nix][build-with-nix-badge]][build-with-nix-page]
 [![FOSSA Status][fossa-status-badge]][fossa-status-page]
 [![Packagist Version][packagist-version-badge]][packagist-page]
 [![Packagist Downloads][packagist-downloads-badge]][packagist-page]
@@ -100,8 +99,6 @@ All the code in this repository is released under the MIT License, for more info
 [codecov-page]: https://codecov.io/gh/FriendsOfOpenTelemetry/opentelemetry-bundle
 [coveralls-badge]: https://img.shields.io/coverallsCoverage/github/FriendsOfOpenTelemetry/opentelemetry-bundle?logo=coveralls&label=coveralls
 [coveralls-page]: https://coveralls.io/github/FriendsOfOpenTelemetry/opentelemetry-bundle
-[build-with-nix-badge]: https://img.shields.io/badge/Built_With-Nix-5277C3.svg?logo=nixos
-[build-with-nix-page]: https://builtwithnix.org/
 [project-stage-badge]: https://img.shields.io/badge/Project_Stage-Development-yellowgreen.svg
 [project-stage-page]: https://blog.pother.ca/project-stages/
 [fossa-status-badge]: https://app.fossa.com/api/projects/custom%2B42279%2Fgithub.com%2FFriendsOfOpenTelemetry%2Fopentelemetry-bundle.svg?type=shield

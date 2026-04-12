@@ -2,11 +2,12 @@
 
 namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\Instrumentation\Symfony\HttpClient;
 
-use GuzzleHttp\Psr7\Uri;
 use OpenTelemetry\API\Trace\SpanKind;
 use OpenTelemetry\API\Trace\TracerInterface;
 use OpenTelemetry\Context\Context;
-use OpenTelemetry\SemConv\TraceAttributes;
+use OpenTelemetry\SemConv\Attributes\HttpAttributes;
+use OpenTelemetry\SemConv\Attributes\UrlAttributes;
+use Psr\Http\Message\UriFactoryInterface;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpClient\Response\ResponseStream;
@@ -20,6 +21,7 @@ final class TraceableHttpClient implements HttpClientInterface, LoggerAwareInter
     public function __construct(
         private HttpClientInterface $client,
         private readonly TracerInterface $tracer,
+        private readonly UriFactoryInterface $uriFactory,
         private ?LoggerInterface $logger = null,
     ) {
     }
@@ -36,18 +38,18 @@ final class TraceableHttpClient implements HttpClientInterface, LoggerAwareInter
             $this->logger?->debug('No active scope');
         }
 
-        $uri = new Uri($url);
+        $uri = $this->uriFactory->createUri($url);
 
         $spanBuilder = $this->tracer
             ->spanBuilder('http.client')
             ->setSpanKind(SpanKind::KIND_CLIENT)
             ->setParent($scope?->context())
-            ->setAttribute(TraceAttributes::URL_FULL, $url)
-            ->setAttribute(TraceAttributes::URL_SCHEME, $uri->getScheme())
-            ->setAttribute(TraceAttributes::URL_PATH, $uri->getPath())
-            ->setAttribute(TraceAttributes::URL_QUERY, $uri->getQuery())
-            ->setAttribute(TraceAttributes::URL_FRAGMENT, $uri->getFragment())
-            ->setAttribute(TraceAttributes::HTTP_REQUEST_METHOD, $method)
+            ->setAttribute(UrlAttributes::URL_FULL, $url)
+            ->setAttribute(UrlAttributes::URL_SCHEME, $uri->getScheme())
+            ->setAttribute(UrlAttributes::URL_PATH, $uri->getPath())
+            ->setAttribute(UrlAttributes::URL_QUERY, $uri->getQuery())
+            ->setAttribute(UrlAttributes::URL_FRAGMENT, $uri->getFragment())
+            ->setAttribute(HttpAttributes::HTTP_REQUEST_METHOD, $method)
         ;
 
         $span = $spanBuilder->startSpan();

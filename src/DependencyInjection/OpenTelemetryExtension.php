@@ -11,6 +11,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 use Symfony\Component\HttpClient\HttpClient;
+use Symfony\Component\HttpClient\Psr18Client;
 use Symfony\Component\HttpKernel\DependencyInjection\ConfigurableExtension;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Messenger\Envelope;
@@ -38,6 +39,13 @@ final class OpenTelemetryExtension extends ConfigurableExtension
     {
         $loader = new PhpFileLoader($container, new FileLocator(dirname(__DIR__).'/Resources/config'));
         $loader->load('services.php');
+
+        $channels = $container->hasParameter('monolog.additional_channels')
+            ? $container->getParameter('monolog.additional_channels')
+            : [];
+        $channels[] = 'open_telemetry';
+        $container->setParameter('monolog.additional_channels', array_unique($channels));
+
         $loader->load('services_transports.php');
         $loader->load('services_logs.php');
         $loader->load('services_metrics.php');
@@ -45,6 +53,7 @@ final class OpenTelemetryExtension extends ConfigurableExtension
         $loader->load('services_tracing_instrumentation.php');
         $loader->load('services_metering_instrumentation.php');
 
+        $this->registerTransportHttpClient($mergedConfig['transport_http_client'], $container);
         $this->registerService($mergedConfig['service'], $container);
         $this->registerInstrumentation($mergedConfig['instrumentation'], $container);
 
@@ -75,6 +84,20 @@ final class OpenTelemetryExtension extends ConfigurableExtension
                 $config['version'],
                 $config['environment'],
             ]);
+    }
+
+    private function registerTransportHttpClient(?string $httpClientServiceId, ContainerBuilder $container): void
+    {
+        if (null !== $httpClientServiceId) {
+            $container->setAlias('open_telemetry.transport_http_client', $httpClientServiceId);
+
+            return;
+        }
+
+        if (class_exists(Psr18Client::class)) {
+            $container->register('open_telemetry.transport_http_client.psr18', Psr18Client::class);
+            $container->setAlias('open_telemetry.transport_http_client', 'open_telemetry.transport_http_client.psr18');
+        }
     }
 
     /**
@@ -260,6 +283,7 @@ final class OpenTelemetryExtension extends ConfigurableExtension
             $container->removeDefinition('open_telemetry.instrumentation.messenger.trace.transport');
             $container->removeDefinition('open_telemetry.instrumentation.messenger.trace.transport_factory');
             $container->removeDefinition('open_telemetry.instrumentation.messenger.trace.middleware');
+            $container->removeDefinition('open_telemetry.instrumentation.messenger.propagation.middleware');
             $container->removeDefinition('open_telemetry.instrumentation.messenger.worker');
         }
 

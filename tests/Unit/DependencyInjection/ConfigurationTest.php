@@ -43,6 +43,7 @@ final class ConfigurationTest extends TestCase
         $configuration = $this->process([]);
 
         self::assertSame([
+            'transport_http_client' => null,
             'service' => [],
             'instrumentation' => [
                 'cache' => [
@@ -147,6 +148,9 @@ final class ConfigurationTest extends TestCase
 
         self::assertSame(<<<YML
         open_telemetry:
+
+            # Service ID used for telemetry export transports. Must implement PSR-18 ClientInterface and PSR-17 RequestFactoryInterface, StreamFactoryInterface. Defaults to Symfony Psr18Client.
+            transport_http_client: null
             service:
                 namespace:            ~ # Required, Example: MyOrganization
                 name:                 ~ # Required, Example: MyApp
@@ -292,9 +296,7 @@ final class ConfigurationTest extends TestCase
                             headers:
 
                                 # Prototype
-                                -
-                                    name:                 ~ # Required
-                                    value:                ~ # Required
+                                name:                 ~
                             timeout:              0.1
                             retry:                100
                             max:                  3
@@ -331,9 +333,7 @@ final class ConfigurationTest extends TestCase
                             headers:
 
                                 # Prototype
-                                -
-                                    name:                 ~ # Required
-                                    value:                ~ # Required
+                                name:                 ~
                             timeout:              0.1
                             retry:                100
                             max:                  3
@@ -395,9 +395,7 @@ final class ConfigurationTest extends TestCase
                             headers:
 
                                 # Prototype
-                                -
-                                    name:                 ~ # Required
-                                    value:                ~ # Required
+                                name:                 ~
                             timeout:              0.1
                             retry:                100
                             max:                  3

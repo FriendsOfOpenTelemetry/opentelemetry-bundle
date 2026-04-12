@@ -24,6 +24,7 @@ use OpenTelemetry\SDK\Common\Export\TransportInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpClient\Psr18Client;
 
 #[CoversClass(TransportFactory::class)]
 class TransportFactoryTest extends TestCase
@@ -38,10 +39,11 @@ class TransportFactoryTest extends TestCase
         array $supportedEndpoints,
         ?string $expectedTransportClass,
     ): void {
+        $psr18Client = new Psr18Client();
         $factory = new TransportFactory([
             new GrpcTransportFactory(),
-            new OtlpHttpTransportFactory(),
-            new PsrHttpTransportFactory(),
+            new OtlpHttpTransportFactory($psr18Client, $psr18Client, $psr18Client),
+            new PsrHttpTransportFactory($psr18Client, $psr18Client, $psr18Client),
             new StreamTransportFactory(),
         ]);
 

@@ -3,7 +3,7 @@
 namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Exporter;
 
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Transport\TransportEnum;
-use GuzzleHttp\Psr7\HttpFactory;
+use Nyholm\Psr7\Factory\Psr17Factory;
 use OpenTelemetry\API\Signals;
 use OpenTelemetry\Contrib\Otlp\HttpEndpointResolverInterface;
 use OpenTelemetry\Contrib\Otlp\OtlpUtil;
@@ -26,7 +26,7 @@ final class OtlpExporterEndpoint implements ExporterEndpointInterface
 
     public static function fromDsn(ExporterDsn $dsn): self
     {
-        return new self($dsn, new HttpFactory());
+        return new self($dsn, new Psr17Factory());
     }
 
     public function withSignal(string $signal): self

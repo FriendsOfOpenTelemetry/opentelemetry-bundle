@@ -24,6 +24,7 @@ final class ConfigurationFormatTest extends AbstractExtensionConfigurationTestCa
     public function testDefaultCompatibility(): void
     {
         $expectedConfiguration = [
+            'transport_http_client' => null,
             'service' => [
                 'namespace' => 'FriendsOfOpenTelemetry/OpenTelemetry',
                 'name' => 'Test',

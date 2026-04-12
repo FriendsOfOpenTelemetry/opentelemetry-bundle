@@ -29,6 +29,15 @@ final class Configuration implements ConfigurationInterface
 
         $rootNode = $treeBuilder->getRootNode();
 
+        $rootNode
+            ->children()
+                ->scalarNode('transport_http_client')
+                    ->info('Service ID used for telemetry export transports. Must implement PSR-18 ClientInterface and PSR-17 RequestFactoryInterface, StreamFactoryInterface. Defaults to Symfony Psr18Client.')
+                    ->defaultNull()
+                ->end()
+            ->end()
+        ;
+
         $this->addServiceSection($rootNode);
         $this->addInstrumentationSection($rootNode);
         $this->addTracesSection($rootNode);
@@ -587,10 +596,12 @@ final class Configuration implements ConfigurationInterface
                     ->values(array_map(fn (OtlpExporterCompressionEnum $format) => $format->value, OtlpExporterCompressionEnum::cases()))
                 ->end()
                 ->arrayNode('headers')
-                    ->arrayPrototype()
-                        ->children()
-                            ->scalarNode('name')->isRequired()->cannotBeEmpty()->end()
-                            ->scalarNode('value')->isRequired()->cannotBeEmpty()->end()
+                    ->useAttributeAsKey('name')
+                    ->normalizeKeys(false)
+                    ->variablePrototype()
+                        ->beforeNormalization()
+                            ->ifArray()
+                            ->then(static fn ($v) => array_values($v))
                         ->end()
                     ->end()
                 ->end()

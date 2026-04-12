@@ -10,10 +10,10 @@ use FriendsOfOpenTelemetry\OpenTelemetryBundle\Instrumentation\Symfony\HttpKerne
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\Instrumentation\Symfony\Mailer\TraceableMailer;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\Instrumentation\Symfony\Mailer\TraceableMailerTransport;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\Instrumentation\Symfony\Messenger\AddStampForPropagationMiddleware;
-use FriendsOfOpenTelemetry\OpenTelemetryBundle\Instrumentation\Symfony\Messenger\WorkerMessageEventSubscriber;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\Instrumentation\Symfony\Messenger\TraceableMessengerMiddleware;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\Instrumentation\Symfony\Messenger\TraceableMessengerTransport;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\Instrumentation\Symfony\Messenger\TraceableMessengerTransportFactory;
+use FriendsOfOpenTelemetry\OpenTelemetryBundle\Instrumentation\Symfony\Messenger\WorkerMessageEventSubscriber;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\Instrumentation\Twig\TraceableTwigExtension;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 
@@ -51,6 +51,7 @@ return static function (ContainerConfigurator $container): void {
         // HTTP Client
         ->set('open_telemetry.instrumentation.http_client.trace.client', TraceableHttpClient::class)
             ->arg('$tracer', service('open_telemetry.traces.default_tracer'))
+            ->arg('$uriFactory', service('open_telemetry.transport_http_client'))
             ->tag('monolog.logger', ['channel' => 'open_telemetry'])
 
         // HTTP Kernel

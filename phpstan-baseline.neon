@@ -89,3 +89,27 @@ parameters:
 			identifier: method.resultUnused
 			count: 1
 			path: tests/Unit/OpenTelemetry/Trace/TracerProvider/NoopTracerProviderFactoryTest.php
+
+		-
+			message: '#^Method FriendsOfOpenTelemetry\\OpenTelemetryBundle\\OpenTelemetry\\Context\\Propagator\\TraceStampPropagator\:\:set\(\) has parameter \$carrier with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: src/OpenTelemetry/Context/Propagator/TraceStampPropagator.php
+
+		-
+			message: '#^Method FriendsOfOpenTelemetry\\OpenTelemetryBundle\\OpenTelemetry\\Context\\Propagator\\TraceStampPropagator\:\:keys\(\) has parameter \$carrier with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: src/OpenTelemetry/Context/Propagator/TraceStampPropagator.php
+
+		-
+			message: '#^Method FriendsOfOpenTelemetry\\OpenTelemetryBundle\\OpenTelemetry\\Context\\Propagator\\TraceStampPropagator\:\:get\(\) has parameter \$carrier with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: src/OpenTelemetry/Context/Propagator/TraceStampPropagator.php
+
+		-
+			message: '#^Call to an undefined static method ReflectionMethod\:\:createFromMethodName\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 1
+			path: src/Instrumentation/Symfony/Framework/Routing/TraceableRouteLoader.php

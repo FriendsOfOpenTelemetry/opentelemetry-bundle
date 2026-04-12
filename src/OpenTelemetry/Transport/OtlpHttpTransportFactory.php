@@ -6,14 +6,22 @@ use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Exporter\ExporterEn
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Exporter\ExporterOptionsInterface;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Exporter\OtlpExporterCompressionEnum;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Exporter\OtlpExporterFormatEnum;
-use GuzzleHttp\Client;
-use GuzzleHttp\Psr7\HttpFactory;
 use OpenTelemetry\SDK\Common\Export\Http\PsrTransport;
 use OpenTelemetry\SDK\Common\Export\Http\PsrUtils;
 use OpenTelemetry\SDK\Common\Export\TransportInterface;
+use Psr\Http\Client\ClientInterface;
+use Psr\Http\Message\RequestFactoryInterface;
+use Psr\Http\Message\StreamFactoryInterface;
 
 final readonly class OtlpHttpTransportFactory implements TransportFactoryInterface
 {
+    public function __construct(
+        private ClientInterface $client,
+        private RequestFactoryInterface $requestFactory,
+        private StreamFactoryInterface $streamFactory,
+    ) {
+    }
+
     public function supports(#[\SensitiveParameter] ExporterEndpointInterface $endpoint, ExporterOptionsInterface $options): bool
     {
         if (null === $endpoint->getTransport()) {
@@ -34,9 +42,9 @@ final readonly class OtlpHttpTransportFactory implements TransportFactoryInterfa
         $compression = OtlpExporterCompressionEnum::tryFrom($params->compression) ?? OtlpExporterCompressionEnum::None;
 
         return new PsrTransport(
-            new Client(),
-            new HttpFactory(),
-            new HttpFactory(),
+            $this->client,
+            $this->requestFactory,
+            $this->streamFactory,
             (string) $endpoint,
             $format,
             $params->headers,

@@ -13,6 +13,7 @@ use OpenTelemetry\SDK\Common\Export\TransportInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpClient\Psr18Client;
 
 #[CoversClass(ZipkinSpanExporterFactory::class)]
 class ZipkinSpanExporterFactoryTest extends TestCase
@@ -28,8 +29,9 @@ class ZipkinSpanExporterFactoryTest extends TestCase
         bool $supports,
     ): void {
         $dsn = ExporterDsn::fromString($dsn);
+        $psr18Client = new Psr18Client();
         $exporterFactory = new ZipkinSpanExporterFactory(new TransportFactory([
-            new PsrHttpTransportFactory(),
+            new PsrHttpTransportFactory($psr18Client, $psr18Client, $psr18Client),
         ]));
 
         self::assertEquals($supports, $exporterFactory->supports($dsn, $options));

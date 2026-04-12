@@ -15,6 +15,7 @@ use OpenTelemetry\SDK\Common\Export\TransportInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpClient\Psr18Client;
 
 #[CoversClass(OtlpLogExporterFactory::class)]
 class OtlpLogExporterFactoryTest extends TestCase
@@ -30,9 +31,10 @@ class OtlpLogExporterFactoryTest extends TestCase
         bool $supports,
     ): void {
         $dsn = ExporterDsn::fromString($dsn);
+        $psr18Client = new Psr18Client();
         $exporterFactory = new OtlpLogExporterFactory(new TransportFactory([
             new GrpcTransportFactory(),
-            new PsrHttpTransportFactory(),
+            new PsrHttpTransportFactory($psr18Client, $psr18Client, $psr18Client),
         ]));
 
         self::assertEquals($supports, $exporterFactory->supports($dsn, $options));

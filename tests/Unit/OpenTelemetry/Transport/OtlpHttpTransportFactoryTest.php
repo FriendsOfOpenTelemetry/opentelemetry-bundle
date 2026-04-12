@@ -16,6 +16,7 @@ use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Transport\OtlpHttpT
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpClient\Psr18Client;
 
 #[CoversClass(OtlpHttpTransportFactory::class)]
 class OtlpHttpTransportFactoryTest extends TestCase
@@ -26,7 +27,8 @@ class OtlpHttpTransportFactoryTest extends TestCase
         ExporterOptionsInterface $options,
         bool $shouldSupport,
     ): void {
-        $factory = new OtlpHttpTransportFactory();
+        $psr18Client = new Psr18Client();
+        $factory = new OtlpHttpTransportFactory($psr18Client, $psr18Client, $psr18Client);
 
         self::assertSame($shouldSupport, $factory->supports($endpoint, $options));
 

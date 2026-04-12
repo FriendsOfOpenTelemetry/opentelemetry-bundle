@@ -205,10 +205,7 @@ class OpenTelemetryMetricsExtensionTest extends AbstractExtensionTestCase
                 'format' => 'json',
                 'compression' => 'gzip',
                 'headers' => [
-                    [
-                        'name' => 'X-Foo',
-                        'value' => 'Bar',
-                    ],
+                    'X-Foo' => 'Bar',
                 ],
                 'timeout' => 0.4,
                 'retry' => 500,
