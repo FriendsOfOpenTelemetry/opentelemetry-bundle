@@ -10,7 +10,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - name: Setup PHP
-        uses: shivammathur/setup-php@fcafdd6392932010c2bd5094439b8e33be2a8a09 # v2.37.0
+        uses: shivammathur/setup-php@accd6127cb78bee3e8082180cb391013d204ef9f # v2.37.0
         with:
           php-version: '8.4'
           extensions: grpc, mbstring, opentelemetry, pdo, pdo_sqlite
