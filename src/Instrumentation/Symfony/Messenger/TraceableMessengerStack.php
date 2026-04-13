@@ -33,18 +33,6 @@ class TraceableMessengerStack implements StackInterface
             $this->logger?->debug('No active scope');
         }
 
-        /*        if (null !== $scope) {
-                    $span = Span::fromContext($scope->context());
-
-                    if ($span->isRecording()) {
-                        $scope->detach();
-
-                        $span->setStatus(StatusCode::STATUS_OK);
-                        $this->logger?->debug(sprintf('Ending span "%s"', $span->getContext()->getSpanId()));
-                        $span->end();
-                    }
-                }*/
-
         $spanBuilder = $this->tracer
             ->spanBuilder('messenger.middleware')
             ->setSpanKind(SpanKind::KIND_INTERNAL)

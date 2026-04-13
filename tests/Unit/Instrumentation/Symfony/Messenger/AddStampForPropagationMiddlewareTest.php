@@ -4,6 +4,7 @@ namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\Tests\Unit\Instrumentation\
 
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\Instrumentation\Symfony\Messenger\AddStampForPropagationMiddleware;
 use FriendsOfOpenTelemetry\OpenTelemetryBundle\Instrumentation\Symfony\Messenger\TraceStamp;
+use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Context\Propagator\TraceStampPropagator;
 use OpenTelemetry\API\Trace\Propagation\TraceContextPropagator;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\Propagation\MultiTextMapPropagator;
@@ -21,6 +22,7 @@ use Symfony\Component\Messenger\Middleware\StackInterface;
 class AddStampForPropagationMiddlewareTest extends TestCase
 {
     private MultiTextMapPropagator $propagator;
+    private TraceStampPropagator $traceStampPropagator;
 
     protected function setUp(): void
     {
@@ -29,11 +31,12 @@ class AddStampForPropagationMiddlewareTest extends TestCase
         }
 
         $this->propagator = new MultiTextMapPropagator([TraceContextPropagator::getInstance()]);
+        $this->traceStampPropagator = new TraceStampPropagator();
     }
 
     public function testSkipsInjectionWhenTraceStampAlreadyPresent(): void
     {
-        $middleware = new AddStampForPropagationMiddleware($this->propagator);
+        $middleware = new AddStampForPropagationMiddleware($this->propagator, $this->traceStampPropagator);
 
         $originalStamp = new TraceStamp('00-0af7651916cd43dd8448eb211c80319c-b7ad6b7169203331-01');
         $envelope = new Envelope(new \stdClass(), [$originalStamp]);
@@ -50,7 +53,7 @@ class AddStampForPropagationMiddlewareTest extends TestCase
 
     public function testDoesNotInjectWhenNoActiveScope(): void
     {
-        $middleware = new AddStampForPropagationMiddleware($this->propagator);
+        $middleware = new AddStampForPropagationMiddleware($this->propagator, $this->traceStampPropagator);
 
         $envelope = new Envelope(new \stdClass());
 
@@ -71,7 +74,7 @@ class AddStampForPropagationMiddlewareTest extends TestCase
         $scope = $span->activate();
 
         try {
-            $middleware = new AddStampForPropagationMiddleware($this->propagator);
+            $middleware = new AddStampForPropagationMiddleware($this->propagator, $this->traceStampPropagator);
 
             $envelope = new Envelope(new \stdClass());
 

@@ -13,6 +13,12 @@ parameters:
 			path: src/Instrumentation/Doctrine/Middleware/TraceableConnectionV4.php
 
 		-
+			message: '#^Property FriendsOfOpenTelemetry\\OpenTelemetryBundle\\Instrumentation\\Symfony\\Messenger\\AddStampForPropagationMiddleware\:\:\$logger is never read, only written\.$#'
+			identifier: property.onlyWritten
+			count: 1
+			path: src/Instrumentation/Symfony/Messenger/AddStampForPropagationMiddleware.php
+
+		-
 			message: '#^Property FriendsOfOpenTelemetry\\OpenTelemetryBundle\\Instrumentation\\Doctrine\\Middleware\\TraceableStatementV4\:\:\$logger is never read, only written\.$#'
 			identifier: property.onlyWritten
 			count: 1

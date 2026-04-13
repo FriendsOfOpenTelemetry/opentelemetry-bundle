@@ -5,11 +5,9 @@ namespace FriendsOfOpenTelemetry\OpenTelemetryBundle\Instrumentation\Symfony\Mes
 use Symfony\Component\Messenger\Stamp\StampInterface;
 
 /**
- * @doc: https://www.w3.org/TR/trace-context/
- *
- * You can see how the trace parent generated here: https://github.com/open-telemetry/opentelemetry-php/blob/main/src/API/Trace/Propagation/TraceContextPropagator.php
+ * @see https://www.w3.org/TR/trace-context/
  */
-readonly class TraceStamp implements StampInterface
+final readonly class TraceStamp implements StampInterface
 {
     public function __construct(
         private string $traceParent,

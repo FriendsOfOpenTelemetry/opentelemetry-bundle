@@ -11,12 +11,14 @@ use Symfony\Component\Messenger\Middleware\MiddlewareInterface;
 use Symfony\Component\Messenger\Middleware\StackInterface;
 
 /**
- * Be aware the app consuming the message must be able to denormalize the stamp.
+ * Injects the current trace context into the Messenger envelope as a TraceStamp
+ * so that trace propagation is maintained across asynchronous message boundaries.
  */
-readonly class AddStampForPropagationMiddleware implements MiddlewareInterface
+final readonly class AddStampForPropagationMiddleware implements MiddlewareInterface
 {
     public function __construct(
         private MultiTextMapPropagator $propagator,
+        private TraceStampPropagator $traceStampPropagator,
         private ?LoggerInterface $logger = null,
     ) {
     }
@@ -32,7 +34,9 @@ readonly class AddStampForPropagationMiddleware implements MiddlewareInterface
         $scope = Context::storage()->scope();
 
         if (null !== $scope) {
-            $this->propagator->inject($envelope, new TraceStampPropagator($this->logger), Context::getCurrent());
+            // inject() mutates $envelope by reference through the TraceStampPropagator setter,
+            // because Envelope is immutable and with() returns a new instance.
+            $this->propagator->inject($envelope, $this->traceStampPropagator, Context::getCurrent());
         }
 
         return $stack->next()->handle($envelope, $stack);

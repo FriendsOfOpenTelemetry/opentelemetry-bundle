@@ -23,16 +23,22 @@ use Symfony\Component\Messenger\Stamp\BusNameStamp;
 use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
 use Symfony\Contracts\Service\ServiceSubscriberInterface;
 
-class WorkerMessageEventSubscriber implements EventSubscriberInterface, ServiceSubscriberInterface, InstrumentationTypeInterface
+/**
+ * Creates consumer-side spans for messages processed by the Symfony Messenger worker,
+ * with support for both auto and attribute-based instrumentation modes,
+ * trace context propagation from the producer, and retry/failure metadata.
+ */
+final class WorkerMessageEventSubscriber implements EventSubscriberInterface, ServiceSubscriberInterface, InstrumentationTypeInterface
 {
-    private ?InstrumentationTypeEnum $instrumentationType = null;
+    private InstrumentationTypeEnum $instrumentationType = InstrumentationTypeEnum::Auto;
 
     public function __construct(
         private readonly MultiTextMapPropagator $propagator,
         private readonly TracerInterface $tracer,
         /** @var ServiceLocator<TracerInterface> */
         private readonly ServiceLocator $tracerLocator,
-        private readonly LoggerInterface $logger,
+        private readonly TraceStampPropagator $traceStampPropagator,
+        private readonly ?LoggerInterface $logger = null,
     ) {
     }
 
@@ -56,36 +62,43 @@ class WorkerMessageEventSubscriber implements EventSubscriberInterface, ServiceS
         ];
     }
 
+    /**
+     * @return class-string[]
+     */
     public static function getSubscribedServices(): array
     {
-        return [];
+        return [TracerInterface::class];
     }
 
     public function startSpan(WorkerMessageReceivedEvent $event): void
     {
         $message = $event->getEnvelope()->getMessage();
+        $traceable = $this->parseAttribute($message);
 
-        if (false === $this->isAutoTraceable() && false === $this->isAttributeTraceable($message)) {
+        if (!$this->isAutoTraceable() && !$this->isAttributeTraceable($traceable)) {
+            $this->logger?->debug(sprintf('Message "%s" is not traceable, skipping span creation', get_class($message)));
+
             return;
         }
 
         // Clean up any lingering scope from a previous message that was not
-        // properly ended (e.g. worker killed, unhandled error in another subscriber).
+        // properly ended (e.g. an exception in another high-priority subscriber
+        // prevented the handled/failed event from firing).
         $previousScope = Context::storage()->scope();
         if (null !== $previousScope) {
             $previousScope->detach();
             $orphanedSpan = Span::fromContext($previousScope->context());
             $orphanedSpan->setStatus(StatusCode::STATUS_ERROR, 'Span was not properly ended');
             $orphanedSpan->end();
-            $this->logger->warning(sprintf('Cleaned up orphaned span "%s"', $orphanedSpan->getContext()->getSpanId()));
+            $this->logger?->warning(sprintf('Cleaned up orphaned span "%s"', $orphanedSpan->getContext()->getSpanId()));
         }
 
         // ensure propagation from incoming trace
-        $context = $this->propagator->extract($event->getEnvelope(), new TraceStampPropagator($this->logger));
+        $context = $this->propagator->extract($event->getEnvelope(), $this->traceStampPropagator);
 
         $messageClass = get_class($message);
 
-        $span = $this->getTracer($message)
+        $span = $this->getTracer($traceable)
             ->spanBuilder(sprintf('%s %s', $event->getReceiverName(), $messageClass))
             ->setParent($context)
             ->setSpanKind(SpanKind::KIND_CONSUMER)
@@ -99,7 +112,7 @@ class WorkerMessageEventSubscriber implements EventSubscriberInterface, ServiceS
             $span->setAttribute('symfony.messenger.bus.name', $busNameStamp->getBusName());
         }
 
-        $this->logger->debug(sprintf('Starting span "%s"', $span->getContext()->getSpanId()));
+        $this->logger?->debug(sprintf('Starting span "%s"', $span->getContext()->getSpanId()));
 
         Context::storage()
             ->attach(
@@ -113,6 +126,8 @@ class WorkerMessageEventSubscriber implements EventSubscriberInterface, ServiceS
         $scope = Context::storage()->scope();
 
         if (null === $scope) {
+            $this->logger?->debug('No active scope');
+
             return;
         }
 
@@ -120,7 +135,7 @@ class WorkerMessageEventSubscriber implements EventSubscriberInterface, ServiceS
 
         $span = Span::fromContext($scope->context());
         $span->setStatus(StatusCode::STATUS_OK);
-        $this->logger->debug(sprintf('Ending span "%s"', $span->getContext()->getSpanId()));
+        $this->logger?->debug(sprintf('Ending span "%s"', $span->getContext()->getSpanId()));
         $span->end();
     }
 
@@ -129,6 +144,8 @@ class WorkerMessageEventSubscriber implements EventSubscriberInterface, ServiceS
         $scope = Context::storage()->scope();
 
         if (null === $scope) {
+            $this->logger?->debug('No active scope');
+
             return;
         }
 
@@ -155,7 +172,7 @@ class WorkerMessageEventSubscriber implements EventSubscriberInterface, ServiceS
 
         $span->setStatus(StatusCode::STATUS_ERROR, $exception->getMessage());
 
-        $this->logger->debug(sprintf('Ending span "%s"', $span->getContext()->getSpanId()));
+        $this->logger?->debug(sprintf('Ending span "%s"', $span->getContext()->getSpanId()));
         $span->end();
     }
 
@@ -167,11 +184,15 @@ class WorkerMessageEventSubscriber implements EventSubscriberInterface, ServiceS
         return $attribute?->newInstance();
     }
 
-    private function getTracer(object $message): TracerInterface
+    private function getTracer(?Traceable $traceable): TracerInterface
     {
-        $traceable = $this->parseAttribute($message);
-
         if (null !== $traceable?->tracer) {
+            if (!$this->tracerLocator->has($traceable->tracer)) {
+                $this->logger?->warning(sprintf('Tracer "%s" not found in service locator, using default tracer', $traceable->tracer));
+
+                return $this->tracer;
+            }
+
             return $this->tracerLocator->get($traceable->tracer);
         }
 
@@ -183,9 +204,9 @@ class WorkerMessageEventSubscriber implements EventSubscriberInterface, ServiceS
         return InstrumentationTypeEnum::Auto === $this->instrumentationType;
     }
 
-    private function isAttributeTraceable(object $message): bool
+    private function isAttributeTraceable(?Traceable $traceable): bool
     {
         return InstrumentationTypeEnum::Attribute === $this->instrumentationType
-            && $this->parseAttribute($message) instanceof Traceable;
+            && null !== $traceable;
     }
 }

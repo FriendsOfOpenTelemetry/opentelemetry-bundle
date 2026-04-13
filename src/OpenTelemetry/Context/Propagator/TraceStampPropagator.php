@@ -9,7 +9,11 @@ use OpenTelemetry\Context\Propagation\PropagationSetterInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\Envelope;
 
-readonly class TraceStampPropagator implements PropagationSetterInterface, PropagationGetterInterface
+/**
+ * Bridges OpenTelemetry's propagation interfaces with Symfony Messenger envelopes,
+ * reading and writing trace context via TraceStamp instances attached to the envelope.
+ */
+final readonly class TraceStampPropagator implements PropagationSetterInterface, PropagationGetterInterface
 {
     public function __construct(
         private ?LoggerInterface $logger = null,
