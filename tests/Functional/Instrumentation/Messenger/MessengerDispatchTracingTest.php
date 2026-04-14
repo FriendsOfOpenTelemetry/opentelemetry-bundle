@@ -48,7 +48,7 @@ class MessengerDispatchTracingTest extends KernelTestCase
         self::assertSpanEventsCount($middlewareSpan, 0);
     }
 
-    public function testException(): void
+    public function testDispatchOfAsyncExceptionMessage(): void
     {
         $this->bus->dispatch(new ExceptionMessage('test'));
 
