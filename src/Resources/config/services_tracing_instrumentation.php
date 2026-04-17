@@ -97,7 +97,6 @@ return static function (ContainerConfigurator $container): void {
             ->arg('$tracer', service('open_telemetry.traces.default_tracer'))
             ->arg('$transportFactory', service('messenger.transport_factory'))
             ->tag('messenger.transport_factory')
-            ->tag('kernel.reset', ['method' => 'reset'])
             ->tag('monolog.logger', ['channel' => 'open_telemetry'])
         ->alias('messenger.transport.open_telemetry_tracer.factory', 'open_telemetry.instrumentation.messenger.trace.transport_factory')
 
