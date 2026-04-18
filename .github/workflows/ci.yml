@@ -17,14 +17,12 @@ jobs:
       matrix:
         php:
           - '8.2'
-          - '8.3'
-          - '8.4'
       fail-fast: false
     steps:
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - name: Setup PHP
-        uses: shivammathur/setup-php@fcafdd6392932010c2bd5094439b8e33be2a8a09 # v2.37.0
+        uses: shivammathur/setup-php@accd6127cb78bee3e8082180cb391013d204ef9f # v2.37.0
         with:
           php-version: ${{ matrix.php }}
           extensions: mbstring
@@ -33,7 +31,7 @@ jobs:
         id: composercache
         run: echo "dir=$(composer config cache-files-dir)" >> "$GITHUB_OUTPUT"
       - name: Cache dependencies
-        uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
         with:
           path: ${{ steps.composercache.outputs.dir }}
           key: ${{ runner.os }}-composer-tools-php-cs-fixer-${{ hashFiles('**/composer.json') }}
@@ -49,15 +47,13 @@ jobs:
     strategy:
       matrix:
         php:
-          - '8.2'
-          - '8.3'
           - '8.4'
       fail-fast: false
     steps:
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - name: Setup PHP
-        uses: shivammathur/setup-php@fcafdd6392932010c2bd5094439b8e33be2a8a09 # v2.37.0
+        uses: shivammathur/setup-php@accd6127cb78bee3e8082180cb391013d204ef9f # v2.37.0
         with:
           php-version: ${{ matrix.php }}
           extensions: grpc, mbstring, opentelemetry, pdo, pdo_sqlite
@@ -66,7 +62,7 @@ jobs:
         id: composercache
         run: echo "dir=$(composer config cache-files-dir)" >> "$GITHUB_OUTPUT"
       - name: Cache dependencies
-        uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
         with:
           path: ${{ steps.composercache.outputs.dir }}
           key: ${{ runner.os }}-composer-tools-phpstan-${{ hashFiles('**/composer.json') }}
@@ -76,7 +72,7 @@ jobs:
           composer update --no-interaction --no-progress --ansi
           cd tools/phpstan && composer update --no-interaction --no-progress --ansi
       - name: Cache PHPStan results
-        uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
         with:
           path: /tmp/phpstan
           key: phpstan-php${{ matrix.php }}-${{ github.sha }}
@@ -95,8 +91,6 @@ jobs:
     strategy:
       matrix:
         php:
-          - '8.2'
-          - '8.3'
           - '8.4'
         dependencies:
           - 'highest'
@@ -104,18 +98,12 @@ jobs:
           - php: '8.4'
             dependencies: 'highest'
             coverage: true
-          - php: '8.3'
-            dependencies: 'highest'
-            coverage: true
-          - php: '8.2'
-            dependencies: 'highest'
-            coverage: true
       fail-fast: false
     steps:
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - name: Setup PHP
-        uses: shivammathur/setup-php@fcafdd6392932010c2bd5094439b8e33be2a8a09 # v2.37.0
+        uses: shivammathur/setup-php@accd6127cb78bee3e8082180cb391013d204ef9f # v2.37.0
         with:
           php-version: ${{ matrix.php }}
           extensions: grpc, mbstring, opentelemetry, pdo, pdo_sqlite
@@ -124,7 +112,7 @@ jobs:
         id: composercache
         run: echo "dir=$(composer config cache-files-dir)" >> "$GITHUB_OUTPUT"
       - name: Cache dependencies
-        uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
         with:
           path: ${{ steps.composercache.outputs.dir }}
           key: ${{ runner.os }}-composer-${{ matrix.dependencies }}-${{ hashFiles('**/composer.json') }}
@@ -139,7 +127,7 @@ jobs:
           XDEBUG_MODE: coverage
       - name: Upload test artifacts
         if: always()
-        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: phpunit-logs-php${{ matrix.php }}-${{ matrix.dependencies }}
           path: build/logs/phpunit

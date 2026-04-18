@@ -6,9 +6,6 @@ use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Trace\SpanProcessor
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @coversDefaultClass \FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Trace\SpanProcessor\NoopSpanProcessorFactory
- */
 #[CoversClass(NoopSpanProcessorFactory::class)]
 class NoopSpanProcessorFactoryTest extends TestCase
 {

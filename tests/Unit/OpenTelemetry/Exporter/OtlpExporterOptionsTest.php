@@ -12,8 +12,6 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @coversDefaultClass \FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Exporter\OtlpExporterOptions
- *
  * @phpstan-import-type ExporterOptions from ExporterOptionsInterface
  */
 #[CoversClass(OtlpExporterOptions::class)]

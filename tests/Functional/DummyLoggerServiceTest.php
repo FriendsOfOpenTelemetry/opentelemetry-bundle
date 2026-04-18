@@ -9,12 +9,10 @@ use App\Service\DummyLoggerService;
 use Monolog\Level;
 use OpenTelemetry\SDK\Logs\ReadableLogRecord;
 use OpenTelemetry\SDK\Trace\StatusData;
-use PHPUnit\Framework\Attributes\CoversClass;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zalas\PHPUnit\Globals\Attribute\Env;
 
 #[Env('KERNEL_CLASS', Kernel::class)]
-#[CoversClass(DummyLoggerService::class)]
 class DummyLoggerServiceTest extends KernelTestCase
 {
     use LoggingTestCaseTrait;
