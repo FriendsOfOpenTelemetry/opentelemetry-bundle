@@ -6,13 +6,11 @@ use App\Kernel;
 use App\Service\DummyMeterService;
 use OpenTelemetry\SDK\Metrics\Data\HistogramDataPoint;
 use OpenTelemetry\SDK\Metrics\Data\NumberDataPoint;
-use PHPUnit\Framework\Attributes\CoversClass;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\VarDumper\Test\VarDumperTestTrait;
 use Zalas\PHPUnit\Globals\Attribute\Env;
 
 #[Env('KERNEL_CLASS', Kernel::class)]
-#[CoversClass(DummyMeterService::class)]
 final class DummyMeterServiceTest extends KernelTestCase
 {
     use MeterTestCaseTrait;
