@@ -10,9 +10,6 @@ use FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Transport\Transport
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @coversDefaultClass \FriendsOfOpenTelemetry\OpenTelemetryBundle\OpenTelemetry\Trace\SpanProcessor\SimpleSpanProcessorFactory
- */
 #[CoversClass(SimpleSpanProcessorFactory::class)]
 class SimpleSpanProcessorFactoryTest extends TestCase
 {
