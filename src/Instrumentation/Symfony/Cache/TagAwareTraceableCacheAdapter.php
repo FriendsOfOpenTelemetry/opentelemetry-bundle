@@ -25,6 +25,9 @@ class TagAwareTraceableCacheAdapter implements TagAwareAdapterInterface, TagAwar
         $this->logger = $logger;
     }
 
+    /**
+     * @param array<array-key, mixed>|null $metadata
+     */
     public function get(string $key, callable $callback, ?float $beta = null, ?array &$metadata = null): mixed
     {
         return $this->tracer->traceFunction(
