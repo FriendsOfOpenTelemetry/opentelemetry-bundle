@@ -30,11 +30,11 @@ jobs:
         run: |
           composer update --no-interaction --no-progress --ansi
       - name: Run Fossa Scan
-        uses: fossas/fossa-action@ff70fe9fe17cbd2040648f1c45e8ec4e4884dcf3 # v1.9.0
+        uses: fossas/fossa-action@29693cc50323968e039056be419b32989fc5880c # v2.0.0
         with:
           api-key: '384c9e439463ce9d43a4bb7641d6785b'
       - name: Run Fossa Test
-        uses: fossas/fossa-action@ff70fe9fe17cbd2040648f1c45e8ec4e4884dcf3 # v1.9.0
+        uses: fossas/fossa-action@29693cc50323968e039056be419b32989fc5880c # v2.0.0
         with:
           api-key: '384c9e439463ce9d43a4bb7641d6785b'
           run-tests: true
