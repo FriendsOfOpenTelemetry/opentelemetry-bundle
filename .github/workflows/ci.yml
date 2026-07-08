@@ -94,6 +94,7 @@ jobs:
           - '8.4'
         dependencies:
           - 'highest'
+          - 'lowest'
         include:
           - php: '8.4'
             dependencies: 'highest'
